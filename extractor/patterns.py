@@ -21,7 +21,15 @@ C_PATTERNS = {
    # Matches multi-line comments /* ... */
    'multiline_comments': r'/\*[\s\S]*?\*/',
    # Matches C data types
-   'data_types': r'\b(int|char|float|double|void)\b'
+   'data_types': r'\b(int|char|float|double|void)\b',
     # Matches C preprocessor directives
    'preprocessor': r'#(define|ifdef|ifndef|endif)'
    }
+
+# Common patterns for both languages
+COMMON_PATTERNS = {
+    'operators': r'[+\-*/=<>!&|]+',
+    'brackets': r'[(){}\[\]]',
+    'semicolon': r';',
+    'numbers': r'\b\d+\b'
+}
