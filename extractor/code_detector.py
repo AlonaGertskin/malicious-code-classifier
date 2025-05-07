@@ -1,5 +1,5 @@
 from .patterns import PYTHON_PATTERNS, C_PATTERNS, COMMON_PATTERNS
-"""hi"""
+
 class CodeDetector:
     def __init__(self):
         """
