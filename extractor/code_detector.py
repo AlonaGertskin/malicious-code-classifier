@@ -1,7 +1,5 @@
 from .patterns import PYTHON_PATTERNS, C_PATTERNS, COMMON_PATTERNS
-"""
-        Initialize the code detector with patterns for different languages.
-        """ 
+
 class CodeDetector:
     def __init__(self):
         """
