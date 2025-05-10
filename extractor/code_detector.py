@@ -64,7 +64,7 @@ def _identify_language(self, code_block):
             
         score = 0
         for pattern in patterns.values():
-            matches = re.findall(pattern, content)
+            matches = re.findall(pattern, content) #finds matches in patterns
             score += len(matches)
         
         scores[lang] = score
