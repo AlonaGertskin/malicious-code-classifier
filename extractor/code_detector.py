@@ -167,3 +167,32 @@ class CodeDetector:
             'language': fragments[0]['language'],
             'confidence': sum(f['score'] for f in fragments) / len(fragments) # placeholder
         }
+    
+
+"""
+A problem the arised from the C code blocks: ending } are not being recignized as code
+Another issue could be comments like """ """ in python or /* */ in C
+as a solution we might use two passes to fix the structure of the code:
+
+Pass 1 Functions:
+
+scan_for_code_patterns(lines) - returns list of line indices with code patterns
+identify_structural_elements(lines) - finds language-specific delimiters (braces, quotes, backslashes)
+calculate_line_scores(lines) - scores each line for code likelihood
+detect_multiline_starts(lines) - identifies opening patterns (function defs, docstrings, comments)
+
+Pass 2 Functions:
+
+find_block_boundaries(code_lines, structural_elements, language) - determines start/end using language rules
+complete_multiline_constructs(boundaries, lines, language) - extends to find closing elements
+merge_adjacent_regions(boundaries) - combines nearby code sections
+validate_block_integrity(boundaries, lines) - ensures structural completeness
+extract_final_blocks(lines, refined_boundaries) - creates final code block objects
+
+Language-specific completion:
+
+C: match braces {} and /* */
+Python: match quotes and continuation lines \
+
+Main flow: Pass 1 → Pass 2 (language-aware) → return blocks.
+"""
