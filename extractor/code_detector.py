@@ -62,8 +62,11 @@ class CodeDetector:
         #     else:
         #         i += 1
         
-        return self.group_by_language(code_fragments)
-
+        code_blocks =  self.group_by_language(code_fragments)
+        for block in code_blocks:
+            structure_info = self.analyze_structure(block['content'], block['language'], block['start_line'])
+        return code_blocks
+        
     def line_contains_code_patterns(self, line):
         """
         Check if a line contains code patterns
@@ -143,7 +146,16 @@ class CodeDetector:
         return scores
 
     def group_by_language(self, fragments):
-        """Group fragments by language, keeping sequence order"""
+        """
+        Group fragments by language, keeping sequence order
+        Returns :
+            list: List of dictionaries, each representing a language-specific code block:
+                - 'content': List of code lines (strings)
+                - 'start_line': First line number of the block (int)
+                - 'end_line': Last line number of the block (int)  
+                - 'language': Programming language identifier ('python', 'c', etc.)
+                - 'confidence': Average confidence score for the block (float 0.0-1.0)
+        """
         groups = []
         
         # Get languages from patterns (excluding 'common')
@@ -168,6 +180,62 @@ class CodeDetector:
             'confidence': sum(f['score'] for f in fragments) / len(fragments) # placeholder
         }
     
+    def count_braces_in_line(self, line):
+        round_brace_counter = 0
+        square_brace_counter = 0
+        curly_brace_counter = 0
+        round_brace_counter += line.count('(')
+        round_brace_counter -= line.count(')')
+        square_brace_counter += line.count('[')
+        square_brace_counter -= line.count(']')
+        curly_brace_counter += line.count('{')
+        curly_brace_counter -= line.count('}') 
+        return (round_brace_counter, square_brace_counter, curly_brace_counter)
+
+    def handle_comment_delimiters(self, line, line_num, start_delim, end_delim, in_comment, comment_start, multiline_comments):
+        if start_delim in line and not in_comment:
+            comment_start = line_num
+            in_comment = True
+        if end_delim in line and in_comment:
+            multiline_comments.append({'start': comment_start, 'end': line_num})
+            in_comment = False
+        
+        return in_comment, comment_start
+
+    def process_multiline_comments(self, line, line_num, language, in_comment,\
+                                    comment_start, multiline_comments):
+        if language == 'c':
+            in_comment, comment_start = self.handle_comment_delimiters( \
+                line, line_num, '/*', '*/', in_comment, comment_start, multiline_comments)
+        elif language == 'python':
+            in_comment, comment_start = self.handle_comment_delimiters( \
+                line, line_num, '"""', '"""', in_comment, comment_start, multiline_comments)  
+        return in_comment, comment_start
+
+    def analyze_structure(self, content , language, start_line):
+        round_brace_counter = 0
+        square_brace_counter = 0
+        curly_brace_counter = 0
+        multiline_comments = []
+        in_comment = False
+        comment_start = None
+        for i, line in enumerate(content):
+            counters = self.count_braces_in_line(line)
+            round_brace_counter += counters[0]
+            square_brace_counter += counters[1] 
+            curly_brace_counter += counters[2]
+            print(f'\nline:{line}, \nbrace count: round - {round_brace_counter},\nsquare - {square_brace_counter}, \ncurly - {curly_brace_counter}')
+            in_comment, comment_start = self.process_multiline_comments( \
+            line, start_line + i, language, in_comment, comment_start, multiline_comments)
+        braces_sum = round_brace_counter + square_brace_counter + curly_brace_counter
+        if  braces_sum != 0:
+            #fix_braces()
+            pass
+            
+
+
+
+
 
 """
 A problem the arised from the C code blocks: ending } are not being recignized as code
@@ -179,14 +247,14 @@ Pass 1 Functions:
 scan_for_code_patterns(lines) - returns list of line indices with code patterns
 identify_structural_elements(lines) - finds language-specific delimiters (braces, quotes, backslashes)
 calculate_line_scores(lines) - scores each line for code likelihood
-detect_multiline_starts(lines) - identifies opening patterns (function defs, docstrings, comments)
+analyze_structure(lines) - finds language-specific delimiters (braces, quotes, backslashes) and 
+identifies opening patterns (function defs, docstrings, comments)
+
+
 
 Pass 2 Functions:
 
-find_block_boundaries(code_lines, structural_elements, language) - determines start/end using language rules
 complete_multiline_constructs(boundaries, lines, language) - extends to find closing elements
-merge_adjacent_regions(boundaries) - combines nearby code sections
-validate_block_integrity(boundaries, lines) - ensures structural completeness
 extract_final_blocks(lines, refined_boundaries) - creates final code block objects
 
 Language-specific completion:

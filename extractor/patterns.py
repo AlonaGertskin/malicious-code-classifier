@@ -8,6 +8,8 @@ PYTHON_PATTERNS = {
     'indentation': (r'^    \w+.*$', 0.3),
     # Matches single-line comments starting with #
     'comments': (r'#.*$', 0.2),
+    # Matches multi-line comments ''' ... '''
+    'multiline_comments': (r"'''[\s\S]*?'''", 0.4),
     # Matches strings in single or double quotes
     'string_literals': (r'["\'].*["\']', 0.1)
 }
@@ -21,7 +23,7 @@ C_PATTERNS = {
     # Matches single-line comments starting with //
     'comments': (r'//.*$', 0.2),
     # Matches multi-line comments /* ... */
-    'multiline_comments': (r'/\*[\s\S]*?\*/', 0.3),
+    'multiline_comments': (r'/\*[\s\S]*?\*/', 0.4),
     # Matches C data types
     'data_types': (r'\b(int|char|float|double|void)\b', 0.4),
     # Matches C preprocessor directives
