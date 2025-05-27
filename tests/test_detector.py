@@ -3,7 +3,13 @@ from extractor.code_detector import CodeDetector
 import glob
 from datetime import datetime
 
-# run with python -m pytest tests/test_detector.py -v -s
+"""
+run with the command in the terminal: python -m pytest tests/test_detector.py -v -s
+-s adds prints so for more minimal test remove it.
+make sure you are in the correct directory.
+tests every file in the test_samples directory, if you want to remove a file,
+move them to the more_tests directory or delete the file
+"""
 
 def save_results_to_file(results, output_file="detection_results.txt"):
     """Save detection results to a text file"""
@@ -57,7 +63,7 @@ def run_file_test(filename):
     assert len(result) >= 1, f"Expected at least 1 code block, found {len(result)}"
     
     # Print results
-    print(f"File: {filename}")
+    print(f"\nFile: {filename}")
     print(f"Detected {len(result)} code block(s):")
     
     for i, block in enumerate(result):

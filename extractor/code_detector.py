@@ -35,7 +35,6 @@ class CodeDetector:
                 - 'confidence': Detection confidence score (0.0-1.0)
         """
         lines = text.split('\n')
-        # detected_blocks = [] # Stores blocks of code
         code_fragments = []
 
                 # Collect all code-like lines
@@ -50,21 +49,14 @@ class CodeDetector:
                     'language': max(scores, key=scores.get),
                     'score': max_score
                 })
-        # i = 0
-        # while i < len(lines):
-        #     if self.line_contains_code_patterns(lines[i]): # Checks if the text has patterns
-        #         block = self.extract_block(lines, i)
-        #         if block: # If the block isnt empty
-        #             detected_blocks.append(block) # Enters the block into the detected_blocks
-        #             i = block['end_line'] # Goes to the end of the line
-        #         else:
-        #             i += 1
-        #     else:
-        #         i += 1
         
         code_blocks =  self.group_by_language(code_fragments)
         for block in code_blocks:
             structure_info = self.analyze_structure(block['content'], block['language'], block['start_line'])
+            block['structure_info'] = structure_info
+            block = self.expand_blocks_with_comments(block, structure_info, lines)
+
+            
         return code_blocks
         
     def line_contains_code_patterns(self, line):
@@ -129,18 +121,23 @@ class CodeDetector:
         return None
 
     def identify_language_for_line(self, line):
-        """Return language scores for a single line"""
         scores = {}
+        common_score = 0
         
+        # Calculate common pattern score once
+        for pattern, weight in self.patterns['common'].values():
+            if re.search(pattern, line):
+                common_score += weight
+        
+        # Add to each language score
         for lang, patterns in self.patterns.items():
             if lang == 'common':
                 continue
                 
-            score = 0
+            score = common_score  # Start with common score
             for pattern, weight in patterns.values():
                 if re.search(pattern, line):
                     score += weight
-            
             scores[lang] = score
         
         return scores
@@ -196,13 +193,24 @@ class CodeDetector:
         return counters
 
     def handle_comment_delimiters(self, line, line_num, start_delim, end_delim, in_comment, comment_start, multiline_comments):
+        # print(f"  Checking line {line_num}: '{line.strip()}' for {start_delim}/{end_delim}")
+        
+        if start_delim == end_delim:
+            count = line.count(start_delim)
+            if count % 2 == 0:
+                return in_comment, comment_start
+
+        elif start_delim in line and end_delim in line:
+            return in_comment, comment_start
+        
         if start_delim in line and not in_comment:
             comment_start = line_num
             in_comment = True
-        if end_delim in line and in_comment:
+            print(f"    Found comment start at line {line_num}")
+        elif end_delim in line and in_comment:
             multiline_comments.append({'start': comment_start, 'end': line_num})
             in_comment = False
-        
+            print(f"    Found comment end at line {line_num}, added comment block: {comment_start}-{line_num}")
         return in_comment, comment_start
 
     def process_multiline_comments(self, line, line_num, language, in_comment,\
@@ -226,19 +234,37 @@ class CodeDetector:
             in_comment, comment_start = self.process_multiline_comments( \
             line, start_line + i, language, in_comment, comment_start, multiline_comments)
             # Debug output
-
-        
-        """
-        TODO:
-        Use the brace_errors and multiline_comments to check if all lines were correctly appended to
-        the code blocks.
-        """
+        # print(f"\n=== STRUCTURE ANALYSIS for {language} ===")
+        # print(f"Multiline comments: {multiline_comments}")
+        # print(f"Brace errors: {brace_errors}")
+        # print(f"Final counters: {counters}")
+        # print("=" * 40)
+        missing_lines = []
+        for comment in multiline_comments:
+            for line_num in range(comment['start'], comment['end'] + 1):
+                if line_num not in range(start_line, start_line + len(content)):
+                    missing_lines.append(line_num)
         return {
         'multiline_comments': multiline_comments,
-        'brace_errors': brace_errors
+        'brace_errors': brace_errors,
+        'missing_comment_lines': missing_lines
         }
             
-
+    def expand_blocks_with_comments(self, block, structure_info, original_lines):
+        """Expand block boundaries based on structure analysis"""
+        if structure_info['multiline_comments']:
+            all_line_nums = list(range(block['start_line'], block['end_line'] + 1))
+            
+            # Add all lines within comment ranges
+            for comment in structure_info['multiline_comments']:
+                for line_num in range(comment['start'], comment['end'] + 1):
+                    if line_num not in all_line_nums:
+                        all_line_nums.append(line_num)
+            
+            all_line_nums.sort()
+            block['start_line'] = min(all_line_nums)
+            block['end_line'] = max(all_line_nums)
+            block['content'] = original_lines[block['start_line']:block['end_line'] + 1]
 
 
 
