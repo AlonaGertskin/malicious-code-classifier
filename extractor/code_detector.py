@@ -193,7 +193,7 @@ class CodeDetector:
                 for _ in range(abs(count)):
                     if brace_errors[brace_type]:
                         brace_errors[brace_type].pop()
-        return 
+        return counters
 
     def handle_comment_delimiters(self, line, line_num, start_delim, end_delim, in_comment, comment_start, multiline_comments):
         if start_delim in line and not in_comment:
@@ -225,6 +225,8 @@ class CodeDetector:
             counters = self.count_braces_in_line(line, start_line + i, brace_errors, counters)
             in_comment, comment_start = self.process_multiline_comments( \
             line, start_line + i, language, in_comment, comment_start, multiline_comments)
+            # Debug output
+
         
         """
         TODO:
