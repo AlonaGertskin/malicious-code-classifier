@@ -180,17 +180,20 @@ class CodeDetector:
             'confidence': sum(f['score'] for f in fragments) / len(fragments) # placeholder
         }
     
-    def count_braces_in_line(self, line):
-        round_brace_counter = 0
-        square_brace_counter = 0
-        curly_brace_counter = 0
-        round_brace_counter += line.count('(')
-        round_brace_counter -= line.count(')')
-        square_brace_counter += line.count('[')
-        square_brace_counter -= line.count(']')
-        curly_brace_counter += line.count('{')
-        curly_brace_counter -= line.count('}') 
-        return (round_brace_counter, square_brace_counter, curly_brace_counter)
+    def count_braces_in_line(self, line, line_index ,brace_errors, counters):
+        line_counts = [line.count('(') - line.count(')'),
+                    line.count('[') - line.count(']'), 
+                    line.count('{') - line.count('}')]
+        
+        for i, (brace_type, count) in enumerate(zip(['round', 'square', 'curly'], line_counts)):
+            counters[i] += count
+            if counters[i] > 0 and count > 0:  # New opens
+                brace_errors[brace_type].extend([line_index] * count)
+            elif counters[i] >= 0 and count < 0:  # Closes match opens
+                for _ in range(abs(count)):
+                    if brace_errors[brace_type]:
+                        brace_errors[brace_type].pop()
+        return 
 
     def handle_comment_delimiters(self, line, line_num, start_delim, end_delim, in_comment, comment_start, multiline_comments):
         if start_delim in line and not in_comment:
@@ -213,24 +216,25 @@ class CodeDetector:
         return in_comment, comment_start
 
     def analyze_structure(self, content , language, start_line):
-        round_brace_counter = 0
-        square_brace_counter = 0
-        curly_brace_counter = 0
         multiline_comments = []
+        brace_errors = {'round': [], 'square': [], 'curly': []}
+        counters = [0, 0, 0]
         in_comment = False
         comment_start = None
         for i, line in enumerate(content):
-            counters = self.count_braces_in_line(line)
-            round_brace_counter += counters[0]
-            square_brace_counter += counters[1] 
-            curly_brace_counter += counters[2]
-            print(f'\nline:{line}, \nbrace count: round - {round_brace_counter},\nsquare - {square_brace_counter}, \ncurly - {curly_brace_counter}')
+            counters = self.count_braces_in_line(line, start_line + i, brace_errors, counters)
             in_comment, comment_start = self.process_multiline_comments( \
             line, start_line + i, language, in_comment, comment_start, multiline_comments)
-        braces_sum = round_brace_counter + square_brace_counter + curly_brace_counter
-        if  braces_sum != 0:
-            #fix_braces()
-            pass
+        
+        """
+        TODO:
+        Use the brace_errors and multiline_comments to check if all lines were correctly appended to
+        the code blocks.
+        """
+        return {
+        'multiline_comments': multiline_comments,
+        'brace_errors': brace_errors
+        }
             
 
 
