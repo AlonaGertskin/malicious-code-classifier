@@ -56,6 +56,7 @@ class CodeDetector:
             block['structure_info'] = structure_info
             block = self.expand_blocks_with_comments(block, structure_info, lines)
 
+        code_blocks = self.reassign_based_on_structure(code_blocks)
             
         return code_blocks
         
@@ -124,21 +125,34 @@ class CodeDetector:
         scores = {}
         common_score = 0
         
-        # Calculate common pattern score once
-        for pattern, weight in self.patterns['common'].values():
+        # Calculate common pattern score
+        for pattern, weight, penalties in self.patterns['common'].values():
             if re.search(pattern, line):
                 common_score += weight
         
-        # Add to each language score
+        # Initialize scores with common score
+        for lang in self.patterns.keys():
+            if lang != 'common':
+                scores[lang] = common_score
+        
+        # Calculate language-specific scores and apply penalties
         for lang, patterns in self.patterns.items():
             if lang == 'common':
                 continue
                 
-            score = common_score  # Start with common score
-            for pattern, weight in patterns.values():
+            for pattern, pos_weight, penalties in patterns.values():
                 if re.search(pattern, line):
-                    score += weight
-            scores[lang] = score
+                    # Add positive weight to this language
+                    scores[lang] += pos_weight
+                    
+                    # Apply penalties to other languages
+                    for penalty_lang, penalty_weight in penalties.items():
+                        if penalty_lang in scores:
+                            scores[penalty_lang] -= penalty_weight
+        
+        # Don't allow negative scores
+        for lang in scores:
+            scores[lang] = max(0, scores[lang])
         
         return scores
 
@@ -251,23 +265,66 @@ class CodeDetector:
         }
             
     def expand_blocks_with_comments(self, block, structure_info, original_lines):
-        """Expand block boundaries based on structure analysis"""
-        if structure_info['multiline_comments']:
-            all_line_nums = list(range(block['start_line'], block['end_line'] + 1))
+        """Expand block boundaries to include complete multiline comments"""
+        if not structure_info['multiline_comments']:
+            return block
+        
+        # Get current block line numbers
+        current_lines = set(range(block['start_line'], block['end_line'] + 1))
+        
+        # Add all lines that are part of multiline comments
+        for comment in structure_info['multiline_comments']:
+            for line_num in range(comment['start'], comment['end'] + 1):
+                current_lines.add(line_num)
+        
+        # Update block boundaries
+        all_lines = sorted(current_lines)
+        block['start_line'] = all_lines[0]
+        block['end_line'] = all_lines[-1]
+        
+        # Safely update content with bounds checking
+        start_idx = max(0, block['start_line'])
+        end_idx = min(len(original_lines), block['end_line'] + 1)
+        block['content'] = original_lines[start_idx:end_idx]
+        
+        return block
+
+    def reassign_based_on_structure(self, blocks):
+        """Move lines between blocks to fix structural imbalances"""
+        
+        for i, block in enumerate(blocks):
+            structure = block.get('structure_info', {})
+            brace_errors = structure.get('brace_errors', {})
             
-            # Add all lines within comment ranges
-            for comment in structure_info['multiline_comments']:
-                for line_num in range(comment['start'], comment['end'] + 1):
-                    if line_num not in all_line_nums:
-                        all_line_nums.append(line_num)
-            
-            all_line_nums.sort()
-            block['start_line'] = min(all_line_nums)
-            block['end_line'] = max(all_line_nums)
-            block['content'] = original_lines[block['start_line']:block['end_line'] + 1]
-
-
-
+            # Check if C block is missing closing braces
+            if block['language'] == 'c':
+                missing_closes = []
+                for brace_type, open_lines in brace_errors.items():
+                    if open_lines:  # Has unmatched opens
+                        missing_closes.extend(open_lines)
+                
+                if missing_closes:
+                    # Look for Python blocks with extra closing braces
+                    for j, other_block in enumerate(blocks):
+                        if other_block['language'] == 'python' and i != j:
+                            # Check if this Python block starts with closing braces
+                            first_line = other_block['content'][0].strip()
+                            if first_line in ['}', ']', ')']:
+                                # Move this line to the C block
+                                self.move_line_between_blocks(other_block, block, 0)
+                                break
+        return [block for block in blocks if block['content']]
+    
+    def move_line_between_blocks(self, from_block, to_block, line_index):
+        """Move a line from one block to another"""
+        # Remove line from source block
+        moved_line = from_block['content'].pop(line_index)
+        to_block['content'].append(moved_line)
+        
+        # Update boundaries
+        from_block['end_line'] = from_block['start_line'] + len(from_block['content']) - 1
+        to_block['end_line'] = max(to_block['end_line'], to_block['start_line'] + len(to_block['content']) - 1)
+        
 
 """
 A problem the arised from the C code blocks: ending } are not being recignized as code
