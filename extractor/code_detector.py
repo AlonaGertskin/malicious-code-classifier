@@ -2,10 +2,11 @@ import re
 from .patterns import PYTHON_PATTERNS, C_PATTERNS, COMMON_PATTERNS
 
 class CodeDetector:
-    def __init__(self):
+    def __init__(self, debug=False):
         """
         Initialize the code detector with patterns for different languages.
         """
+        self.debug = debug
         self.patterns = {
             'python': PYTHON_PATTERNS,    # Python-specific patterns
             'c': C_PATTERNS,              # C-specific patterns
@@ -41,6 +42,24 @@ class CodeDetector:
         for i, line in enumerate(lines):
             scores = self.identify_language_for_line(line)
             max_score = max(scores.values()) if scores else 0
+
+            # debug printing
+            if self.debug:
+                print(f"Line: '{line[:50]}...'")
+                lang_totals = {}
+                for lang, patterns in self.patterns.items():
+                    lang_total = 0
+                    for name, (pattern, weight, _) in patterns.items():
+                        if re.search(pattern, line):
+                            print(f"  {lang}.{name}: {weight}")
+                            lang_totals[lang] = lang_totals.get(lang, 0) + weight
+                    if lang in lang_totals:
+                        lang_total = lang_totals[lang]
+                
+                print(f"  Totals: {lang_totals}")
+                if lang_totals:
+                    chosen_lang = max(lang_totals, key=lang_totals.get)
+                    print(f"  Chosen: {chosen_lang} ({lang_totals[chosen_lang]})")
             
             if max_score >= 0.4: # threshold
                 code_fragments.append({
@@ -51,13 +70,13 @@ class CodeDetector:
                 })
         
         code_blocks =  self.group_by_language(code_fragments)
-        for block in code_blocks:
+        for block in code_blocks:            
             structure_info = self.analyze_structure(block['content'], block['language'], block['start_line'])
             block['structure_info'] = structure_info
             block = self.expand_blocks_with_comments(block, structure_info, lines)
 
         code_blocks = self.reassign_based_on_structure(code_blocks)
-            
+        code_blocks = self.merge_orphaned_brackets(code_blocks, lines)
         return code_blocks
         
     def line_contains_code_patterns(self, line):
@@ -325,7 +344,24 @@ class CodeDetector:
         from_block['end_line'] = from_block['start_line'] + len(from_block['content']) - 1
         to_block['end_line'] = max(to_block['end_line'], to_block['start_line'] + len(to_block['content']) - 1)
         
-
+    def merge_orphaned_brackets(self, code_blocks, original_lines):
+        """Merge standalone bracket lines with adjacent code blocks"""
+        for block in code_blocks:
+            # Check for orphaned brackets before this block
+            for line_num in range(max(0, block['start_line'] - 3), block['start_line']):
+                line = original_lines[line_num].strip()
+                if line in ['{', '}', ')', ']', '(', '[']:
+                    block['start_line'] = min(block['start_line'], line_num)
+                    block['content'].insert(0, original_lines[line_num])
+            
+            # Check for orphaned brackets after this block  
+            for line_num in range(block['end_line'] + 1, min(len(original_lines), block['end_line'] + 4)):
+                line = original_lines[line_num].strip()
+                if line in ['{', '}', ')', ']', '(', '[']:
+                    block['end_line'] = max(block['end_line'], line_num)
+                    block['content'].append(original_lines[line_num])
+        
+        return code_blocks
 """
 A problem the arised from the C code blocks: ending } are not being recignized as code
 Another issue could be comments like """ """ in python or /* */ in C

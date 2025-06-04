@@ -35,10 +35,25 @@ COMMON_PATTERNS = {
     'numbers': (r'\b\d+\b', 0.1, {}),
     'comma_separated': (r',\s*["\w]', 0.2, {}),
     'string_literals': (r'["\'].*["\']', 0.2, {}),
-    'return_keyword': (r'\breturn\b', 0.2, {}),
-    'control_flow': (r'\b(if|else|while|for)\b', 0.2, {}),
     'closing_brace': (r'^\s*[}\]\)]\s*$', 0.5, {}),
     'object_literal': (r'\{[^}]*:', 0.6, {}),
     'multiline_call': (r'\w+\s*\(\s*$', 0.6, {}),
     'data_assignment': (r'\w+\s*=\s*[\[\{]', 0.5, {}),
+    'return_statement': (r'\breturn\s+\w+|return\s*$', 0.5, {}),
+    'control_flow_start': (r'^\s*(if|else|while|for)\b', 0.6, {}),
+    'control_flow_general': (r'\b(if|else|while|for)\b', 0.3, {}),
+
+    # negative patterns to penalize natural language
+    'articles': (r'\b(the|a|an)\s+\w+', -0.3, {}),  # "the code", "a function"
+    'prepositions': (r'\b(in|on|at|by|with|from|to|of)\s+\w+', -0.2, {}),  # "in Python", "by John"
+    'full_sentences': (r'\w+\s+\w+\s+\w+\s+\w+\s+\w+', -0.2, {}),  # 5+ words in sequence
+    'question_words': (r'\b(what|how|why|when|where|which)\b', -0.4, {}),
+    'past_tense': (r'\w+ed\s', -0.1, {}),  # "created", "written"
+    'ordinal_numbers': (r'\b\d+(st|nd|rd|th)\b', -0.3, {}),  # "1st", "2nd"
+    'linking_verbs': (r'\b(is|are|was|were|has|have|been)\s+\w+', -0.2, {}),
+    'markdown_links': (r'\[.*\]\(.*\)', -0.5, {}),  # [link](url)
+    'citations': (r'\d+\.\s+[A-Z]', -0.4, {}),  # "1. This piece"
+    'question_words': (r'(?i)\b(what|how|why|when|where|which|does)\b', -0.7, {}),
+    'articles_with_nouns': (r'\b(the|a|an)\s+\w+', -0.3, {}),
+    'verb_phrases': (r'\b(does|do|will|can|should)\s+\w+', -0.4, {}),
 }

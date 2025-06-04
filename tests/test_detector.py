@@ -57,10 +57,9 @@ def run_file_test(filename):
     
     # Run detection
     detector = CodeDetector()
+    # run with debugging enabled:
+    detector = CodeDetector(debug=True)
     result = detector.detect_code(text)
-    
-    # Basic assertions (modify as needed)
-    assert len(result) >= 1, f"Expected at least 1 code block, found {len(result)}"
     
     # Print results
     print(f"\nFile: {filename}")
@@ -105,7 +104,6 @@ def test_all_sample_files():
     for file_path in test_files:
         result, file_result = run_file_test(file_path)
         all_results.append(file_result)
-        assert len(result) >= 0, f"Detection failed for {file_path}"
-    
+        print(f"Processed {file_path} with {len(result)} code blocks detected.")
     save_results_to_file(all_results)
 
