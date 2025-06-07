@@ -1,4 +1,4 @@
-Code Detection Results - 2025-05-27 19:20:33
+Code Detection Results - 2025-06-07 20:52:45
 ============================================================
 
 File: tests/test_samples\c_multiline_comment.txt
@@ -7,7 +7,7 @@ Total blocks: 1
 Block 1:
   Language: c
   Lines: 0-3
-  Confidence: 1.2
+  Confidence: 1.7000000000000002
   Content:
     /*
     Multiline comment
@@ -21,7 +21,7 @@ Total blocks: 1
 Block 1:
   Language: python
   Lines: 0-5
-  Confidence: 1.5333333333333332
+  Confidence: 1.633333333333333
   Content:
     data = {
         "users": [
@@ -37,23 +37,27 @@ Total blocks: 1
 Block 1:
   Language: python
   Lines: 0-1
-  Confidence: 1.7500000000000002
+  Confidence: 1.35
   Content:
     result = dict[(key1, key2)] + array[0:5]
     function({key: [val1, val2]})
 
 
 File: tests/test_samples\multiline_function.txt
-Total blocks: 1
+Total blocks: 2
 ----------------------------------------
 Block 1:
   Language: python
-  Lines: 0-4
-  Confidence: 0.9600000000000002
+  Lines: 0-0
+  Confidence: 1.2000000000000002
   Content:
     function_call(
-        parameter1,
-        parameter2,
+
+Block 2:
+  Language: python
+  Lines: 3-4
+  Confidence: 0.9
+  Content:
         nested_call(arg1, arg2)
     )
 
@@ -64,7 +68,7 @@ Total blocks: 1
 Block 1:
   Language: python
   Lines: 0-3
-  Confidence: 2.0
+  Confidence: 1.35
   Content:
     if (condition) {
         array[index] = function(param1, param2);
@@ -73,18 +77,21 @@ Block 1:
 
 
 File: tests/test_samples\python_docstring.txt
-Total blocks: 1
+Total blocks: 2
 ----------------------------------------
 Block 1:
   Language: python
-  Lines: 0-6
-  Confidence: 1.175
+  Lines: 0-1
+  Confidence: 1.05
   Content:
     def func():
         """
-        Docstring here
-        and here
-        and here
+
+Block 2:
+  Language: python
+  Lines: 5-6
+  Confidence: 1.05
+  Content:
         """
         return True
 
@@ -95,7 +102,7 @@ Total blocks: 1
 Block 1:
   Language: python
   Lines: 0-2
-  Confidence: 1.2666666666666666
+  Confidence: 1.0999999999999999
   Content:
     print("This { is not } a brace")
     comment = "Array[0] and function()"
@@ -108,7 +115,7 @@ Total blocks: 1
 Block 1:
   Language: python
   Lines: 0-3
-  Confidence: 1.25
+  Confidence: 1.525
   Content:
     def function():
         if (condition:

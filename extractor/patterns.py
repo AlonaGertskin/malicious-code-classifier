@@ -1,4 +1,6 @@
-# All patterns now use format: (regex, positive_weight, {penalty_dict})
+# Pattern format: (regex_pattern, positive_weight, {language: penalty_weight})
+# positive_weight: score added when pattern matches
+# penalty_weight: score subtracted from other languages when this pattern matches
 PYTHON_PATTERNS = {
     'function_def': (r'def\s+\w+\s*\(.*\):', 0.8, {'c': 0.9}),
     'python_keywords': (r'\b(class|import|elif|pass|with|as)\b', 0.4, {'c': 0.6}),
@@ -12,6 +14,7 @@ PYTHON_PATTERNS = {
     'json_structure': (r'["\'][^"\']*["\']:\s*[\[\{]', 0.6, {'c': 0.5}),
     'dict_item': (r'["\'][^"\']*["\']:\s*[^,}\]]+', 0.5, {'c': 0.4}),
     'list_with_dicts': (r'\[.*\{.*\}.*\]', 0.7, {'c': 0.6}),
+    'python_decorators': (r'@\w+', 0.9, {'c': 0.95}),
 }
 
 C_PATTERNS = {
@@ -24,6 +27,10 @@ C_PATTERNS = {
     'c_io': (r'\b(printf|scanf|malloc|free|strlen)\s*\(', 0.6, {'python': 0.7}),
     'return_semicolon': (r'\breturn\s.*;\s*$', 0.5, {'python': 0.6}),
     'semicolon_end': (r';\s*$', 0.3, {'python': 0.4}),
+    'c_main_function': (r'int\s+main\s*\(', 1.5, {'python': 0.99}),  
+    'pointer_syntax': (r'\w+\s*\*\s*\w+', 0.8, {'python': 0.9}),  
+    'arrow_operator': (r'->', 0.9, {'python': 0.95}),  
+
 }
 
 COMMON_PATTERNS = {
