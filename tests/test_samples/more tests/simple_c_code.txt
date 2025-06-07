@@ -1,0 +1,9 @@
+int main() {
+        printf("Hello");
+        /*
+        text
+        */
+text checking normal text
+        return 0;
+    more text
+    }

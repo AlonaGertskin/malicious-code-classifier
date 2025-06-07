@@ -1,0 +1,4 @@
+def function():
+    if (condition:
+        print("missing parenthesis")
+    return array[index

@@ -1,0 +1,118 @@
+Code Detection Results - 2025-05-27 19:20:33
+============================================================
+
+File: tests/test_samples\c_multiline_comment.txt
+Total blocks: 1
+----------------------------------------
+Block 1:
+  Language: c
+  Lines: 0-3
+  Confidence: 1.2
+  Content:
+    /*
+    Multiline comment
+    */
+    int main() { return 0; }
+
+
+File: tests/test_samples\deeply_nested.txt
+Total blocks: 1
+----------------------------------------
+Block 1:
+  Language: python
+  Lines: 0-5
+  Confidence: 1.5333333333333332
+  Content:
+    data = {
+        "users": [
+            {"name": "John", "scores": [85, 92, 78]},
+            {"name": "Jane", "scores": [91, 87, 95]}
+        ]
+    }
+
+
+File: tests/test_samples\mixed_brackets.txt
+Total blocks: 1
+----------------------------------------
+Block 1:
+  Language: python
+  Lines: 0-1
+  Confidence: 1.7500000000000002
+  Content:
+    result = dict[(key1, key2)] + array[0:5]
+    function({key: [val1, val2]})
+
+
+File: tests/test_samples\multiline_function.txt
+Total blocks: 1
+----------------------------------------
+Block 1:
+  Language: python
+  Lines: 0-4
+  Confidence: 0.9600000000000002
+  Content:
+    function_call(
+        parameter1,
+        parameter2,
+        nested_call(arg1, arg2)
+    )
+
+
+File: tests/test_samples\nested_braces.txt
+Total blocks: 1
+----------------------------------------
+Block 1:
+  Language: python
+  Lines: 0-3
+  Confidence: 2.0
+  Content:
+    if (condition) {
+        array[index] = function(param1, param2);
+        nested_dict = {"key": [1, 2, 3]};
+    }
+
+
+File: tests/test_samples\python_docstring.txt
+Total blocks: 1
+----------------------------------------
+Block 1:
+  Language: python
+  Lines: 0-6
+  Confidence: 1.175
+  Content:
+    def func():
+        """
+        Docstring here
+        and here
+        and here
+        """
+        return True
+
+
+File: tests/test_samples\string_with_braces.txt
+Total blocks: 1
+----------------------------------------
+Block 1:
+  Language: python
+  Lines: 0-2
+  Confidence: 1.2666666666666666
+  Content:
+    print("This { is not } a brace")
+    comment = "Array[0] and function()"
+    regex = r"\{.*\}"
+
+
+File: tests/test_samples\unmatched_braces.txt
+Total blocks: 1
+----------------------------------------
+Block 1:
+  Language: python
+  Lines: 0-3
+  Confidence: 1.25
+  Content:
+    def function():
+        if (condition:
+            print("missing parenthesis")
+        return array[index
+
+

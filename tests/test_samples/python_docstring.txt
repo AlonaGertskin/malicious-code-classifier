@@ -1,0 +1,7 @@
+def func():
+    """
+    Docstring here
+    and here
+    and here
+    """
+    return True
