@@ -174,41 +174,134 @@ class CodeDetector:
             scores[lang] = max(0, scores[lang])
         
         return scores
+   
+    def apply_language_bonus(self, scores, fragments):
+       """
+       Apply bonus scores based on consecutive language patterns.
+       When multiple lines of the same language appear together, it's more likely
+       that the entire block is in that language.
+       
+       Args:
+           scores (dict): Current language scores {'python': score, 'c': score}
+           fragments (list): List of code fragments with language assignments
+       
+       Returns:
+           dict: Updated scores with streak bonuses applied
+       """
+       # Early return if not enough data
+       if len(fragments) < 2:
+           return scores
+       
+       # Count consecutive occurrences of each language
+       language_streaks = {}
+       current_lang = None
+       current_streak = 0
+       
+       # Iterate through fragments to find language streaks
+       for fragment in fragments:
+           if fragment['language'] == current_lang:
+               # Continue current streak
+               current_streak += 1
+           else:
+               # Save previous streak if it was significant
+               if current_lang and current_streak > 1:
+                   if current_lang not in language_streaks:
+                       language_streaks[current_lang] = 0
+                   language_streaks[current_lang] = max(language_streaks[current_lang], current_streak)
+               # Start new streak
+               current_lang = fragment['language']
+               current_streak = 1
+       
+       # Don't forget to save the last streak
+       if current_lang and current_streak > 1:
+           if current_lang not in language_streaks:
+               language_streaks[current_lang] = 0
+           language_streaks[current_lang] = max(language_streaks[current_lang], current_streak)
+       
+       # Apply bonuses based on streak length
+       for lang, streak in language_streaks.items():
+           if lang in scores and streak > 2:
+               # Bonus increases with streak length, capped at 1.0
+               bonus = min(0.3 * (streak - 2), 1.0)
+               scores[lang] += bonus
+       
+       return scores
 
     def group_by_language(self, fragments):
-        """
-        Group fragments by language, keeping sequence order
-        Returns :
-            list: List of dictionaries, each representing a language-specific code block:
-                - 'content': List of code lines (strings)
-                - 'start_line': First line number of the block (int)
-                - 'end_line': Last line number of the block (int)  
-                - 'language': Programming language identifier ('python', 'c', etc.)
-                - 'confidence': Average confidence score for the block (float 0.0-1.0)
-        """
-        groups = []
-        
-        # Get languages from patterns (excluding 'common')
-        available_languages = [lang for lang in self.patterns.keys() if lang != 'common']
-        
-        for lang in available_languages:
-            lang_fragments = [f for f in fragments if f['language'] == lang]
-            
-            if lang_fragments:
-                lang_fragments.sort(key=lambda x: x['line_num'])
-                groups.append(self.create_block_from_fragments(lang_fragments))
-        
-        return groups
+       """
+       Group continuous code fragments into blocks.
+       Instead of grouping by language, groups by proximity and then
+       determines the best language for each group.
+       
+       Args:
+           fragments (list): List of identified code fragments
+           
+       Returns:
+           list: List of code blocks with unified language assignments
+       """
+       if not fragments:
+           return []
+       
+       groups = []
+       current_group = [fragments[0]]
+       
+       # Group fragments by proximity (within 2 lines of each other)
+       for i in range(1, len(fragments)):
+           # Check if current fragment is close to previous one
+           if fragments[i]['line_num'] - fragments[i-1]['line_num'] <= 2:
+               # Add to current group
+               current_group.append(fragments[i])
+           else:
+               # Gap too large - create block from current group
+               if current_group:
+                   groups.append(self.create_block_from_fragments(current_group))
+               # Start new group
+               current_group = [fragments[i]]
+       
+       # Don't forget the last group
+       if current_group:
+           groups.append(self.create_block_from_fragments(current_group))
+       
+       return groups
 
     def create_block_from_fragments(self, fragments):
-        """Convert list of fragments into block format"""
-        return {
-            'content': [f['content'] for f in fragments],
-            'start_line': fragments[0]['line_num'],
-            'end_line': fragments[-1]['line_num'],
-            'language': fragments[0]['language'],
-            'confidence': sum(f['score'] for f in fragments) / len(fragments) # placeholder
-        }
+       """
+       Convert list of fragments into a cohesive code block.
+       Re-evaluates the language assignment for the entire block based on
+       cumulative evidence from all fragments.
+       
+       Args:
+           fragments (list): List of code fragments to combine
+           
+       Returns:
+           dict: Block dictionary with content, line numbers, language, and confidence
+       """
+       # Calculate cumulative language scores for the entire block
+       block_scores = {'python': 0, 'c': 0}
+       
+       # Sum up scores from all fragments
+       for fragment in fragments:
+           if fragment['language'] in block_scores:
+               block_scores[fragment['language']] += fragment['score']
+       
+       # Apply streak bonus to reward consecutive lines of same language
+       block_scores = self.apply_language_bonus(block_scores, fragments)
+       
+       # Choose the language with highest total score
+       best_language = max(block_scores, key=block_scores.get)
+       
+       # If scores are very close, prefer the original fragment assignment
+       # This prevents flip-flopping between languages for ambiguous code
+       if abs(block_scores['python'] - block_scores['c']) < 0.5:
+           best_language = fragments[0]['language']
+       
+       return {
+           'content': [f['content'] for f in fragments],
+           'start_line': fragments[0]['line_num'],
+           'end_line': fragments[-1]['line_num'],
+           'language': best_language,
+           'confidence': block_scores[best_language] / len(fragments) if fragments else 0
+       }
     
     def count_braces_in_line(self, line, line_index ,brace_errors, counters):
         line_counts = [line.count('(') - line.count(')'),
