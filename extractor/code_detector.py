@@ -228,41 +228,26 @@ class CodeDetector:
        return scores
 
     def group_by_language(self, fragments):
-       """
-       Group continuous code fragments into blocks.
-       Instead of grouping by language, groups by proximity and then
-       determines the best language for each group.
-       
-       Args:
-           fragments (list): List of identified code fragments
-           
-       Returns:
-           list: List of code blocks with unified language assignments
-       """
-       if not fragments:
-           return []
-       
-       groups = []
-       current_group = [fragments[0]]
-       
-       # Group fragments by proximity (within 2 lines of each other)
-       for i in range(1, len(fragments)):
-           # Check if current fragment is close to previous one
-           if fragments[i]['line_num'] - fragments[i-1]['line_num'] <= 2:
-               # Add to current group
-               current_group.append(fragments[i])
-           else:
-               # Gap too large - create block from current group
-               if current_group:
-                   groups.append(self.create_block_from_fragments(current_group))
-               # Start new group
-               current_group = [fragments[i]]
-       
-       # Don't forget the last group
-       if current_group:
-           groups.append(self.create_block_from_fragments(current_group))
-       
-       return groups
+        """
+        Group fragments by language, keeping sequence order
+        Returns :
+            list: List of dictionaries, each representing a language-specific code block:
+                - 'content': List of code lines (strings)
+                - 'start_line': First line number of the block (int)
+                - 'end_line': Last line number of the block (int)  
+                - 'language': Programming language identifier ('python', 'c', etc.)
+                - 'confidence': Average confidence score for the block (float 0.0-1.0)
+        """
+        groups = []
+        # Get languages from patterns (excluding 'common')
+        available_languages = [lang for lang in self.patterns.keys() if lang != 'common']
+        for lang in available_languages:
+            lang_fragments = [f for f in fragments if f['language'] == lang]
+
+            if lang_fragments:
+                lang_fragments.sort(key=lambda x: x['line_num'])
+                groups.append(self.create_block_from_fragments(lang_fragments))
+        return groups
 
     def create_block_from_fragments(self, fragments):
        """
