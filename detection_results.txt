@@ -1,4 +1,4 @@
-Code Detection Results - 2025-06-07 20:52:45
+Code Detection Results - 2025-06-08 01:20:53
 ============================================================
 
 File: tests/test_samples\c_multiline_comment.txt
@@ -44,20 +44,14 @@ Block 1:
 
 
 File: tests/test_samples\multiline_function.txt
-Total blocks: 2
+Total blocks: 1
 ----------------------------------------
 Block 1:
   Language: python
-  Lines: 0-0
-  Confidence: 1.2000000000000002
+  Lines: 0-4
+  Confidence: 1.0999999999999999
   Content:
     function_call(
-
-Block 2:
-  Language: python
-  Lines: 3-4
-  Confidence: 0.9
-  Content:
         nested_call(arg1, arg2)
     )
 
@@ -66,9 +60,9 @@ File: tests/test_samples\nested_braces.txt
 Total blocks: 1
 ----------------------------------------
 Block 1:
-  Language: python
+  Language: c
   Lines: 0-3
-  Confidence: 1.35
+  Confidence: 0.9750000000000001
   Content:
     if (condition) {
         array[index] = function(param1, param2);
@@ -77,21 +71,18 @@ Block 1:
 
 
 File: tests/test_samples\python_docstring.txt
-Total blocks: 2
+Total blocks: 1
 ----------------------------------------
 Block 1:
   Language: python
-  Lines: 0-1
-  Confidence: 1.05
+  Lines: 0-6
+  Confidence: 1.2
   Content:
     def func():
         """
-
-Block 2:
-  Language: python
-  Lines: 5-6
-  Confidence: 1.05
-  Content:
+        Docstring here
+        and here
+        and here
         """
         return True
 
