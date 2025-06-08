@@ -228,41 +228,131 @@ class CodeDetector:
        return scores
 
     def group_by_language(self, fragments):
-       """
-       Group continuous code fragments into blocks.
-       Instead of grouping by language, groups by proximity and then
-       determines the best language for each group.
+        """
+        Group continuous code fragments into blocks.
+        Enhanced to handle function calls, control structures, and docstrings properly.
+        
+        Args:
+            fragments (list): List of identified code fragments
+            
+        Returns:
+            list: List of code blocks with unified language assignments
+        """
+        if not fragments:
+            return []
+        
+        groups = []
+        current_group = [fragments[0]]
+        
+        # Track open constructs
+        open_parens = 0
+        open_brackets = 0 
+        open_braces = 0
+        in_docstring = False
+        docstring_delimiter = None
+        
+        for i in range(len(fragments)):
+            fragment = fragments[i]
+            line = fragment['content']
+            
+            # Update bracket/parentheses counts
+            open_parens += line.count('(') - line.count(')')
+            open_brackets += line.count('[') - line.count(']')
+            open_braces += line.count('{') - line.count('}')
+            
+            # Handle docstring tracking
+            if '"""' in line:
+                triple_count = line.count('"""')
+                if not in_docstring and triple_count % 2 == 1:
+                    in_docstring = True
+                    docstring_delimiter = '"""'
+                elif in_docstring and docstring_delimiter == '"""' and triple_count % 2 == 1:
+                    in_docstring = False
+                    docstring_delimiter = None
+            
+            # Check if we should continue the current group
+            should_continue = False
+            
+            if i > 0:
+                prev_fragment = fragments[i-1]
+                line_gap = fragment['line_num'] - prev_fragment['line_num']
+                
+                # Always continue if gap is 1 (consecutive lines)
+                if line_gap <= 1:
+                    should_continue = True
+                # Continue if we're in the middle of a construct
+                elif (open_parens > 0 or open_brackets > 0 or open_braces > 0 or 
+                      in_docstring or line_gap <= 3):
+                    should_continue = True
+                # Continue if previous line suggests a multi-line construct
+                elif self.is_multiline_start(prev_fragment['content']):
+                    should_continue = True
+                # Continue if current line looks like a continuation
+                elif self.is_continuation_line(line):
+                    should_continue = True
+            
+            if i == 0:
+                # First fragment is already in current_group
+                continue
+            elif should_continue:
+                # Add to current group
+                current_group.append(fragment)
+            else:
+                # Start new group
+                if current_group:
+                    groups.append(self.create_block_from_fragments(current_group))
+                current_group = [fragment]
+                
+                # Reset counters for new group
+                open_parens = line.count('(') - line.count(')')
+                open_brackets = line.count('[') - line.count(']')
+                open_braces = line.count('{') - line.count('}')
+        
+        # Don't forget the last group
+        if current_group:
+            groups.append(self.create_block_from_fragments(current_group))
+        
+        return groups
+
+    def is_multiline_start(self, line): 
+       """Check if line indicates start of a multiline construct"""
+       line = line.strip()
        
-       Args:
-           fragments (list): List of identified code fragments
+       # Function calls ending with open parenthesis
+       if line.endswith('('):
+           return True
+       
+       # Control structures
+       if re.match(r'^\s*(if|for|while|def|class)\b.*:\s*$', line):
+           return True
            
-       Returns:
-           list: List of code blocks with unified language assignments
-       """
-       if not fragments:
-           return []
+       # Docstring start
+       if '"""' in line and line.count('"""') % 2 == 1:
+           return True
+           
+       # Data structures
+       if line.endswith(('{', '[')):
+           return True
+           
+       return False
+
+    def is_continuation_line(self, line):
+       """Check if line looks like a continuation of previous construct"""
+       stripped = line.strip()
        
-       groups = []
-       current_group = [fragments[0]]
-       
-       # Group fragments by proximity (within 2 lines of each other)
-       for i in range(1, len(fragments)):
-           # Check if current fragment is close to previous one
-           if fragments[i]['line_num'] - fragments[i-1]['line_num'] <= 2:
-               # Add to current group
-               current_group.append(fragments[i])
-           else:
-               # Gap too large - create block from current group
-               if current_group:
-                   groups.append(self.create_block_from_fragments(current_group))
-               # Start new group
-               current_group = [fragments[i]]
-       
-       # Don't forget the last group
-       if current_group:
-           groups.append(self.create_block_from_fragments(current_group))
-       
-       return groups
+       # Lines starting with closing brackets
+       if stripped.startswith(('}', ']', ')')):
+           return True
+           
+       # Lines that are clearly continuations (indented, parameters, etc.)
+       if re.match(r'^\s+([\w"\']+[,\)]|.*[,\)])\s*$', line):
+           return True
+           
+       # Docstring end
+       if stripped == '"""':
+           return True
+           
+       return False
 
     def create_block_from_fragments(self, fragments):
        """

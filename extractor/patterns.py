@@ -26,11 +26,11 @@ C_PATTERNS = {
     'preprocessor': (r'#(define|ifdef|ifndef|endif)', 0.5, {'python': 0.8}),
     'c_io': (r'\b(printf|scanf|malloc|free|strlen)\s*\(', 0.6, {'python': 0.7}),
     'return_semicolon': (r'\breturn\s.*;\s*$', 0.5, {'python': 0.6}),
-    'semicolon_end': (r';\s*$', 0.3, {'python': 0.4}),
+    'semicolon_end': (r';\s*$', 0.5, {'python': 0.6}),
     'c_main_function': (r'int\s+main\s*\(', 1.5, {'python': 0.99}),  
     'pointer_syntax': (r'\w+\s*\*\s*\w+', 0.8, {'python': 0.9}),  
     'arrow_operator': (r'->', 0.9, {'python': 0.95}),  
-
+    'c_control_with_brace': (r'^\s*(if|while|for|else|do|switch)\s*\(.*\)\s*\{\s*$', 0.8, {'python': 0.9}),
 }
 
 COMMON_PATTERNS = {
@@ -54,7 +54,6 @@ COMMON_PATTERNS = {
     'articles': (r'\b(the|a|an)\s+\w+', -0.3, {}),  # "the code", "a function"
     'prepositions': (r'\b(in|on|at|by|with|from|to|of)\s+\w+', -0.2, {}),  # "in Python", "by John"
     'full_sentences': (r'\w+\s+\w+\s+\w+\s+\w+\s+\w+', -0.2, {}),  # 5+ words in sequence
-    'question_words': (r'\b(what|how|why|when|where|which)\b', -0.4, {}),
     'past_tense': (r'\w+ed\s', -0.1, {}),  # "created", "written"
     'ordinal_numbers': (r'\b\d+(st|nd|rd|th)\b', -0.3, {}),  # "1st", "2nd"
     'linking_verbs': (r'\b(is|are|was|were|has|have|been)\s+\w+', -0.2, {}),
