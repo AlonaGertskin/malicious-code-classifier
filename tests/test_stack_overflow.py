@@ -6,8 +6,21 @@ import html as html_module
 from datetime import datetime
 import os
 from tests.test_detector import test_all_sample_files, run_file_test
+import sys
 
-# run with python -m tests.test_stack_overflow in command line
+"""
+STACK OVERFLOW TESTING USAGE
+============================
+
+# Run tests on existing files (fast)
+python -m tests.test_stack_overflow --reuse
+
+# Download fresh data and run tests (slow)  
+python -m tests.test_stack_overflow --fresh
+
+# Default behavior - try existing first, download if needed
+python -m tests.test_stack_overflow
+"""
 
 def get_stackoverflow_data(language="python", pagesize=5, filename=None):
     """Get Stack Overflow questions for specified language"""
@@ -155,7 +168,32 @@ def test_both_languages():
     get_stackoverflow_data("python", 3)  # Download Python questions
     expected_blocks_python = create_all_tests("python")           # Create test files from downloaded data
 
-def stack_overflow_testing():
+def load_existing_expected_blocks():
+    """Load expected blocks from existing JSON files"""
+    all_expected_blocks = {}
+    
+    for lang in ['c', 'python']:
+        json_file = f"stackoverflow_{lang}_test.json"
+        if os.path.exists(json_file):
+            try:
+                with open(json_file, 'r') as f:
+                    questions = json.load(f)
+                
+                # Extract expected blocks for each question
+                for i, question in enumerate(questions):
+                    title = html_module.unescape(question["title"])
+                    safe_title = re.sub(r"[^a-zA-Z0-9_]", "_", title[:30]).lower()
+                    filename = f"{lang}_stackoverflow_{safe_title}.txt"
+                    
+                    if os.path.exists(f"tests/test_samples/{filename}"):
+                        code_blocks = extract_expected_code_blocks(question["body"])
+                        all_expected_blocks[filename] = code_blocks
+            except Exception as e:
+                print(f"Error loading {json_file}: {e}")
+    
+    return all_expected_blocks
+
+def stack_overflow_testing(reuse_existing=True):
     """
     Complete Stack Overflow testing pipeline:
     1. Download questions
@@ -163,10 +201,45 @@ def stack_overflow_testing():
     3. Run CodeDetector
     4. Compare with expected results
     5. Generate detailed validation report
+    
+    Args:
+    reuse_existing: If True, use existing downloaded files instead of re-downloading
     """
     
     print("=== STACK OVERFLOW TESTING ===")
-    
+        # Check if we should reuse existing files
+    if reuse_existing:
+        # Check if we have existing Stack Overflow test files
+        existing_so_files = [f for f in os.listdir("tests/test_samples/") 
+                           if "stackoverflow" in f and f.endswith(".txt")]
+        
+        if existing_so_files:
+            print(f"\n✓ Found {len(existing_so_files)} existing Stack Overflow test files")
+            print("Skipping download, using existing files...")
+            
+            # Skip download, go straight to detection
+            print("\n3. Running CodeDetector on existing Stack Overflow test files...")
+            detection_results = {}
+            for filename in existing_so_files:
+                filepath = f"tests/test_samples/{filename}"
+                detected_blocks, file_result = run_file_test(filepath)
+                detection_results[filename] = detected_blocks
+            
+            # Load expected blocks from JSON if they exist
+            all_expected_blocks = load_existing_expected_blocks()
+            
+            if all_expected_blocks:
+                print("\n4. Validating results...")
+                validation_results = validate_detection_results(all_expected_blocks, detection_results)
+                
+                print("\n5. Generating validation report...")
+                save_validation_report(validation_results, all_expected_blocks, detection_results)
+                
+                return validation_results
+            else:
+                print("No expected blocks found. Run with reuse_existing=False to re-download.")
+                return None
+            
     # Step 1 & 2: Get questions and create test files (returns expected blocks)
     print("\n1. Getting C questions and creating test files...")
     get_stackoverflow_data("c", 10)
@@ -452,7 +525,24 @@ def save_validation_report(validation_results, all_expected_blocks, detection_re
     print(f"Missed Detections: {stats['missed_detections']} ({missed_detection_rate:.1%})")
 
 if __name__ == "__main__":
-    stack_overflow_testing()
+    
+    # Check for command line arguments
+    if len(sys.argv) > 1 and sys.argv[1] == "--reuse":
+        print("Using existing files...")
+        stack_overflow_testing(reuse_existing=True)
+    elif len(sys.argv) > 1 and sys.argv[1] == "--fresh":
+        print("Downloading fresh data...")
+        stack_overflow_testing(reuse_existing=False)
+    else:
+        # Default behavior - try to reuse, but download if nothing exists
+        try:
+            result = stack_overflow_testing(reuse_existing=True)
+            if result is None:
+                print("No existing data found, downloading fresh...")
+                stack_overflow_testing(reuse_existing=False)
+        except:
+            print("Error with existing data, downloading fresh...")
+            stack_overflow_testing(reuse_existing=False)
 
 
 # if __name__ == "__main__":

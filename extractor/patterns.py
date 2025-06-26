@@ -18,13 +18,16 @@ PYTHON_PATTERNS = {
     'yield_statement': (r'^\s*yield\s+', 0.9, {'c': 0.9}),
     'python_opening_brace': (r'^\s*\{\s*$', 0.7, {'c': 0.3}),
     'python_closing_brace': (r'^\s*\}\s*$', 0.7, {'c': 0.3}),
+    'import_statement': (r'^\s*(import|from)\s+\w+', 0.9, {'c': 0.95}),
+    'import_as': (r'^\s*import\s+\w+\s+as\s+\w+', 0.9, {'c': 0.95}),
+    'from_import': (r'^\s*from\s+\w+\s+import', 0.9, {'c': 0.95}),
 }
 
 C_PATTERNS = {
-    'includes': (r'#include\s*[<"][^>"]+[>"]', 0.8, {'python': 0.9}),
-    'c_function_def': (r'\w+\s+\w+\s*\([^)]*\)\s*\{', 0.7, {'python': 0.9}),
+    'includes': (r'#include\s*[<"][^>"]+[>"]', 0.9, {'python': 1.2}),
+    'c_function_def': (r'\w+\s+\w+\s*\([^)]*\)\s*\{', 0.8, {'python': 1.2}),
     'data_types': (r'\b(int|char|float|double|void)\b', 0.4, {'python': 0.5}),
-    'c_comments': (r'//.*$', 0.2, {'python': 0.7}),
+    'c_comments': (r'//.*$', 0.5, {'python': 0.7}),
     'multiline_comments': (r'/\*|\*/', 0.6, {'python': 0.8}),
     'preprocessor': (r'#(define|ifdef|ifndef|endif)', 0.5, {'python': 0.8}),
     'c_io': (r'\b(printf|scanf|malloc|free|strlen)\s*\(', 0.6, {'python': 0.7}),
