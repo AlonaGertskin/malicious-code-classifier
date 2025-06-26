@@ -96,7 +96,7 @@ def run_file_test(filename):
 def test_all_sample_files():
     """Test all files in the test samples directory"""
     test_dir = "tests/test_samples/"
-    test_files = glob.glob(os.path.join(test_dir, "*.txt"))
+    test_files = glob.glob(os.path.join(test_dir, "**", "*.txt"), recursive=True)
     
     assert test_files, f"No .txt files found in {test_dir}"
     
