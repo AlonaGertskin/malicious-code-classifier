@@ -198,7 +198,7 @@ def stack_overflow_testing():
     
     # Step 5: Generate detailed report
     print("\n6. Generating validation report...")
-    save_validation_report(validation_results)
+    save_validation_report(validation_results, all_expected_blocks)
     
     return validation_results
 
@@ -337,7 +337,7 @@ def get_line_context(lines, index):
     }
     return context
 
-def save_validation_report(validation_results):
+def save_validation_report(validation_results, all_expected_blocks):
     """
     Save comprehensive validation report
     """
@@ -376,6 +376,7 @@ def save_validation_report(validation_results):
         f.write(f"False positives: {false_positives} ({false_positive_rate:.1%})\n")
         f.write(f"Missed detections: {missed_detections} ({missed_detection_rate:.1%})\n\n")
         
+        
         # Detailed file-by-file results
         f.write("DETAILED FILE RESULTS\n")
         f.write("-" * 40 + "\n\n")
@@ -387,6 +388,15 @@ def save_validation_report(validation_results):
             f.write(f"Correct: {file_result['correct_lines']}\n")
             f.write(f"False positives: {file_result['false_positives']}\n")
             f.write(f"Missed detections: {file_result['missed_detections']}\n")
+            
+            # Add expected blocks section
+            if filename in all_expected_blocks:
+                f.write("\nEXPECTED CODE BLOCKS:\n")
+                for i, block in enumerate(all_expected_blocks[filename]):
+                    f.write(f"  Block {i+1}:\n")
+                    for line in block.split('\n'):
+                        f.write(f"    {line}\n")
+                f.write("\n")
             
             # False positives details
             if file_result['false_positive_details']:
