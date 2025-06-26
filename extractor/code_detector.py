@@ -36,6 +36,7 @@ class CodeDetector:
                 - 'confidence': Detection confidence score (0.0-1.0)
         """
         lines = text.split('\n')
+    
         code_fragments = []
 
                 # Collect all code-like lines
@@ -61,7 +62,7 @@ class CodeDetector:
                     chosen_lang = max(lang_totals, key=lang_totals.get)
                     print(f"  Chosen: {chosen_lang} ({lang_totals[chosen_lang]})")
             
-            if max_score >= 0.4: # threshold
+            if max_score >= 0.5: # threshold
                 code_fragments.append({
                     'line_num': i,
                     'content': line,
@@ -70,6 +71,7 @@ class CodeDetector:
                 })
         
         code_blocks =  self.group_by_language(code_fragments)
+
         for block in code_blocks:            
             structure_info = self.analyze_structure(block['content'], block['language'], block['start_line'])
             block['structure_info'] = structure_info
@@ -77,6 +79,8 @@ class CodeDetector:
 
         code_blocks = self.reassign_based_on_structure(code_blocks)
         code_blocks = self.merge_orphaned_brackets(code_blocks, lines)
+        code_blocks = [block for block in code_blocks if self.is_meaningful_code_block(block)]
+
         return code_blocks
         
     def line_contains_code_patterns(self, line):
@@ -440,30 +444,42 @@ class CodeDetector:
                     block['content'].append(original_lines[line_num])
         
         return code_blocks
-"""
-A problem the arised from the C code blocks: ending } are not being recignized as code
-Another issue could be comments like """ """ in python or /* */ in C
-as a solution we might use two passes to fix the structure of the code:
 
-Pass 1 Functions:
+    def is_meaningful_code_block(self, block):
+        """
+        Check if a code block contains actual code or just empty structure
+        Returns False for blocks that are just braces, whitespace, etc.
+        """
+        content_lines = [line.strip() for line in block['content'] if line.strip()]
+        
+        # If no content at all
+        if not content_lines:
+            return False
+        
+        # Count meaningful vs structural-only lines
+        meaningful_lines = 0
+        structural_only_lines = 0
+        
+        for line in content_lines:
+            if line in ['{', '}', '(', ')', '[', ']']:
+                structural_only_lines += 1
+            elif self.has_meaningful_content(line):
+                meaningful_lines += 1
+        
+        # If block is mostly/entirely structural elements
+        if meaningful_lines == 0 or (structural_only_lines / len(content_lines)) > 0.8:
+            return False
+        
+        return True
 
-scan_for_code_patterns(lines) - returns list of line indices with code patterns
-identify_structural_elements(lines) - finds language-specific delimiters (braces, quotes, backslashes)
-calculate_line_scores(lines) - scores each line for code likelihood
-analyze_structure(lines) - finds language-specific delimiters (braces, quotes, backslashes) and 
-identifies opening patterns (function defs, docstrings, comments)
-
-
-
-Pass 2 Functions:
-
-complete_multiline_constructs(boundaries, lines, language) - extends to find closing elements
-extract_final_blocks(lines, refined_boundaries) - creates final code block objects
-
-Language-specific completion:
-
-C: match braces {} and /* */
-Python: match quotes and continuation lines \
-
-Main flow: Pass 1 → Pass 2 (language-aware) → return blocks.
-"""
+    def has_meaningful_content(self, line):
+        """Check if a line has actual code content beyond just symbols"""
+        # Remove whitespace and basic symbols
+        cleaned = re.sub(r'[{}()\[\];,\s]', '', line)
+        
+        # Check for actual identifiers, keywords, strings, etc.
+        if re.search(r'[a-zA-Z_]\w*|".*"|\'.*\'|\d+', cleaned):
+            return True
+        
+        return False
+    

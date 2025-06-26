@@ -15,7 +15,7 @@ def get_stackoverflow_data(language="python", pagesize=5, filename=None):
     url = "https://api.stackexchange.com/2.3/questions"
     params = {
         "order": "desc",
-        "sort": "votes",
+        "sort": "creation",
         "tagged": language,
         "site": "stackoverflow",
         "pagesize": pagesize,
@@ -169,11 +169,11 @@ def stack_overflow_testing():
     
     # Step 1 & 2: Get questions and create test files (returns expected blocks)
     print("\n1. Getting C questions and creating test files...")
-    get_stackoverflow_data("c", 3)
+    get_stackoverflow_data("c", 10)
     expected_blocks_c = create_all_tests("c")
     
     print("\n2. Getting Python questions and creating test files...")
-    get_stackoverflow_data("python", 3)
+    get_stackoverflow_data("python", 10)
     expected_blocks_python = create_all_tests("python")
     
     # Combine expected blocks
@@ -198,7 +198,7 @@ def stack_overflow_testing():
     
     # Step 5: Generate detailed report
     print("\n6. Generating validation report...")
-    save_validation_report(validation_results, all_expected_blocks)
+    save_validation_report(validation_results, all_expected_blocks, detection_results)
     
     return validation_results
 
@@ -337,7 +337,7 @@ def get_line_context(lines, index):
     }
     return context
 
-def save_validation_report(validation_results, all_expected_blocks):
+def save_validation_report(validation_results, all_expected_blocks, detection_results):
     """
     Save comprehensive validation report
     """
@@ -398,6 +398,22 @@ def save_validation_report(validation_results, all_expected_blocks):
                         f.write(f"    {line}\n")
                 f.write("\n")
             
+            if filename in detection_results:
+                f.write("DETECTED CODE BLOCKS:\n")
+                detected_blocks = detection_results[filename]
+                for i, block in enumerate(detected_blocks):
+                    f.write(f"  Block {i+1}:\n")
+                    f.write(f"    Language: {block.get('language', 'Unknown')}\n")
+                    f.write(f"    Lines: {block.get('start_line', 'N/A')}-{block.get('end_line', 'N/A')}\n")
+                    f.write(f"    Confidence: {block.get('confidence', 'N/A')}\n")
+                    f.write(f"    Content:\n")
+                    if block.get('content'):
+                        for line in block['content']:
+                            f.write(f"      {line}\n")
+                    else:
+                        f.write(f"      (empty)\n")
+                f.write("\n")
+                        
             # False positives details
             if file_result['false_positive_details']:
                 f.write("\nFALSE POSITIVES (detected but shouldn't be):\n")

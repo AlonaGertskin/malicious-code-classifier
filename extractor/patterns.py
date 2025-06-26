@@ -15,6 +15,9 @@ PYTHON_PATTERNS = {
     'dict_item': (r'["\'][^"\']*["\']:\s*[^,}\]]+', 0.5, {'c': 0.4}),
     'list_with_dicts': (r'\[.*\{.*\}.*\]', 0.7, {'c': 0.6}),
     'python_decorators': (r'@\w+', 0.9, {'c': 0.95}),
+    'yield_statement': (r'^\s*yield\s+', 0.9, {'c': 0.9}),
+    'python_opening_brace': (r'^\s*\{\s*$', 0.7, {'c': 0.3}),
+    'python_closing_brace': (r'^\s*\}\s*$', 0.7, {'c': 0.3}),
 }
 
 C_PATTERNS = {
@@ -22,14 +25,17 @@ C_PATTERNS = {
     'c_function_def': (r'\w+\s+\w+\s*\([^)]*\)\s*\{', 0.7, {'python': 0.9}),
     'data_types': (r'\b(int|char|float|double|void)\b', 0.4, {'python': 0.5}),
     'c_comments': (r'//.*$', 0.2, {'python': 0.7}),
-    'multiline_comments': (r'/\*|\*/', 0.4, {'python': 0.6}),
+    'multiline_comments': (r'/\*|\*/', 0.6, {'python': 0.8}),
     'preprocessor': (r'#(define|ifdef|ifndef|endif)', 0.5, {'python': 0.8}),
     'c_io': (r'\b(printf|scanf|malloc|free|strlen)\s*\(', 0.6, {'python': 0.7}),
     'return_semicolon': (r'\breturn\s.*;\s*$', 0.5, {'python': 0.6}),
     'semicolon_end': (r';\s*$', 0.3, {'python': 0.4}),
     'c_main_function': (r'int\s+main\s*\(', 1.5, {'python': 0.99}),  
     'pointer_syntax': (r'\w+\s*\*\s*\w+', 0.8, {'python': 0.9}),  
-    'arrow_operator': (r'->', 0.9, {'python': 0.95}),  
+    'arrow_operator': (r'->', 0.9, {'python': 0.95}), 
+    'extern_declaration': (r'extern\s+\w+', 0.6, {'python': 0.8}),
+    'c_opening_brace': (r'^\s*\{\s*$', 0.8, {'python': 0.3}),
+    'c_closing_brace': (r'^\s*\}\s*$', 0.8, {'python': 0.3}),
 
 }
 
@@ -42,13 +48,14 @@ COMMON_PATTERNS = {
     'numbers': (r'\b\d+\b', 0.1, {}),
     'comma_separated': (r',\s*["\w]', 0.2, {}),
     'string_literals': (r'["\'].*["\']', 0.2, {}),
-    'closing_brace': (r'^\s*[}\]\)]\s*$', 0.5, {}),
     'object_literal': (r'\{[^}]*:', 0.6, {}),
     'multiline_call': (r'\w+\s*\(\s*$', 0.6, {}),
     'data_assignment': (r'\w+\s*=\s*[\[\{]', 0.5, {}),
     'return_statement': (r'\breturn\s+\w+|return\s*$', 0.5, {}),
     'control_flow_start': (r'^\s*(if|else|while|for)\b', 0.6, {}),
     'control_flow_general': (r'\b(if|else|while|for)\b', 0.3, {}),
+    'increment_ops': (r'\b\w+\+\+;?\s*$', 0.6, {}),           
+    'simple_return': (r'^\s*return\s+\w+;?\s*$', 0.6, {}),    
 
     # negative patterns to penalize natural language
     'articles': (r'\b(the|a|an)\s+\w+', -0.3, {}),  # "the code", "a function"
@@ -63,4 +70,12 @@ COMMON_PATTERNS = {
     'question_words': (r'(?i)\b(what|how|why|when|where|which|does)\b', -0.7, {}),
     'articles_with_nouns': (r'\b(the|a|an)\s+\w+', -0.3, {}),
     'verb_phrases': (r'\b(does|do|will|can|should)\s+\w+', -0.4, {}),
+    'explanatory_phrases': (r'\b(rather than|in order to|as opposed to|let\'s|we\'re going to)\b', -0.6, {}),
+    'tutorial_language': (r'\b(simply|just|now|then|next|first|finally)\s+\w+', -0.5, {}),
+    'descriptive_phrases': (r'\b(this is|that is|it is|there is|this will|that will)\b', -0.6, {}),
+    'measurement_talk': (r'\b(seconds|minutes|hours|records|per second|faster|slower)\b', -0.5, {}),
+    'performance_discussion': (r'\b(performance|improvement|optimization|better|worse)\s+\w+', -0.5, {}),
+    'result_phrases': (r'\b(imported|we can do|able to|up to)\s+\d+', -0.7, {}),
+    'technical_explanations': (r'\b(by default|this guarantees|we are instructing)\b', -0.8, {}),
+    'conditional_explanations': (r'\b(if|when|because|since|unless)\s+\w+\s+\w+', -0.4, {}),
 }
