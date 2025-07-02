@@ -12,10 +12,10 @@ import sys
 STACK OVERFLOW TESTING USAGE
 ============================
 
-# Run tests on existing files (fast)
+# Run tests on existing files
 python -m tests.test_stack_overflow --reuse
 
-# Download fresh data and run tests (slow)  
+# Download fresh data and run tests 
 python -m tests.test_stack_overflow --fresh
 
 # Default behavior - try existing first, download if needed
@@ -242,11 +242,11 @@ def stack_overflow_testing(reuse_existing=True):
             
     # Step 1 & 2: Get questions and create test files (returns expected blocks)
     print("\n1. Getting C questions and creating test files...")
-    get_stackoverflow_data("c", 10)
+    get_stackoverflow_data("c", 50)
     expected_blocks_c = create_all_tests("c")
     
     print("\n2. Getting Python questions and creating test files...")
-    get_stackoverflow_data("python", 10)
+    get_stackoverflow_data("python", 50)
     expected_blocks_python = create_all_tests("python")
     
     # Combine expected blocks

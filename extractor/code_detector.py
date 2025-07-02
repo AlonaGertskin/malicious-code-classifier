@@ -62,7 +62,9 @@ class CodeDetector:
                     chosen_lang = max(lang_totals, key=lang_totals.get)
                     print(f"  Chosen: {chosen_lang} ({lang_totals[chosen_lang]})")
             
-            if max_score >= 0.5: # threshold
+            if max_score >= 0.4: # threshold
+                if max_score < 0.6 and len(line.strip()) < 40:
+                    continue  # Skip short lines with low confidence
                 code_fragments.append({
                     'line_num': i,
                     'content': line,

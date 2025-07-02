@@ -31,7 +31,7 @@ C_PATTERNS = {
     'multiline_comments': (r'/\*|\*/', 0.6, {'python': 0.8}),
     'preprocessor': (r'#(define|ifdef|ifndef|endif)', 0.5, {'python': 0.8}),
     'c_io': (r'\b(printf|scanf|malloc|free|strlen)\s*\(', 0.6, {'python': 0.7}),
-    'return_semicolon': (r'\breturn\s.*;\s*$', 0.5, {'python': 0.6}),
+    'return_semicolon': (r'\breturn\s.*;\s*$', 0.7, {'python': 0.6}),
     'semicolon_end': (r';\s*$', 0.3, {'python': 0.4}),
     'c_main_function': (r'int\s+main\s*\(', 1.5, {'python': 0.99}),  
     'pointer_syntax': (r'\w+\s*\*\s*\w+', 0.8, {'python': 0.9}),  
@@ -39,6 +39,15 @@ C_PATTERNS = {
     'extern_declaration': (r'extern\s+\w+', 0.6, {'python': 0.8}),
     'c_opening_brace': (r'^\s*\{\s*$', 0.8, {'python': 0.3}),
     'c_closing_brace': (r'^\s*\}\s*$', 0.8, {'python': 0.3}),
+    'preprocessor_directive': (r'^\s*#\s*(define|else|endif|if|ifdef|ifndef)\b', 0.6, {'python': 0.7}),
+    'spaced_define': (r'^\s*#\s+define\s+\w+', 0.7, {'python': 0.8}),
+    'preprocessor_else': (r'^\s*#else\s*$', 0.6, {'python': 0.7}),
+    'variable_declaration': (r'\b[a-zA-Z_]\w*_t\s+\w+.*;\s*$', 0.7, {'python': 0.8}),  # Custom types like lv_coord_t
+    'multi_variable_decl': (r'\b\w+\s+\w+,\s*\w+.*;\s*$', 0.6, {'python': 0.7}),      # int x, y, z;
+    'continue_statement': (r'^\s*continue\s*;\s*$', 0.8, {'python': 0.9}),   # continue;
+    'break_statement': (r'^\s*break\s*;\s*$', 0.8, {'python': 0.9}),         # break;
+    'c_identifier_pattern': (r'\b[a-zA-Z_]\w*_[a-zA-Z]\w*\b', 0.3, {}),  # snake_case identifiers common in C
+    'multiple_vars': (r'\w+,\s*\w+', 0.4, {'python': 0.2}),              # x, y, z pattern
 
 }
 
@@ -58,20 +67,25 @@ COMMON_PATTERNS = {
     'control_flow_start': (r'^\s*(if|else|while|for)\b', 0.6, {}),
     'control_flow_general': (r'\b(if|else|while|for)\b', 0.3, {}),
     'increment_ops': (r'\b\w+\+\+;?\s*$', 0.6, {}),           
-    'simple_return': (r'^\s*return\s+\w+;?\s*$', 0.6, {}),    
+    'simple_return': (r'^\s*return\s+\w+;?\s*$', 0.6, {}),
+    'standalone_bracket': (r'^\s*[\]\)]\s*$', 0.7, {}),
+    'bracket_combinations': (r'^\s*[\]\)\}][\]\)\}]*\s*$', 0.7, {}),
+    'list_item': (r'^\s*["\']?\w+["\']?\s*,\s*$', 0.6, {}),
+    'parameter_with_type': (r'^\s*\w+\s*:\s*\w+.*,\s*$', 0.7, {}),
+    'line_ending_brace': (r'[}\])];\s*$', 0.6, {}),
+    'simple_declaration': (r'^\s*(int|char|float|double)\s+\w+\s*;?\s*$', 0.8, {}),
+    'simple_call': (r'^\s*\w+\.\w+\(\)\s*;?\s*$', 0.7, {}), 
+    'simple_assignment': (r'^\s*\w+\s*=\s*\w+\s*;?\s*$', 0.6, {}),    
 
     # negative patterns to penalize natural language
-    'articles': (r'\b(the|a|an)\s+\w+', -0.3, {}),  # "the code", "a function"
-    'prepositions': (r'\b(in|on|at|by|with|from|to|of)\s+\w+', -0.2, {}),  # "in Python", "by John"
-    'full_sentences': (r'\w+\s+\w+\s+\w+\s+\w+\s+\w+', -0.2, {}),  # 5+ words in sequence
-    'question_words': (r'\b(what|how|why|when|where|which)\b', -0.4, {}),
-    'past_tense': (r'\w+ed\s', -0.1, {}),  # "created", "written"
-    'ordinal_numbers': (r'\b\d+(st|nd|rd|th)\b', -0.3, {}),  # "1st", "2nd"
-    'linking_verbs': (r'\b(is|are|was|were|has|have|been)\s+\w+', -0.2, {}),
-    'markdown_links': (r'\[.*\]\(.*\)', -0.5, {}),  # [link](url)
-    'citations': (r'\d+\.\s+[A-Z]', -0.4, {}),  # "1. This piece"
+    'articles': (r'\b(the|a|an)\s+\w+', -0.3, {}), 
+    'prepositions': (r'\b(in|on|at|by|with|from|to|of)\s+\w+', -0.2, {}),
+    'full_sentences': (r'\w+\s+\w+\s+\w+\s+\w+\s+\w+', -0.2, {}), 
+    'past_tense': (r'\w+ed\s', -0.1, {}),
+    'ordinal_numbers': (r'\b\d+(st|nd|rd|th)\b', -0.3, {}), 
+    'markdown_links': (r'\[.*\]\(.*\)', -0.5, {}), 
+    'citations': (r'\d+\.\s+[A-Z]', -0.4, {}),
     'question_words': (r'(?i)\b(what|how|why|when|where|which|does)\b', -0.7, {}),
-    'articles_with_nouns': (r'\b(the|a|an)\s+\w+', -0.3, {}),
     'verb_phrases': (r'\b(does|do|will|can|should)\s+\w+', -0.4, {}),
     'explanatory_phrases': (r'\b(rather than|in order to|as opposed to|let\'s|we\'re going to)\b', -0.6, {}),
     'tutorial_language': (r'\b(simply|just|now|then|next|first|finally)\s+\w+', -0.5, {}),
@@ -81,4 +95,9 @@ COMMON_PATTERNS = {
     'result_phrases': (r'\b(imported|we can do|able to|up to)\s+\d+', -0.7, {}),
     'technical_explanations': (r'\b(by default|this guarantees|we are instructing)\b', -0.8, {}),
     'conditional_explanations': (r'\b(if|when|because|since|unless)\s+\w+\s+\w+', -0.4, {}),
+    'sentence_ending': (r'\w+\s+(is|are|was|were|has|have|been)\s+\w+', -0.4, {}), 
+    'conversational': (r'\b(i|you|we)\s+(can|should|need|want|have|get)\b', -0.4, {}), 
+    'explanatory_verbs': (r'\b(tried|expect|tested|flagged)\s+', -0.3, {}), 
+    'copyright_generic': (r'copyright|license|author', -0.6, {}), 
+    'file_references': (r'\.(txt|py|c|cpp|h|js|yaml)(\s|$)', -0.4, {}),
 }
