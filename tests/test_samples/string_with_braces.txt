@@ -1,3 +1,0 @@
-print("This { is not } a brace")
-comment = "Array[0] and function()"
-regex = r"\{.*\}"

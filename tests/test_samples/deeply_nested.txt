@@ -1,6 +1,0 @@
-data = {
-    "users": [
-        {"name": "John", "scores": [85, 92, 78]},
-        {"name": "Jane", "scores": [91, 87, 95]}
-    ]
-}

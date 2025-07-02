@@ -1,4 +1,0 @@
-if (condition) {
-    array[index] = function(param1, param2);
-    nested_dict = {"key": [1, 2, 3]};
-}

@@ -1,5 +1,0 @@
-function_call(
-    parameter1,
-    parameter2,
-    nested_call(arg1, arg2)
-)

@@ -1,2 +1,0 @@
-printf("This /* is not */ a comment");
-print("String with */ inside")
