@@ -242,11 +242,11 @@ def stack_overflow_testing(reuse_existing=True):
             
     # Step 1 & 2: Get questions and create test files (returns expected blocks)
     print("\n1. Getting C questions and creating test files...")
-    get_stackoverflow_data("c", 50)
+    get_stackoverflow_data("c", 100)
     expected_blocks_c = create_all_tests("c")
     
     print("\n2. Getting Python questions and creating test files...")
-    get_stackoverflow_data("python", 50)
+    get_stackoverflow_data("python", 100)
     expected_blocks_python = create_all_tests("python")
     
     # Combine expected blocks

@@ -246,14 +246,20 @@ class CodeDetector:
         """
         groups = []
         # Get languages from patterns (excluding 'common')
-        available_languages = [lang for lang in self.patterns.keys() if lang != 'common']
-        for lang in available_languages:
-            lang_fragments = [f for f in fragments if f['language'] == lang]
+        # available_languages = [lang for lang in self.patterns.keys() if lang != 'common']
+        # for lang in available_languages:
+        lang_fragments = [f for f in fragments]
 
-            if lang_fragments:
-                lang_fragments.sort(key=lambda x: x['line_num'])
-                groups.append(self.create_block_from_fragments(lang_fragments))
-        return groups
+        if lang_fragments:
+            lang_fragments.sort(key=lambda x: x['line_num'])
+            groups.append(self.create_block_from_fragments(lang_fragments))
+            return {
+               'content': [f['content'] for f in fragments],
+               'start_line': fragments[0]['line_num'],
+               'end_line': fragments[-1]['line_num'],
+           }
+
+        # return groups
 
     def create_block_from_fragments(self, fragments):
        """
