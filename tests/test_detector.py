@@ -96,7 +96,7 @@ def run_file_test(filename):
 def test_all_sample_files():
     """Test all files in the test samples directory"""
     test_dir = "tests/test_samples/"
-    test_files = glob.glob(os.path.join(test_dir, "**", "*.txt"), recursive=True)
+    test_files = glob.glob(os.path.join(test_dir, "**", "*.txt"))
     
     assert test_files, f"No .txt files found in {test_dir}"
     
@@ -107,3 +107,30 @@ def test_all_sample_files():
         print(f"Processed {file_path} with {len(result)} code blocks detected.")
     save_results_to_file(all_results)
 
+def test_single_file(filename=None):
+    """
+    Test code detection on a single specific file
+    
+    Args:
+        filename (str): Path to the test file, or None to prompt for input
+    """
+    if filename is None:
+        filename = input("Enter the path to the file you want to test: ")
+    
+    print(f"Testing single file: {filename}")
+    result, file_result = run_file_test(filename)
+    
+    # Save results for this single file
+    save_results_to_file([file_result], f"single_file_results_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt")
+    
+    return result, file_result
+
+if __name__ == "__main__":
+    # Check if a filename was provided as command line argument
+    import sys
+    if len(sys.argv) > 1:
+        # Run single file test with provided filename
+        test_single_file(sys.argv[1])
+    else:
+        # Run all tests (existing behavior)
+        test_all_sample_files()

@@ -27,12 +27,12 @@ C_PATTERNS = {
     'includes': (r'#include\s*[<"][^>"]+[>"]', 0.9, {'python': 1.2}),
     'c_function_def': (r'\w+\s+\w+\s*\([^)]*\)\s*\{', 0.8, {'python': 1.2}),
     'data_types': (r'\b(int|char|float|double|void)\b', 0.4, {'python': 0.5}),
-    'c_comments': (r'//.*$', 0.5, {'python': 0.7}),
-    'multiline_comments': (r'/\*|\*/', 0.6, {'python': 0.8}),
+    'c_comments': (r'//.*$', 4, {'python': 0.7}),
+    'multiline_comments': (r'/\*|\*/', 4, {'python': 0.8}),
     'preprocessor': (r'#(define|ifdef|ifndef|endif)', 0.5, {'python': 0.8}),
     'c_io': (r'\b(printf|scanf|malloc|free|strlen)\s*\(', 0.6, {'python': 0.7}),
     'return_semicolon': (r'\breturn\s.*;\s*$', 0.7, {'python': 0.6}),
-    'semicolon_end': (r';\s*$', 0.3, {'python': 0.4}),
+    'semicolon_end': (r';\s*$', 0.6, {'python': 0.4}),
     'c_main_function': (r'int\s+main\s*\(', 1.5, {'python': 0.99}),  
     'pointer_syntax': (r'\w+\s*\*\s*\w+', 0.8, {'python': 0.9}),  
     'arrow_operator': (r'->', 0.9, {'python': 0.95}), 
@@ -44,21 +44,32 @@ C_PATTERNS = {
     'preprocessor_else': (r'^\s*#else\s*$', 0.6, {'python': 0.7}),
     'variable_declaration': (r'\b[a-zA-Z_]\w*_t\s+\w+.*;\s*$', 0.7, {'python': 0.8}),  # Custom types like lv_coord_t
     'multi_variable_decl': (r'\b\w+\s+\w+,\s*\w+.*;\s*$', 0.6, {'python': 0.7}),      # int x, y, z;
+    'multi_variable': (r'\b\w+\s+\w+,\s*\w+', 0.3, {'python': 0.7}),
     'continue_statement': (r'^\s*continue\s*;\s*$', 0.8, {'python': 0.9}),   # continue;
     'break_statement': (r'^\s*break\s*;\s*$', 0.8, {'python': 0.9}),         # break;
     'c_identifier_pattern': (r'\b[a-zA-Z_]\w*_[a-zA-Z]\w*\b', 0.3, {}),  # snake_case identifiers common in C
-    'multiple_vars': (r'\w+,\s*\w+', 0.4, {'python': 0.2}),              # x, y, z pattern
+    'multiple_vars': (r'(?:(?:int|char|float|double|var|let)\s+|^\s*|[=(]\s*)[a-zA-Z_]\w*,\s*[a-zA-Z_]\w*(?=\s*[;)=,])', 0.4, {'python': 0.2}),
+    'typedef_start': (r'typedef\s+\w+', 0.9, {'python': 0.95}),  # Catches any typedef beginning
+    'struct_end_with_type': (r'^\s*\}\s*[a-zA-Z_]\w*\s*;', 0.8, {'python': 0.9}),  # Catches "} TypeName;"
+    'function_pointer': (r'typedef\s+\w+\s*\(\s*\*', 0.95, {'python': 0.98}),  # Function pointers are very C-specific
+    'brace_else': (r'^\s*\}\s*else\s*\{', 0.8, {}),
+    'closing_brace_statement': (r'^\s*\}\s*(else|while|catch|finally)', 0.7, {}),
+    'else_if_pattern': (r'^\s*\}\s*else\s+if\s*\(', 0.8, {}),
+    'control_flow_with_braces': (r'\}\s*(else|while|catch)\s*[\{\(]', 0.7, {}),
+    'struct_definition': (r'struct\s+\w+\s*\{', 0.9, {'python': 0.9}),
+    'case_statement': (r'^\s*case\s+.+:', 0.8, {'python': 0.9}),
+    'default_case': (r'^\s*default\s*:', 0.9, {'python': 0.9}),
+    'switch_statement': (r'switch\s*\(', 0.9, {'python': 0.9}),
 
 }
 
 COMMON_PATTERNS = {
-    'brackets': (r'[(){}\[\]]', 0.2, {}),
     'function_call': (r'\w+\s*\(', 0.4, {}),
     'assignment': (r'\w+\s*=\s*', 0.3, {}),
     'array_access': (r'\w+\[.*\]', 0.4, {}),
     'operators': (r'[+\-*/=<>!&|]+', 0.1, {}),
     'numbers': (r'\b\d+\b', 0.1, {}),
-    'comma_separated': (r',\s*["\w]', 0.2, {}),
+    'comma_separated': (r',\s*(?:"[^"]*"|\w+)(?=\s*[,\]\}\)])', 0.2, {}),
     'string_literals': (r'["\'].*["\']', 0.2, {}),
     'object_literal': (r'\{[^}]*:', 0.6, {}),
     'multiline_call': (r'\w+\s*\(\s*$', 0.6, {}),
@@ -100,4 +111,12 @@ COMMON_PATTERNS = {
     'explanatory_verbs': (r'\b(tried|expect|tested|flagged)\s+', -0.3, {}), 
     'copyright_generic': (r'copyright|license|author', -0.6, {}), 
     'file_references': (r'\.(txt|py|c|cpp|h|js|yaml)(\s|$)', -0.4, {}),
+    'http_urls': (r'https?://[^\s]+', -0.8, {}),
+    'www_urls': (r'www\.[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}', -0.7, {}),
+    'ftp_urls': (r'ftp://[^\s]+', -0.8, {}),
+    'generic_urls': (r'\b[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/[^\s]*', -0.6, {}),
+    'file_paths': (r'[a-zA-Z]:[/\\][^\s]+', -0.5, {}),  
+    'unix_paths': (r'/[a-zA-Z0-9_.-]+/[^\s]*', -0.4, {}), 
+    'domain_extensions': (r'\b\w+\.(com|org|net|edu|gov|io|co)\b', -0.6, {}),
+    'email_addresses': (r'\b[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\b', -0.7, {}),
 }

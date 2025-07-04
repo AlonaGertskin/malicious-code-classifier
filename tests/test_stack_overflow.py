@@ -187,7 +187,11 @@ def load_existing_expected_blocks():
                     
                     if os.path.exists(f"tests/test_samples/{filename}"):
                         code_blocks = extract_expected_code_blocks(question["body"])
-                        all_expected_blocks[filename] = code_blocks
+                        if code_blocks:
+                            unified_block = '\n'.join(code_blocks)
+                            all_expected_blocks[filename] = [unified_block]
+                        else:
+                            all_expected_blocks[filename] = []
             except Exception as e:
                 print(f"Error loading {json_file}: {e}")
     

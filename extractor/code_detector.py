@@ -2,11 +2,12 @@ import re
 from .patterns import PYTHON_PATTERNS, C_PATTERNS, COMMON_PATTERNS
 
 class CodeDetector:
-    def __init__(self, debug=False):
+    def __init__(self, debug=False, threshold=0.4):
         """
         Initialize the code detector with patterns for different languages.
         """
         self.debug = debug
+        self.threshold = threshold
         self.patterns = {
             'python': PYTHON_PATTERNS,    # Python-specific patterns
             'c': C_PATTERNS,              # C-specific patterns
@@ -62,9 +63,9 @@ class CodeDetector:
                     chosen_lang = max(lang_totals, key=lang_totals.get)
                     print(f"  Chosen: {chosen_lang} ({lang_totals[chosen_lang]})")
             
-            if max_score >= 0.4: # threshold
-                if max_score < 0.6 and len(line.strip()) < 40:
-                    continue  # Skip short lines with low confidence
+            if max_score >= self.threshold: # threshold
+                # if max_score <= 0.6 and len(line.strip()) < 40:
+                #     continue  # Skip short lines with low confidence
                 code_fragments.append({
                     'line_num': i,
                     'content': line,
