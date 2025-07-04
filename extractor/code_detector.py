@@ -72,7 +72,7 @@ class CodeDetector:
                     'score': max_score
                 })
         
-        code_blocks =  self.group_by_language(code_fragments)
+        code_blocks =  self.unify_fragments(code_fragments)
 
         for block in code_blocks:            
             structure_info = self.analyze_structure(block['content'], block['language'], block['start_line'])
@@ -84,40 +84,33 @@ class CodeDetector:
         code_blocks = [block for block in code_blocks if self.is_meaningful_code_block(block)]
 
         return code_blocks
-        
-    def line_contains_code_patterns(self, line):
-        """
-        Check if a line contains code patterns
-        fast boolean check for the initial scan
-        TODO
-        adding a evaluate_code_patterns function that 
-        does detailed analysis of code patterns with weighted scoring for patterns
-        """
-        # Check against all patterns
-        for lang_patterns in self.patterns.values():
-            for pattern in lang_patterns.values():
-                if re.search(pattern, line):
-                    return True
-        return False
 
-    def extract_block(self, lines, start_idx):
+    def unify_fragments(self, fragments):
         """
-        Extract a complete code block starting from given line
-        Might not use because code could be fragmented and not in blocks
+        Simple function to combine all code fragments into a single block
+        
+        Args:
+            fragments (list): List of code fragments with line numbers and content
+            
+        Returns:
+            list: Single-item list containing one unified code block, or empty list if no fragments
         """
-        block = {
-            'content': [],
-            'start_line': start_idx,
-            'end_line': start_idx,
-            'language': None,
-            'confidence': 0.0
+        if not fragments:
+            return []
+        
+        # Sort by line number to preserve original order
+        fragments.sort(key=lambda x: x['line_num'])
+        
+        # Create unified block with basic info
+        unified_block = {
+            'content': [f['content'] for f in fragments],
+            'start_line': fragments[0]['line_num'],
+            'end_line': fragments[-1]['line_num'],
+            'language': '',
+            'confidence': sum(f['score'] for f in fragments) / len(fragments)
         }
         
-        # Extract block based on indentation or braces
-        # TODO
-        # To be implemented
-        
-        return block if block['content'] else None
+        return [unified_block]
 
     def identify_language(self, code_block):
         """
@@ -246,20 +239,14 @@ class CodeDetector:
         """
         groups = []
         # Get languages from patterns (excluding 'common')
-        # available_languages = [lang for lang in self.patterns.keys() if lang != 'common']
-        # for lang in available_languages:
-        lang_fragments = [f for f in fragments]
+        available_languages = [lang for lang in self.patterns.keys() if lang != 'common']
+        for lang in available_languages:
+            lang_fragments = [f for f in fragments if f['language'] == lang]
 
-        if lang_fragments:
-            lang_fragments.sort(key=lambda x: x['line_num'])
-            groups.append(self.create_block_from_fragments(lang_fragments))
-            return {
-               'content': [f['content'] for f in fragments],
-               'start_line': fragments[0]['line_num'],
-               'end_line': fragments[-1]['line_num'],
-           }
-
-        # return groups
+            if lang_fragments:
+                lang_fragments.sort(key=lambda x: x['line_num'])
+                groups.append(self.create_block_from_fragments(lang_fragments))
+        return groups
 
     def create_block_from_fragments(self, fragments):
        """

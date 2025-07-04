@@ -475,8 +475,6 @@ def save_validation_report(validation_results, all_expected_blocks, detection_re
                 f.write("DETECTED CODE BLOCKS:\n")
                 detected_blocks = detection_results[filename]
                 for i, block in enumerate(detected_blocks):
-                    f.write(f"  Block {i+1}:\n")
-                    f.write(f"    Language: {block.get('language', 'Unknown')}\n")
                     f.write(f"    Lines: {block.get('start_line', 'N/A')}-{block.get('end_line', 'N/A')}\n")
                     f.write(f"    Confidence: {block.get('confidence', 'N/A')}\n")
                     f.write(f"    Content:\n")
@@ -492,20 +490,12 @@ def save_validation_report(validation_results, all_expected_blocks, detection_re
                 f.write("\nFALSE POSITIVES (detected but shouldn't be):\n")
                 for fp in file_result['false_positive_details']:
                     f.write(f"  Line {fp['line_number']}: {fp['line']}\n")
-                    if fp['context']['before']:
-                        f.write(f"    Before: {fp['context']['before']}\n")
-                    if fp['context']['after']:
-                        f.write(f"    After: {fp['context']['after']}\n")
             
             # Missed detections details
             if file_result['missed_detection_details']:
                 f.write("\nMISSED DETECTIONS (should be detected but weren't):\n")
                 for md in file_result['missed_detection_details']:
                     f.write(f"  Expected line {md['expected_line_number']}: {md['line']}\n")
-                    if md['context']['before']:
-                        f.write(f"    Before: {md['context']['before']}\n")
-                    if md['context']['after']:
-                        f.write(f"    After: {md['context']['after']}\n")
             
             f.write("\n" + "-" * 60 + "\n\n")
     
