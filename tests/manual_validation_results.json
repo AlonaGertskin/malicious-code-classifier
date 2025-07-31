@@ -1,0 +1,1002 @@
+{
+  "c_stackoverflow_animation_not_animating_correc.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "c_stackoverflow_are_i_c_child_nodes_instantiat.txt": {
+    "contains_code": true,
+    "code_type": "no_code",
+    "expected_detection": true
+  },
+  "c_stackoverflow_are__asctime_r__and__ctime_r__.txt": {
+    "contains_code": false,
+    "code_type": "no_code",
+    "expected_detection": false
+  },
+  "c_stackoverflow_c51___non_understandable_behav.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "c_stackoverflow_c51___wrong_jumping.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "c_stackoverflow_can_i_printf_a_half_precision_.txt": {
+    "contains_code": false,
+    "code_type": "no_code",
+    "expected_detection": false
+  },
+  "c_stackoverflow_can_i_tell_my_compiler_that_a_.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "c_stackoverflow_can_linking_be_nested__e_g__by.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "c_stackoverflow_clangd_lsp_with_cmock.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "c_stackoverflow_clang_format_is_not_formatting.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "c_stackoverflow_compiling_libwebsockets_with_c.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "c_stackoverflow_cygwin_gdb_not_working_under_c.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "c_stackoverflow_c_how_to_generate_an_arbitrary.txt": {
+    "contains_code": false,
+    "code_type": "no_code",
+    "expected_detection": false
+  },
+  "c_stackoverflow_c_programm__define_from__defin.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "c_stackoverflow_c_switch_function.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "c_stackoverflow_c___s_virtual_methods_implemen.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "c_stackoverflow_dangling_pointer_to_pointer_wa.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "c_stackoverflow_differentiating_pointer_declar.txt": {
+    "contains_code": false,
+    "code_type": "no_code",
+    "expected_detection": false
+  },
+  "c_stackoverflow_discover_gatt_characteristics_.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "c_stackoverflow_does_critical_section_protecte.txt": {
+    "contains_code": false,
+    "code_type": "no_code",
+    "expected_detection": false
+  },
+  "c_stackoverflow_does_strtok_s_static_state_lea.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "c_stackoverflow_does_there_exist_a_reversed_co.txt": {
+    "contains_code": false,
+    "code_type": "no_code",
+    "expected_detection": false
+  },
+  "c_stackoverflow_dynamically_resizing_array_in_.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "c_stackoverflow_encountering_an_issue_in_sasm_.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "c_stackoverflow_error_invalid_parameter_in_set.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "c_stackoverflow_expected_identifier_or______ho.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "c_stackoverflow_finding_config_files_on_androi.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "c_stackoverflow_gnu_attribute__nonnull__and_cu.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "c_stackoverflow_how_can_i_read_environment_var.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "c_stackoverflow_how_does_the_syntax_in_this_fu.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "c_stackoverflow_how_do_i_calculate_the_end_add.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "c_stackoverflow_how_do_i_compile_with_gcc_usin.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "c_stackoverflow_how_do_i_set_data_in_an_inode_.txt": {
+    "contains_code": false,
+    "code_type": "no_code",
+    "expected_detection": false
+  },
+  "c_stackoverflow_how_do_i_share_scalar_types___.txt": {
+    "contains_code": false,
+    "code_type": "pure_code",
+    "expected_detection": false
+  },
+  "c_stackoverflow_how_do_i_update_an_address_wit.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "c_stackoverflow_how_is_lcd_rw_defined_in_sdcc.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "c_stackoverflow_how_to_avoid_buffered_printf__.txt": {
+    "contains_code": false,
+    "code_type": "no_code",
+    "expected_detection": false
+  },
+  "c_stackoverflow_how_to_create_a_macos_app_bund.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "c_stackoverflow_how_to_exclude_a_usb_adapter_v.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "c_stackoverflow_how_to_force_compiler_error_wi.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "c_stackoverflow_how_to_initialize_a_2d_array_w.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "c_stackoverflow_how_to_map_a_value_from_one_ra.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "c_stackoverflow_how_to_pass_raw_c_style_data__.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "c_stackoverflow_how_to_read_exported_symbol_fr.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "c_stackoverflow_how_to_use_ddd_for_debugging_p.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "c_stackoverflow_how_to_wrap_an_already_weak_fu.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "c_stackoverflow_initialize_array_of_pointer_to.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "c_stackoverflow_inputting_to_a_cstring_of_unde.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "c_stackoverflow_in_linux__can_i_make_a_file_un.txt": {
+    "contains_code": false,
+    "code_type": "no_code",
+    "expected_detection": false
+  },
+  "c_stackoverflow_ios__loaded_dynamic_library_ca.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "c_stackoverflow_is_there_any_better_way_to_do_.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "c_stackoverflow_is_there_a_way_to_set_configur.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "c_stackoverflow_is_this_a_use_for_linker_scrip.txt": {
+    "contains_code": false,
+    "code_type": "no_code",
+    "expected_detection": false
+  },
+  "c_stackoverflow_i_o_expander_from_pcf8574_to_t.txt": {
+    "contains_code": false,
+    "code_type": "no_code",
+    "expected_detection": false
+  },
+  "c_stackoverflow_level_of_type_casting_of_point.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "c_stackoverflow_lex_setup_correctly_validating.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "c_stackoverflow_linker_placement_order_is_reve.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "c_stackoverflow_linux_inotify_and_opendir.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "c_stackoverflow_linux__low_level_management_of.txt": {
+    "contains_code": false,
+    "code_type": "no_code",
+    "expected_detection": false
+  },
+  "c_stackoverflow_medicodec_dequeue_out_failing_.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "c_stackoverflow_mixed_type_hash_table_design.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "c_stackoverflow_mysql_proper_api_call.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "c_stackoverflow_not_seeing_webview_within_webk.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "c_stackoverflow_open_mpi_and_mpich_failing_on_.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "c_stackoverflow_pass_c_struct_as__deep__const.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "c_stackoverflow_problems_with_printing_double_.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "c_stackoverflow_psa_error_insufficient_entropy.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "c_stackoverflow_sdcc_can_t_syntax_sbit_of_lcd1.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "c_stackoverflow_segmentation_fault_in_fputs_wh.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "c_stackoverflow_simple_c__typescript_code_is_s.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "c_stackoverflow_simple_xor_loop_in_nasm.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "c_stackoverflow_split_strncmp_and_combine_.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "c_stackoverflow_stack_smashing_with_strtol.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "c_stackoverflow_standards_compliant_way_to_wri.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "c_stackoverflow_static_variable_in_the_header_.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "c_stackoverflow_strange_behaviour_of_atomiccas.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "c_stackoverflow_string_format_specifier_works_.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "c_stackoverflow_undefined_reference_to_mbedtls.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "c_stackoverflow_understanding_static_dynamic_a.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "c_stackoverflow_unexpected_compiler_warning___.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "c_stackoverflow_using_android_ca_store_and_ope.txt": {
+    "contains_code": false,
+    "code_type": "no_code",
+    "expected_detection": false
+  },
+  "c_stackoverflow_variable_number_of_arguments_w.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "c_stackoverflow_what_determines_when_an_array_.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "c_stackoverflow_what_does_the_macro_condition_.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "c_stackoverflow_what_is_the_best_approach_to_h.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "c_stackoverflow_what_is_the_use_of_startct_blk.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "c_stackoverflow_what_is_the__cleanest__way_to_.txt": {
+    "contains_code": false,
+    "code_type": "no_code",
+    "expected_detection": false
+  },
+  "c_stackoverflow_what_s_wrong_with_this_thread_.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "c_stackoverflow_while_loop_in_c_clipboard_prog.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "c_stackoverflow_why_a_pdf_reader_doesn_t_read_.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "c_stackoverflow_why_can_t_i_write_via_uart_.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "c_stackoverflow_why_doesn_t_the_windows_c_comp.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "c_stackoverflow_why_does_my_function_replace_m.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "c_stackoverflow_why_does_the_c_compiler_save_r.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "c_stackoverflow_why_do_c_compilers_still_prefe.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "c_stackoverflow_why_is_my_string_not_printing_.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "c_stackoverflow_why_is_the_message_arrived_cal.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "c_stackoverflow_why_i_can_t_create_a_pixmap_fr.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "c_stackoverflow_why_zero_has_no_decimal_intege.txt": {
+    "contains_code": false,
+    "code_type": "no_code",
+    "expected_detection": false
+  },
+  "c_stackoverflow_writing_a_binomial_coefficient.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "python_stackoverflow_access_to_integer_value.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "python_stackoverflow_auto_detect_the_language_for_s.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "python_stackoverflow_can_t_convert_geometry_from_ba.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "python_stackoverflow_can_t_upload_to_ftps_using_pyt.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "python_stackoverflow_captchafox__problem_with_sendi.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "python_stackoverflow_chatbot_does_not_read_web_craw.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "python_stackoverflow_cloned_table_works_causes_fore.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "python_stackoverflow_collection_of_strings_as_pytho.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "python_stackoverflow_column_named_read_as_tuple_ins.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "python_stackoverflow_confused_about_how_tf_keras_se.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "python_stackoverflow_crypto_fips_fips_c_154__openss.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "python_stackoverflow_deepseek_r1_api_integration_re.txt": {
+    "contains_code": false,
+    "code_type": "no_code",
+    "expected_detection": false
+  },
+  "python_stackoverflow_dfi_export_and_style__clipping.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "python_stackoverflow_django_admin_ask_for_login_on_.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "python_stackoverflow_django_rest_viewsets_modelview.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "python_stackoverflow_does_python_store_subscr_bytec.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "python_stackoverflow_enum_class_with_function_value.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "python_stackoverflow_exchangelib_wrong_credentials_.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "python_stackoverflow_export_to_csv_issue_only_retur.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "python_stackoverflow_fastapi_becomes_unresponsive_w.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "python_stackoverflow_fastapi_workers_die_in_add_bas.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "python_stackoverflow_filter_django_rangefield_by_co.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "python_stackoverflow_fmm_m2m_translation_discrepanc.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "python_stackoverflow_getting_the_default_outlook_si.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "python_stackoverflow_horizontal_scroll_on_shift_in_.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "python_stackoverflow_how_can_i_change_the_x_axis_of.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "python_stackoverflow_how_can_i_trigger_automatic_ac.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "python_stackoverflow_how_can_i_use_string_with_back.txt": {
+    "contains_code": false,
+    "code_type": "no_code",
+    "expected_detection": false
+  },
+  "python_stackoverflow_how_do_i_fix_a_spotipy_access_.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "python_stackoverflow_how_do_i_update_my_get_history.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "python_stackoverflow_how_to_automatically_convert_o.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "python_stackoverflow_how_to_convert_sql_formula_to_.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "python_stackoverflow_how_to_create_rgb_healpix_fits.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "python_stackoverflow_how_to_draw_vertical_dashed_li.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "python_stackoverflow_how_to_fill_values_in_a_datafr.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "python_stackoverflow_how_to_finish_a_test_using_pyt.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "python_stackoverflow_how_to_generate_this_simple_da.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "python_stackoverflow_how_to_get_gradient_with_respe.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "python_stackoverflow_how_to_identify_issue_with_my_.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "python_stackoverflow_how_to_merge_two_csv_files_bas.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "python_stackoverflow_how_to_parse__ole_file_in_pyth.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "python_stackoverflow_how_to_plot_x_axis_in_scientif.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "python_stackoverflow_how_to_replace_existing_data_i.txt": {
+    "contains_code": false,
+    "code_type": "no_code",
+    "expected_detection": false
+  },
+  "python_stackoverflow_how_to_train_gpt_models_in_tra.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "python_stackoverflow_how_to_use_a_python_regular_ex.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "python_stackoverflow_how_to_use_the_same_entry_box_.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "python_stackoverflow_how_to_use_yaml_file_parameter.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "python_stackoverflow_if_a_python_app_uses_uv_lock_f.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "python_stackoverflow_import__pyd_python_module.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "python_stackoverflow_installation_of_backtesting_pa.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "python_stackoverflow_in_pandas__how_to_write_the_wo.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "python_stackoverflow_is_there_a_reason_why_paramiko.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "python_stackoverflow_i_don_t_understand_why_my_test.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "python_stackoverflow_i_need_another_way_to_fill_a_s.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "python_stackoverflow_jax_lax_scan__how_to_iterate_o.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "python_stackoverflow_learnable_parameter_only_updat.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "python_stackoverflow_loading_unpacked_chrome_extens.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "python_stackoverflow_matplotlib_requires_dateutil.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "python_stackoverflow_modulenotfounderror__no_module.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "python_stackoverflow_my_tensor_flow_model_cannot_ge.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "python_stackoverflow_nicegui_aggrid_flashing_cell_b.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "python_stackoverflow_oserror_with_tesseract.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "python_stackoverflow_pandas_dt_accessor_or_groupby_.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "python_stackoverflow_pelican_gives_exception__unabl.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "python_stackoverflow_plot_characters_on_a_graph_usi.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "python_stackoverflow_polars_schema_override_for_dat.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "python_stackoverflow_problem_refreshing_excel_data_.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "python_stackoverflow_problem_with_file_path_resolut.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "python_stackoverflow_problem_with_pygame_window_not.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "python_stackoverflow_python_3_13_5_ctypes_and_tkint.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "python_stackoverflow_python_azure_function_failing_.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "python_stackoverflow_python_code_to_get_direct_down.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "python_stackoverflow_python_lambda_returns_0.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "python_stackoverflow_python_unpicklingerror__invali.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "python_stackoverflow_python_wand__magickreadimage_r.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "python_stackoverflow_ray_parallelised_function_inte.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "python_stackoverflow_reveal_type_in_python_as_of_py.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "python_stackoverflow_rolling_quantile_with_lots_of_.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "python_stackoverflow_should_i_use_jax_grad_or_imple.txt": {
+    "contains_code": false,
+    "code_type": "no_code",
+    "expected_detection": false
+  },
+  "python_stackoverflow_snopt_installation_for_pyoptsp.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "python_stackoverflow_snowflake___sqlalchemy___alemb.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "python_stackoverflow_solve_a_2_equations_systems_of.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "python_stackoverflow_stream_klv_and_video_using_ffm.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "python_stackoverflow_tabularexplainer_not_working_f.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "python_stackoverflow_trying_to_build_a_discord_star.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "python_stackoverflow_trying_to_update_context_varia.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "python_stackoverflow_unable_to_import_the_compresse.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "python_stackoverflow_unexpected_memory_leak_in_pyth.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "python_stackoverflow_using_pytest_to_test_a_while_l.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "python_stackoverflow_uvicorn_not_getting_trace_id_f.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "python_stackoverflow_uv__required_environments___on.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "python_stackoverflow_vscode__navigate_from_exceptio.txt": {
+    "contains_code": false,
+    "code_type": "no_code",
+    "expected_detection": false
+  },
+  "python_stackoverflow_what_could_cause_a_django_webp.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "python_stackoverflow_why_does_generating_the_sobol_.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "python_stackoverflow_why_does_replacesubstructs___a.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "python_stackoverflow_why_does_zoneinfo_available_ti.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "python_stackoverflow_why_do_we_need_to_mount_config.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "python_stackoverflow_why_grouping_a_pandas_series_u.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "python_stackoverflow_why_is_pandas_not_formatting_d.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  },
+  "python_stackoverflow_why___first_____and_why_before.txt": {
+    "contains_code": true,
+    "code_type": "pure_code",
+    "expected_detection": true
+  }
+}

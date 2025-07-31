@@ -1,0 +1,256 @@
+================================================================================
+VALIDATION REPORT - MANUAL VS AUTOMATIC DETECTION
+================================================================================
+Generated: 2025-07-31 21:57:09
+
+SUMMARY
+----------------------------------------
+Total files tested: 200
+Correct Detections: 192 (96.0%)
+False positives: 1 (0.5%)
+Miss Detect: 7 (3.5%)
+
+BREAKDOWN BY LANGUAGE
+----------------------------------------
+Python files: 100
+  Correct: 94 (94.0%)
+  Errors: 6
+
+C files: 100
+  Correct: 98 (98.0%)
+  Errors: 2
+
+FALSE POSITIVES (Detected code when there isn't)
+----------------------------------------
+1. c_stackoverflow_how_do_i_share_scalar_types___.txt
+   Manual classification: pure_code
+   Number of blocks detected: 1
+
+FALSE NEGATIVES (Didn't detect code when there is)
+----------------------------------------
+1. c_stackoverflow_how_to_use_ddd_for_debugging_p.txt
+   Manual classification: pure_code
+   Expected to detect: Yes
+2. python_stackoverflow_dfi_export_and_style__clipping.txt
+   Manual classification: pure_code
+   Expected to detect: Yes
+3. python_stackoverflow_how_to_fill_values_in_a_datafr.txt
+   Manual classification: pure_code
+   Expected to detect: Yes
+4. python_stackoverflow_how_to_parse__ole_file_in_pyth.txt
+   Manual classification: pure_code
+   Expected to detect: Yes
+5. python_stackoverflow_in_pandas__how_to_write_the_wo.txt
+   Manual classification: pure_code
+   Expected to detect: Yes
+6. python_stackoverflow_pelican_gives_exception__unabl.txt
+   Manual classification: pure_code
+   Expected to detect: Yes
+7. python_stackoverflow_snopt_installation_for_pyoptsp.txt
+   Manual classification: pure_code
+   Expected to detect: Yes
+
+DETAILED RESULTS FOR ALL FILES
+----------------------------------------
+Filename                                                     Manual     Detected   Result    
+------------------------------------------------------------------------------------------
+c_stackoverflow_animation_not_animating_correc.txt           Code       Code       ✓ OK      
+c_stackoverflow_are__asctime_r__and__ctime_r__.txt           No Code    No Code    ✓ OK      
+c_stackoverflow_are_i_c_child_nodes_instantiat.txt           Code       Code       ✓ OK      
+c_stackoverflow_c51___non_understandable_behav.txt           Code       Code       ✓ OK      
+c_stackoverflow_c51___wrong_jumping.txt                      Code       Code       ✓ OK      
+c_stackoverflow_c___s_virtual_methods_implemen.txt           Code       Code       ✓ OK      
+c_stackoverflow_c_how_to_generate_an_arbitrary.txt           No Code    No Code    ✓ OK      
+c_stackoverflow_c_programm__define_from__defin.txt           Code       Code       ✓ OK      
+c_stackoverflow_c_switch_function.txt                        Code       Code       ✓ OK      
+c_stackoverflow_can_i_printf_a_half_precision_.txt           No Code    No Code    ✓ OK      
+c_stackoverflow_can_i_tell_my_compiler_that_a_.txt           Code       Code       ✓ OK      
+c_stackoverflow_can_linking_be_nested__e_g__by.txt           Code       Code       ✓ OK      
+c_stackoverflow_clang_format_is_not_formatting.txt           Code       Code       ✓ OK      
+c_stackoverflow_clangd_lsp_with_cmock.txt                    Code       Code       ✓ OK      
+c_stackoverflow_compiling_libwebsockets_with_c.txt           Code       Code       ✓ OK      
+c_stackoverflow_cygwin_gdb_not_working_under_c.txt           Code       Code       ✓ OK      
+c_stackoverflow_dangling_pointer_to_pointer_wa.txt           Code       Code       ✓ OK      
+c_stackoverflow_differentiating_pointer_declar.txt           No Code    No Code    ✓ OK      
+c_stackoverflow_discover_gatt_characteristics_.txt           Code       Code       ✓ OK      
+c_stackoverflow_does_critical_section_protecte.txt           No Code    No Code    ✓ OK      
+c_stackoverflow_does_strtok_s_static_state_lea.txt           Code       Code       ✓ OK      
+c_stackoverflow_does_there_exist_a_reversed_co.txt           No Code    No Code    ✓ OK      
+c_stackoverflow_dynamically_resizing_array_in_.txt           Code       Code       ✓ OK      
+c_stackoverflow_encountering_an_issue_in_sasm_.txt           Code       Code       ✓ OK      
+c_stackoverflow_error_invalid_parameter_in_set.txt           Code       Code       ✓ OK      
+c_stackoverflow_expected_identifier_or______ho.txt           Code       Code       ✓ OK      
+c_stackoverflow_finding_config_files_on_androi.txt           Code       Code       ✓ OK      
+c_stackoverflow_gnu_attribute__nonnull__and_cu.txt           Code       Code       ✓ OK      
+c_stackoverflow_how_can_i_read_environment_var.txt           Code       Code       ✓ OK      
+c_stackoverflow_how_do_i_calculate_the_end_add.txt           Code       Code       ✓ OK      
+c_stackoverflow_how_do_i_compile_with_gcc_usin.txt           Code       Code       ✓ OK      
+c_stackoverflow_how_do_i_set_data_in_an_inode_.txt           No Code    No Code    ✓ OK      
+c_stackoverflow_how_do_i_share_scalar_types___.txt           No Code    Code       ✗ ERROR   
+c_stackoverflow_how_do_i_update_an_address_wit.txt           Code       Code       ✓ OK      
+c_stackoverflow_how_does_the_syntax_in_this_fu.txt           Code       Code       ✓ OK      
+c_stackoverflow_how_is_lcd_rw_defined_in_sdcc.txt            Code       Code       ✓ OK      
+c_stackoverflow_how_to_avoid_buffered_printf__.txt           No Code    No Code    ✓ OK      
+c_stackoverflow_how_to_create_a_macos_app_bund.txt           Code       Code       ✓ OK      
+c_stackoverflow_how_to_exclude_a_usb_adapter_v.txt           Code       Code       ✓ OK      
+c_stackoverflow_how_to_force_compiler_error_wi.txt           Code       Code       ✓ OK      
+c_stackoverflow_how_to_initialize_a_2d_array_w.txt           Code       Code       ✓ OK      
+c_stackoverflow_how_to_map_a_value_from_one_ra.txt           Code       Code       ✓ OK      
+c_stackoverflow_how_to_pass_raw_c_style_data__.txt           Code       Code       ✓ OK      
+c_stackoverflow_how_to_read_exported_symbol_fr.txt           Code       Code       ✓ OK      
+c_stackoverflow_how_to_use_ddd_for_debugging_p.txt           Code       No Code    ✗ ERROR   
+c_stackoverflow_how_to_wrap_an_already_weak_fu.txt           Code       Code       ✓ OK      
+c_stackoverflow_i_o_expander_from_pcf8574_to_t.txt           No Code    No Code    ✓ OK      
+c_stackoverflow_in_linux__can_i_make_a_file_un.txt           No Code    No Code    ✓ OK      
+c_stackoverflow_initialize_array_of_pointer_to.txt           Code       Code       ✓ OK      
+c_stackoverflow_inputting_to_a_cstring_of_unde.txt           Code       Code       ✓ OK      
+c_stackoverflow_ios__loaded_dynamic_library_ca.txt           Code       Code       ✓ OK      
+c_stackoverflow_is_there_a_way_to_set_configur.txt           Code       Code       ✓ OK      
+c_stackoverflow_is_there_any_better_way_to_do_.txt           Code       Code       ✓ OK      
+c_stackoverflow_is_this_a_use_for_linker_scrip.txt           No Code    No Code    ✓ OK      
+c_stackoverflow_level_of_type_casting_of_point.txt           Code       Code       ✓ OK      
+c_stackoverflow_lex_setup_correctly_validating.txt           Code       Code       ✓ OK      
+c_stackoverflow_linker_placement_order_is_reve.txt           Code       Code       ✓ OK      
+c_stackoverflow_linux__low_level_management_of.txt           No Code    No Code    ✓ OK      
+c_stackoverflow_linux_inotify_and_opendir.txt                Code       Code       ✓ OK      
+c_stackoverflow_medicodec_dequeue_out_failing_.txt           Code       Code       ✓ OK      
+c_stackoverflow_mixed_type_hash_table_design.txt             Code       Code       ✓ OK      
+c_stackoverflow_mysql_proper_api_call.txt                    Code       Code       ✓ OK      
+c_stackoverflow_not_seeing_webview_within_webk.txt           Code       Code       ✓ OK      
+c_stackoverflow_open_mpi_and_mpich_failing_on_.txt           Code       Code       ✓ OK      
+c_stackoverflow_pass_c_struct_as__deep__const.txt            Code       Code       ✓ OK      
+c_stackoverflow_problems_with_printing_double_.txt           Code       Code       ✓ OK      
+c_stackoverflow_psa_error_insufficient_entropy.txt           Code       Code       ✓ OK      
+c_stackoverflow_sdcc_can_t_syntax_sbit_of_lcd1.txt           Code       Code       ✓ OK      
+c_stackoverflow_segmentation_fault_in_fputs_wh.txt           Code       Code       ✓ OK      
+c_stackoverflow_simple_c__typescript_code_is_s.txt           Code       Code       ✓ OK      
+c_stackoverflow_simple_xor_loop_in_nasm.txt                  Code       Code       ✓ OK      
+c_stackoverflow_split_strncmp_and_combine_.txt               Code       Code       ✓ OK      
+c_stackoverflow_stack_smashing_with_strtol.txt               Code       Code       ✓ OK      
+c_stackoverflow_standards_compliant_way_to_wri.txt           Code       Code       ✓ OK      
+c_stackoverflow_static_variable_in_the_header_.txt           Code       Code       ✓ OK      
+c_stackoverflow_strange_behaviour_of_atomiccas.txt           Code       Code       ✓ OK      
+c_stackoverflow_string_format_specifier_works_.txt           Code       Code       ✓ OK      
+c_stackoverflow_undefined_reference_to_mbedtls.txt           Code       Code       ✓ OK      
+c_stackoverflow_understanding_static_dynamic_a.txt           Code       Code       ✓ OK      
+c_stackoverflow_unexpected_compiler_warning___.txt           Code       Code       ✓ OK      
+c_stackoverflow_using_android_ca_store_and_ope.txt           No Code    No Code    ✓ OK      
+c_stackoverflow_variable_number_of_arguments_w.txt           Code       Code       ✓ OK      
+c_stackoverflow_what_determines_when_an_array_.txt           Code       Code       ✓ OK      
+c_stackoverflow_what_does_the_macro_condition_.txt           Code       Code       ✓ OK      
+c_stackoverflow_what_is_the__cleanest__way_to_.txt           No Code    No Code    ✓ OK      
+c_stackoverflow_what_is_the_best_approach_to_h.txt           Code       Code       ✓ OK      
+c_stackoverflow_what_is_the_use_of_startct_blk.txt           Code       Code       ✓ OK      
+c_stackoverflow_what_s_wrong_with_this_thread_.txt           Code       Code       ✓ OK      
+c_stackoverflow_while_loop_in_c_clipboard_prog.txt           Code       Code       ✓ OK      
+c_stackoverflow_why_a_pdf_reader_doesn_t_read_.txt           Code       Code       ✓ OK      
+c_stackoverflow_why_can_t_i_write_via_uart_.txt              Code       Code       ✓ OK      
+c_stackoverflow_why_do_c_compilers_still_prefe.txt           Code       Code       ✓ OK      
+c_stackoverflow_why_does_my_function_replace_m.txt           Code       Code       ✓ OK      
+c_stackoverflow_why_does_the_c_compiler_save_r.txt           Code       Code       ✓ OK      
+c_stackoverflow_why_doesn_t_the_windows_c_comp.txt           Code       Code       ✓ OK      
+c_stackoverflow_why_i_can_t_create_a_pixmap_fr.txt           Code       Code       ✓ OK      
+c_stackoverflow_why_is_my_string_not_printing_.txt           Code       Code       ✓ OK      
+c_stackoverflow_why_is_the_message_arrived_cal.txt           Code       Code       ✓ OK      
+c_stackoverflow_why_zero_has_no_decimal_intege.txt           No Code    No Code    ✓ OK      
+c_stackoverflow_writing_a_binomial_coefficient.txt           Code       Code       ✓ OK      
+python_stackoverflow_access_to_integer_value.txt             Code       Code       ✓ OK      
+python_stackoverflow_auto_detect_the_language_for_s.txt      Code       Code       ✓ OK      
+python_stackoverflow_can_t_convert_geometry_from_ba.txt      Code       Code       ✓ OK      
+python_stackoverflow_can_t_upload_to_ftps_using_pyt.txt      Code       Code       ✓ OK      
+python_stackoverflow_captchafox__problem_with_sendi.txt      Code       Code       ✓ OK      
+python_stackoverflow_chatbot_does_not_read_web_craw.txt      Code       Code       ✓ OK      
+python_stackoverflow_cloned_table_works_causes_fore.txt      Code       Code       ✓ OK      
+python_stackoverflow_collection_of_strings_as_pytho.txt      Code       Code       ✓ OK      
+python_stackoverflow_column_named_read_as_tuple_ins.txt      Code       Code       ✓ OK      
+python_stackoverflow_confused_about_how_tf_keras_se.txt      Code       Code       ✓ OK      
+python_stackoverflow_crypto_fips_fips_c_154__openss.txt      Code       Code       ✓ OK      
+python_stackoverflow_deepseek_r1_api_integration_re.txt      No Code    No Code    ✓ OK      
+python_stackoverflow_dfi_export_and_style__clipping.txt      Code       No Code    ✗ ERROR   
+python_stackoverflow_django_admin_ask_for_login_on_.txt      Code       Code       ✓ OK      
+python_stackoverflow_django_rest_viewsets_modelview.txt      Code       Code       ✓ OK      
+python_stackoverflow_does_python_store_subscr_bytec.txt      Code       Code       ✓ OK      
+python_stackoverflow_enum_class_with_function_value.txt      Code       Code       ✓ OK      
+python_stackoverflow_exchangelib_wrong_credentials_.txt      Code       Code       ✓ OK      
+python_stackoverflow_export_to_csv_issue_only_retur.txt      Code       Code       ✓ OK      
+python_stackoverflow_fastapi_becomes_unresponsive_w.txt      Code       Code       ✓ OK      
+python_stackoverflow_fastapi_workers_die_in_add_bas.txt      Code       Code       ✓ OK      
+python_stackoverflow_filter_django_rangefield_by_co.txt      Code       Code       ✓ OK      
+python_stackoverflow_fmm_m2m_translation_discrepanc.txt      Code       Code       ✓ OK      
+python_stackoverflow_getting_the_default_outlook_si.txt      Code       Code       ✓ OK      
+python_stackoverflow_horizontal_scroll_on_shift_in_.txt      Code       Code       ✓ OK      
+python_stackoverflow_how_can_i_change_the_x_axis_of.txt      Code       Code       ✓ OK      
+python_stackoverflow_how_can_i_trigger_automatic_ac.txt      Code       Code       ✓ OK      
+python_stackoverflow_how_can_i_use_string_with_back.txt      No Code    No Code    ✓ OK      
+python_stackoverflow_how_do_i_fix_a_spotipy_access_.txt      Code       Code       ✓ OK      
+python_stackoverflow_how_do_i_update_my_get_history.txt      Code       Code       ✓ OK      
+python_stackoverflow_how_to_automatically_convert_o.txt      Code       Code       ✓ OK      
+python_stackoverflow_how_to_convert_sql_formula_to_.txt      Code       Code       ✓ OK      
+python_stackoverflow_how_to_create_rgb_healpix_fits.txt      Code       Code       ✓ OK      
+python_stackoverflow_how_to_draw_vertical_dashed_li.txt      Code       Code       ✓ OK      
+python_stackoverflow_how_to_fill_values_in_a_datafr.txt      Code       No Code    ✗ ERROR   
+python_stackoverflow_how_to_finish_a_test_using_pyt.txt      Code       Code       ✓ OK      
+python_stackoverflow_how_to_generate_this_simple_da.txt      Code       Code       ✓ OK      
+python_stackoverflow_how_to_get_gradient_with_respe.txt      Code       Code       ✓ OK      
+python_stackoverflow_how_to_identify_issue_with_my_.txt      Code       Code       ✓ OK      
+python_stackoverflow_how_to_merge_two_csv_files_bas.txt      Code       Code       ✓ OK      
+python_stackoverflow_how_to_parse__ole_file_in_pyth.txt      Code       No Code    ✗ ERROR   
+python_stackoverflow_how_to_plot_x_axis_in_scientif.txt      Code       Code       ✓ OK      
+python_stackoverflow_how_to_replace_existing_data_i.txt      No Code    No Code    ✓ OK      
+python_stackoverflow_how_to_train_gpt_models_in_tra.txt      Code       Code       ✓ OK      
+python_stackoverflow_how_to_use_a_python_regular_ex.txt      Code       Code       ✓ OK      
+python_stackoverflow_how_to_use_the_same_entry_box_.txt      Code       Code       ✓ OK      
+python_stackoverflow_how_to_use_yaml_file_parameter.txt      Code       Code       ✓ OK      
+python_stackoverflow_i_don_t_understand_why_my_test.txt      Code       Code       ✓ OK      
+python_stackoverflow_i_need_another_way_to_fill_a_s.txt      Code       Code       ✓ OK      
+python_stackoverflow_if_a_python_app_uses_uv_lock_f.txt      Code       Code       ✓ OK      
+python_stackoverflow_import__pyd_python_module.txt           Code       Code       ✓ OK      
+python_stackoverflow_in_pandas__how_to_write_the_wo.txt      Code       No Code    ✗ ERROR   
+python_stackoverflow_installation_of_backtesting_pa.txt      Code       Code       ✓ OK      
+python_stackoverflow_is_there_a_reason_why_paramiko.txt      Code       Code       ✓ OK      
+python_stackoverflow_jax_lax_scan__how_to_iterate_o.txt      Code       Code       ✓ OK      
+python_stackoverflow_learnable_parameter_only_updat.txt      Code       Code       ✓ OK      
+python_stackoverflow_loading_unpacked_chrome_extens.txt      Code       Code       ✓ OK      
+python_stackoverflow_matplotlib_requires_dateutil.txt        Code       Code       ✓ OK      
+python_stackoverflow_modulenotfounderror__no_module.txt      Code       Code       ✓ OK      
+python_stackoverflow_my_tensor_flow_model_cannot_ge.txt      Code       Code       ✓ OK      
+python_stackoverflow_nicegui_aggrid_flashing_cell_b.txt      Code       Code       ✓ OK      
+python_stackoverflow_oserror_with_tesseract.txt              Code       Code       ✓ OK      
+python_stackoverflow_pandas_dt_accessor_or_groupby_.txt      Code       Code       ✓ OK      
+python_stackoverflow_pelican_gives_exception__unabl.txt      Code       No Code    ✗ ERROR   
+python_stackoverflow_plot_characters_on_a_graph_usi.txt      Code       Code       ✓ OK      
+python_stackoverflow_polars_schema_override_for_dat.txt      Code       Code       ✓ OK      
+python_stackoverflow_problem_refreshing_excel_data_.txt      Code       Code       ✓ OK      
+python_stackoverflow_problem_with_file_path_resolut.txt      Code       Code       ✓ OK      
+python_stackoverflow_problem_with_pygame_window_not.txt      Code       Code       ✓ OK      
+python_stackoverflow_python_3_13_5_ctypes_and_tkint.txt      Code       Code       ✓ OK      
+python_stackoverflow_python_azure_function_failing_.txt      Code       Code       ✓ OK      
+python_stackoverflow_python_code_to_get_direct_down.txt      Code       Code       ✓ OK      
+python_stackoverflow_python_lambda_returns_0.txt             Code       Code       ✓ OK      
+python_stackoverflow_python_unpicklingerror__invali.txt      Code       Code       ✓ OK      
+python_stackoverflow_python_wand__magickreadimage_r.txt      Code       Code       ✓ OK      
+python_stackoverflow_ray_parallelised_function_inte.txt      Code       Code       ✓ OK      
+python_stackoverflow_reveal_type_in_python_as_of_py.txt      Code       Code       ✓ OK      
+python_stackoverflow_rolling_quantile_with_lots_of_.txt      Code       Code       ✓ OK      
+python_stackoverflow_should_i_use_jax_grad_or_imple.txt      No Code    No Code    ✓ OK      
+python_stackoverflow_snopt_installation_for_pyoptsp.txt      Code       No Code    ✗ ERROR   
+python_stackoverflow_snowflake___sqlalchemy___alemb.txt      Code       Code       ✓ OK      
+python_stackoverflow_solve_a_2_equations_systems_of.txt      Code       Code       ✓ OK      
+python_stackoverflow_stream_klv_and_video_using_ffm.txt      Code       Code       ✓ OK      
+python_stackoverflow_tabularexplainer_not_working_f.txt      Code       Code       ✓ OK      
+python_stackoverflow_trying_to_build_a_discord_star.txt      Code       Code       ✓ OK      
+python_stackoverflow_trying_to_update_context_varia.txt      Code       Code       ✓ OK      
+python_stackoverflow_unable_to_import_the_compresse.txt      Code       Code       ✓ OK      
+python_stackoverflow_unexpected_memory_leak_in_pyth.txt      Code       Code       ✓ OK      
+python_stackoverflow_using_pytest_to_test_a_while_l.txt      Code       Code       ✓ OK      
+python_stackoverflow_uv__required_environments___on.txt      Code       Code       ✓ OK      
+python_stackoverflow_uvicorn_not_getting_trace_id_f.txt      Code       Code       ✓ OK      
+python_stackoverflow_vscode__navigate_from_exceptio.txt      No Code    No Code    ✓ OK      
+python_stackoverflow_what_could_cause_a_django_webp.txt      Code       Code       ✓ OK      
+python_stackoverflow_why___first_____and_why_before.txt      Code       Code       ✓ OK      
+python_stackoverflow_why_do_we_need_to_mount_config.txt      Code       Code       ✓ OK      
+python_stackoverflow_why_does_generating_the_sobol_.txt      Code       Code       ✓ OK      
+python_stackoverflow_why_does_replacesubstructs___a.txt      Code       Code       ✓ OK      
+python_stackoverflow_why_does_zoneinfo_available_ti.txt      Code       Code       ✓ OK      
+python_stackoverflow_why_grouping_a_pandas_series_u.txt      Code       Code       ✓ OK      
+python_stackoverflow_why_is_pandas_not_formatting_d.txt      Code       Code       ✓ OK      
