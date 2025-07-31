@@ -171,7 +171,7 @@ def compare_with_detection_results():
     # Calculate statistics
     correct_detections = 0
     false_positives = 0
-    false_negatives = 0
+    miss_detects = 0
 
     for filename, result in detection_results.items():
         detected = result['detected']
@@ -182,7 +182,7 @@ def compare_with_detection_results():
         elif detected and not should_detect:
             false_positives += 1
         elif not detected and should_detect:
-            false_negatives += 1
+            miss_detects += 1
         else:  # not detected and not should_detect
             correct_detections += 1
 
@@ -195,7 +195,7 @@ def compare_with_detection_results():
     print(f"Total files tested: {total}")
     print(f"✅ Correct detections: {correct_detections}")
     print(f"❌ False Positives: {false_positives} (detected code when there isn't)")
-    print(f"❌ False Negatives: {false_negatives} (didn't detect code when there is)")
+    print(f"❌ Miss Detects: {miss_detects} (didn't detect code when there is)")
     print(f"📊 Overall accuracy: {accuracy:.1f}%")
 
     # Display error details
@@ -205,8 +205,8 @@ def compare_with_detection_results():
             if result['detected'] and not result['manual_says_code']:
                 print(f"  - {filename}")
 
-    if false_negatives > 0:
-        print(f"\n🔴 False Negatives:")
+    if miss_detects > 0:
+        print(f"\n🔴 Miss Detects:")
         for filename, result in detection_results.items():
             if not result['detected'] and result['manual_says_code']:
                 print(f"  - {filename} (type: {result['code_type']})")
