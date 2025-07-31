@@ -1,7 +1,7 @@
 ================================================================================
 VALIDATION REPORT - MANUAL VS AUTOMATIC DETECTION
 ================================================================================
-Generated: 2025-07-31 21:57:09
+Generated: 2025-08-01 02:20:36
 
 SUMMARY
 ----------------------------------------
@@ -26,7 +26,7 @@ FALSE POSITIVES (Detected code when there isn't)
    Manual classification: pure_code
    Number of blocks detected: 1
 
-FALSE NEGATIVES (Didn't detect code when there is)
+MISS DETECTS (Didn't detect code when there is)
 ----------------------------------------
 1. c_stackoverflow_how_to_use_ddd_for_debugging_p.txt
    Manual classification: pure_code
