@@ -5,78 +5,78 @@ from pathlib import Path
 
 def manual_validation():
     """
-    עובר על כל קבצי הבדיקה מ-Stack Overflow ומאפשר סימון ידני
+    Iterate through all Stack Overflow test files and allow manual labeling
     """
-    # תיקיית הקבצים - בדוק איפה אנחנו
+    # Test files directory - check where we are
     if os.path.exists("test_samples"):
-        test_dir = "test_samples"  # אם אנחנו בתוך tests
+        test_dir = "test_samples"  # If we're inside tests
     else:
-        test_dir = "tests/test_samples"  # אם אנחנו בתיקיה הראשית
+        test_dir = "tests/test_samples"  # If we're in the root directory
 
-    # חיפוש כל קבצי Stack Overflow
+    # Search for all Stack Overflow files
     so_files = []
     for file in os.listdir(test_dir):
         if "stackoverflow" in file and file.endswith(".txt"):
             so_files.append(file)
 
-    print(f"נמצאו {len(so_files)} קבצי Stack Overflow לבדיקה\n")
+    print(f"Found {len(so_files)} Stack Overflow files for validation\n")
 
-    # מילון לשמירת התוצאות
+    # Dictionary to save results
     validation_results = {}
 
-    # אם יש קובץ תוצאות קיים, טען אותו
+    # If results file exists, load it
     results_file = "manual_validation_results.json"
     if os.path.exists(results_file):
         with open(results_file, 'r') as f:
             validation_results = json.load(f)
-        print(f"נטענו {len(validation_results)} תוצאות קיימות\n")
+        print(f"Loaded {len(validation_results)} existing results\n")
 
-    # עבור על כל קובץ
+    # Iterate through each file
     for i, filename in enumerate(so_files):
-        # אם כבר בדקנו את הקובץ, דלג
+        # If we already validated this file, skip
         if filename in validation_results:
             continue
 
         filepath = os.path.join(test_dir, filename)
 
         print(f"\n{'=' * 60}")
-        print(f"קובץ {i + 1}/{len(so_files)}: {filename}")
+        print(f"File {i + 1}/{len(so_files)}: {filename}")
         print(f"{'=' * 60}\n")
 
-        # קרא את תוכן הקובץ
+        # Read file content
         with open(filepath, 'r', encoding='utf-8') as f:
             content = f.read()
 
-        # הצג את התוכן
+        # Display content
         lines = content.split('\n')
-        print("תוכן הקובץ (עד 50 שורות):")
+        print("File content (up to 50 lines):")
         print("-" * 40)
         for j, line in enumerate(lines[:50]):
             print(f"{j + 1:3}: {line}")
         if len(lines) > 50:
-            print(f"\n... ועוד {len(lines) - 50} שורות")
+            print(f"\n... and {len(lines) - 50} more lines")
 
-        # קבל החלטה מהמשתמש
+        # Get user decision
         print("\n" + "-" * 40)
-        print("האם הקובץ מכיל קוד משמעותי?")
-        print("1 = כן, מכיל קוד")
-        print("2 = לא, רק טקסט")
-        print("3 = מכיל קוד אבל מעורבב עם הרבה טקסט")
-        print("s = דלג (skip)")
-        print("q = צא (quit)")
+        print("Does this file contain meaningful code?")
+        print("1 = Yes, contains code")
+        print("2 = No, only text")
+        print("3 = Contains code but mixed with lots of text")
+        print("s = Skip")
+        print("q = Quit")
 
         while True:
-            choice = input("\nהבחירה שלך: ").strip().lower()
+            choice = input("\nYour choice: ").strip().lower()
 
             if choice == 'q':
-                # שמור ויצא
+                # Save and exit
                 with open(results_file, 'w') as f:
                     json.dump(validation_results, f, indent=2)
-                print(f"\nנשמרו {len(validation_results)} תוצאות")
+                print(f"\nSaved {len(validation_results)} results")
                 return
 
             elif choice == 's':
-                print("דילוג...")
+                print("Skipping...")
                 break
 
             elif choice in ['1', '2', '3']:
@@ -90,77 +90,77 @@ def manual_validation():
                     'expected_detection': choice in ['1', '3']
                 }
 
-                # שמור אחרי כל קובץ
+                # Save after each file
                 with open(results_file, 'w') as f:
                     json.dump(validation_results, f, indent=2)
 
-                print(f"✓ נשמר: {validation_results[filename]}")
+                print(f"✓ Saved: {validation_results[filename]}")
                 break
             else:
-                print("בחירה לא חוקית, נסה שוב")
+                print("Invalid choice, please try again")
 
-    print(f"\n\nסיימנו! בדקנו {len(validation_results)} קבצים")
+    print(f"\n\nFinished! Validated {len(validation_results)} files")
 
-    # הצג סיכום
+    # Display summary
     code_files = sum(1 for v in validation_results.values() if v['contains_code'])
     no_code = sum(1 for v in validation_results.values() if v['code_type'] == 'no_code')
     mixed = sum(1 for v in validation_results.values() if v['code_type'] == 'mixed')
 
-    print(f"\nסיכום:")
-    print(f"- קבצי קוד טהור: {code_files - mixed}")
-    print(f"- קבצים מעורבבים: {mixed}")
-    print(f"- קבצים ללא קוד: {no_code}")
+    print(f"\nSummary:")
+    print(f"- Pure code files: {code_files - mixed}")
+    print(f"- Mixed files: {mixed}")
+    print(f"- Files without code: {no_code}")
 
 
 def compare_with_detection_results():
     """
-    משווה את התוצאות הידניות עם תוצאות ה-CodeDetector
+    Compare manual validation results with CodeDetector results
     """
     import subprocess
 
-    # בדוק אם יש תוצאות ידניות
+    # Check if manual results exist
     if not os.path.exists('manual_validation_results.json'):
-        print("❌ לא נמצא קובץ manual_validation_results.json")
-        print("הרץ קודם: python manual_validation.py")
+        print("❌ File manual_validation_results.json not found")
+        print("Run first: python manual_validation.py")
         return
 
-    # טען תוצאות ידניות
+    # Load manual results
     with open('manual_validation_results.json', 'r') as f:
         manual_results = json.load(f)
 
-    print(f"נטענו {len(manual_results)} תוצאות ידניות\n")
+    print(f"Loaded {len(manual_results)} manual results\n")
 
-    # הרץ את CodeDetector על הקבצים
-    print("מריץ CodeDetector על הקבצים...")
+    # Run CodeDetector on files
+    print("Running CodeDetector on files...")
 
-    # תיקון ה-import - הוסף את התיקיה הראשית ל-path
+    # Fix import - add root directory to path
     import sys
-    sys.path.append('..')  # הוסף את התיקיה הראשית
+    sys.path.append('..')  # Add root directory
 
     from extractor.code_detector import CodeDetector
 
     detector = CodeDetector()
     detection_results = {}
 
-    # תיקון הנתיב - הקבצים בתיקיית test_samples
-    test_dir = "test_samples"  # התת-תיקייה הנכונה
+    # Fix path - files are in test_samples directory
+    test_dir = "test_samples"  # The correct subdirectory
 
-    # בדוק כל קובץ שסימנו ידנית
+    # Check each manually labeled file
     for filename, manual_label in manual_results.items():
         filepath = os.path.join(test_dir, filename)
 
         if not os.path.exists(filepath):
-            print(f"⚠️  לא נמצא: {filepath}")
+            print(f"⚠️  Not found: {filepath}")
             continue
 
-        # קרא את הקובץ
+        # Read the file
         with open(filepath, 'r', encoding='utf-8') as f:
             content = f.read()
 
-        # הרץ את הdetector
+        # Run the detector
         detected_blocks = detector.detect_code(content)
 
-        # שמור תוצאה
+        # Save result
         detection_results[filename] = {
             'detected': len(detected_blocks) > 0,
             'num_blocks': len(detected_blocks),
@@ -168,7 +168,7 @@ def compare_with_detection_results():
             'code_type': manual_label['code_type']
         }
 
-    # חשב סטטיסטיקות
+    # Calculate statistics
     correct_detections = 0
     false_positives = 0
     false_negatives = 0
@@ -190,15 +190,15 @@ def compare_with_detection_results():
     accuracy = (correct_detections / total * 100) if total > 0 else 0
 
     print(f"\n{'=' * 50}")
-    print(f"תוצאות ההשוואה:")
+    print(f"Comparison Results:")
     print(f"{'=' * 50}")
-    print(f"סה\"כ קבצים שנבדקו: {total}")
-    print(f"✅ זיהויים נכונים: {correct_detections}")
-    print(f"❌ False Positives: {false_positives} (זיהה קוד כשאין)")
-    print(f"❌ False Negatives: {false_negatives} (לא זיהה קוד כשיש)")
-    print(f"📊 דיוק כולל: {accuracy:.1f}%")
+    print(f"Total files tested: {total}")
+    print(f"✅ Correct detections: {correct_detections}")
+    print(f"❌ False Positives: {false_positives} (detected code when there isn't)")
+    print(f"❌ False Negatives: {false_negatives} (didn't detect code when there is)")
+    print(f"📊 Overall accuracy: {accuracy:.1f}%")
 
-    # הצג פירוט של טעויות
+    # Display error details
     if false_positives > 0:
         print(f"\n🔴 False Positives:")
         for filename, result in detection_results.items():
@@ -211,10 +211,10 @@ def compare_with_detection_results():
             if not result['detected'] and result['manual_says_code']:
                 print(f"  - {filename} (type: {result['code_type']})")
 
-    # שמור תוצאות מפורטות
+    # Save detailed results
     with open('comparison_results.json', 'w') as f:
         json.dump(detection_results, f, indent=2)
-    print(f"\n💾 תוצאות מפורטות נשמרו ב-comparison_results.json")
+    print(f"\n💾 Detailed results saved to comparison_results.json")
 
 
 if __name__ == "__main__":
