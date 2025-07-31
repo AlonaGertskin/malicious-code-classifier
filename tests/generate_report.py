@@ -3,9 +3,9 @@ from datetime import datetime
 
 
 def generate_detailed_report():
-    """Generate a detailed comparison report"""  # CHANGED: from Hebrew to English
+    """Generate a detailed comparison report"""
 
-    # Load results  # CHANGED: from Hebrew comment
+    # Load results
     try:
         with open('comparison_results.json', 'r') as f:
             results = json.load(f)
@@ -13,14 +13,14 @@ def generate_detailed_report():
         with open('manual_validation_results.json', 'r') as f:
             manual = json.load(f)
     except FileNotFoundError:
-        print("❌ Result files not found")  # CHANGED: from Hebrew
+        print("❌ Result files not found")
         return
 
-    # Calculate statistics  # CHANGED: from Hebrew comment
+    # Calculate statistics
     total = len(results)
     correct = 0
     false_positives = []
-    false_negatives = []
+    miss_detects = []
 
     for filename, result in results.items():
         detected = result['detected']
@@ -31,9 +31,9 @@ def generate_detailed_report():
         elif detected and not should_detect:
             false_positives.append(filename)
         else:
-            false_negatives.append((filename, result['code_type']))
+            miss_detects.append((filename, result['code_type']))
 
-    # Create the report  # CHANGED: from Hebrew comment
+    # Create the report
     report = []
     report.append("=" * 80)
     report.append("VALIDATION REPORT - MANUAL VS AUTOMATIC DETECTION")
@@ -41,16 +41,16 @@ def generate_detailed_report():
     report.append(f"Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     report.append("")
 
-    # General summary  # CHANGED: from Hebrew comment
+    # General summary
     report.append("SUMMARY")
     report.append("-" * 40)
     report.append(f"Total files tested: {total}")
     report.append(f"Correct Detections: {correct} ({correct / total * 100:.1f}%)")
     report.append(f"False positives: {len(false_positives)} ({len(false_positives) / total * 100:.1f}%)")
-    report.append(f"Miss Detect: {len(false_negatives)} ({len(false_negatives) / total * 100:.1f}%)")
+    report.append(f"Miss Detect: {len(miss_detects)} ({len(miss_detects) / total * 100:.1f}%)")
     report.append("")
 
-    # Breakdown by language  # CHANGED: from Hebrew comment
+    # Breakdown by language
     report.append("BREAKDOWN BY LANGUAGE")
     report.append("-" * 40)
 
@@ -80,16 +80,16 @@ def generate_detailed_report():
         report.append(f"   Number of blocks detected: {results[fp]['num_blocks']}")
     report.append("")
 
-    # False Negatives
-    report.append("FALSE NEGATIVES (Didn't detect code when there is)")
+    # Miss Detects
+    report.append("MISS DETECTS (Didn't detect code when there is)")
     report.append("-" * 40)
-    for i, (fn, code_type) in enumerate(false_negatives, 1):
+    for i, (fn, code_type) in enumerate(miss_detects, 1):
         report.append(f"{i}. {fn}")
         report.append(f"   Manual classification: {code_type}")
         report.append(f"   Expected to detect: Yes")
     report.append("")
 
-    # Full details  # CHANGED: from Hebrew comment
+    # Full details
     report.append("DETAILED RESULTS FOR ALL FILES")
     report.append("-" * 40)
     report.append(f"{'Filename':<60} {'Manual':<10} {'Detected':<10} {'Result':<10}")
@@ -103,19 +103,19 @@ def generate_detailed_report():
 
         report.append(f"{filename:<60} {manual_says:<10} {detected:<10} {status:<10}")
 
-    # Save to file  # CHANGED: from Hebrew comment
+    # Save to file
     output_file = "validation_report_detailed.txt"
     with open(output_file, 'w', encoding='utf-8') as f:
         f.write('\n'.join(report))
 
-    print(f"✅ Report saved to: {output_file}")  # CHANGED: from Hebrew
-    print(f"📄 Report size: {len(report)} lines")  # CHANGED: from Hebrew
+    print(f"✅ Report saved to: {output_file}")
+    print(f"📄 Report size: {len(report)} lines")
 
-    # Display summary  # CHANGED: from Hebrew comment
-    print("\nSummary:")  # CHANGED: from Hebrew
+    # Display summary
+    print("\nSummary:")
     print(f"- Correct Detection: {correct / total * 100:.1f}%")
     print(f"- False Positives: {len(false_positives)}")
-    print(f"- Miss Detect : {len(false_negatives)}")
+    print(f"- Miss Detect : {len(miss_detects)}")
 
 
 if __name__ == "__main__":
