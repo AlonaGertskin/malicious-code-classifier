@@ -1,0 +1,179 @@
+[1762419439.089][INFO]: Starting ChromeDriver 142.0.7444.59 (4b8153ab58d3c3f4c9f7e4baad9616ecf80db5fa-refs/branch-heads/7444_52@{#4}) on port 51133
+[1762419439.089][INFO]: Please see https://chromedriver.chromium.org/security-considerations for suggestions on keeping ChromeDriver safe.
+[1762419439.094][INFO]: ChromeDriver was started successfully on port 51133
+[1762419439.156][INFO]: [80ba8e74f3788cef64c7519d1352cb64] COMMAND InitSession {
+   "capabilities": {
+      "alwaysMatch": {
+         "browserName": "chrome",
+         "goog:chromeOptions": {
+            "args": [ "--headless", "--no-sandbox", "--disable-dev-shm-usage", "--user-data-dir=/tmp/chrome-user-data" ],
+            "extensions": [  ]
+         },
+         "pageLoadStrategy": "normal"
+      },
+      "firstMatch": [ {
+      } ]
+   }
+}
+[1762419439.156][INFO]: Browser search. Trying... /usr/bin/chromium
+[1762419439.156][INFO]: Browser search. Found at  /usr/bin/chromium
+[1762419439.157][INFO]: Populating Preferences file: {
+   "alternate_error_pages": {
+      "enabled": false
+   },
+   "autofill": {
+      "enabled": false
+   },
+   "browser": {
+      "check_default_browser": false
+   },
+   "distribution": {
+      "import_bookmarks": false,
+      "import_history": false,
+      "import_search_engine": false,
+      "make_chrome_default_for_user": false,
+      "skip_first_run_ui": true
+   },
+   "dns_prefetching": {
+      "enabled": false
+   },
+   "profile": {
+      "content_settings": {
+         "pattern_pairs": {
+            "https://*,*": {
+               "media-stream": {
+                  "audio": "Default",
+                  "video": "Default"
+               }
+            }
+         }
+      },
+      "default_content_setting_values": {
+         "geolocation": 1
+      },
+      "default_content_settings": {
+         "geolocation": 1,
+         "mouselock": 1,
+         "notifications": 1,
+         "popups": 1,
+         "ppapi-broker": 1
+      },
+      "password_manager_enabled": false
+   },
+   "safebrowsing": {
+      "enabled": false
+   },
+   "search": {
+      "suggest_enabled": false
+   },
+   "translate": {
+      "enabled": false
+   }
+}
+[1762419439.157][INFO]: Populating Local State file: {
+   "background_mode": {
+      "enabled": false
+   },
+   "ssl": {
+      "rev_checking": {
+         "enabled": false
+      }
+   }
+}
+[1762419439.157][INFO]: ChromeDriver supports communication with Chrome via pipes. This is more reliable and more secure.
+[1762419439.157][INFO]: Use the --remote-debugging-pipe Chrome switch instead of the default --remote-debugging-port to enable this communication mode.
+[1762419439.157][INFO]: Launching chrome: /usr/bin/chromium --allow-pre-commit-input --disable-background-networking --disable-client-side-phishing-detection --disable-default-apps --disable-dev-shm-usage --disable-features=IgnoreDuplicateNavs,Prewarm --disable-hang-monitor --disable-popup-blocking --disable-prompt-on-repost --disable-sync --enable-automation --enable-logging=stderr --headless --log-level=0 --no-first-run --no-sandbox --no-service-autorun --password-store=basic --remote-debugging-port=0 --test-type=webdriver --use-mock-keychain --user-data-dir=/tmp/chrome-user-data
+chrome_crashpad_handler: --database is required
+Try 'chrome_crashpad_handler --help' for more information.
+[1305:1305:1106/085719.230136:ERROR:third_party/crashpad/crashpad/util/linux/socket.cc:120] recvmsg: Connection reset by peer (104)
+[1762419439.372][INFO]: [80ba8e74f3788cef64c7519d1352cb64] RESPONSE InitSession ERROR session not created: Chrome instance exited. Examine ChromeDriver verbose log to determine the cause.
+[1762419439.372][DEBUG]: Log type 'driver' lost 0 entries on destruction
+[1762419439.372][DEBUG]: Log type 'browser' lost 0 entries on destruction
+
+# --- New Code Block --- 
+
+def __init__(self):
+        # Initialize Chrome only once
+        if ContextService._driver is None:
+            with ContextService._lock:
+                if ContextService._driver is None:  # Check again once locked
+                    options = Options()
+                    options.add_argument(
+                        "--headless"
+                    )  # This makes the browser run in the background with NO GUI
+                    options.add_argument("--no-sandbox")
+                    options.add_argument(
+                        "--disable-dev-shm-usage"
+                    )  #  Use temporary directory instead of /dev/shm (may crash on Docker)
+                    options.add_argument("--user-data-dir=/tmp/chrome-user-data")
+
+                    if os.path.exists("/usr/bin/chromium"):
+                        # Usage of chromium -> Docker (lighter)
+                        service = Service(
+                            "/usr/bin/chromedriver",
+                            log_output="/tmp/chrome.log",
+                            service_args=["--verbose"],
+                        )
+                    else:
+                        # Usage of Chrome in local development
+                        service = Service(ChromeDriverManager().install())
+
+                    try:
+                        ContextService._driver = webdriver.Chrome(
+                            service=service, options=options
+                        ) # IT FAILS HERE!
+                        ContextService._driver.set_page_load_timeout(30)
+                    except WebDriverException as wde:
+                        raise RuntimeError(f"Failed to start Chrome driver: {wde}")
+
+# --- New Code Block --- 
+
+{
+  "detail": "Failed to process request due to internal error: RuntimeError - Failed to start Chrome driver: Message: session not created: Chrome instance exited. Examine ChromeDriver verbose log to determine the cause.; For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#sessionnotcreatedexception\nStacktrace:\n#0 0x5e0cdaf9e2c2 <unknown>\n#1 0x5e0cdaa0356b <unknown>\n#2 0x5e0cdaa3f0e6 <unknown>\n#3 0x5e0cdaa390cf <unknown>\n#4 0x5e0cdaa881b7 <unknown>\n#5 0x5e0cdaa87917 <unknown>\n#6 0x5e0cdaa78da7 <unknown>\n#7 0x5e0cdaa46a11 <unknown>\n#8 0x5e0cdaa477f5 <unknown>\n#9 0x5e0cdaf67b74 <unknown>\n#10 0x5e0cdaf6b01f <unknown>\n#11 0x5e0cdaf6aabc <unknown>\n#12 0x5e0cdaf6b4c9 <unknown>\n#13 0x5e0cdaf5158b <unknown>\n#14 0x5e0cdaf6b854 <unknown>\n#15 0x5e0cdaf3ad7d <unknown>\n#16 0x5e0cdaf8abf9 <unknown>\n#17 0x5e0cdaf8adef <unknown>\n#18 0x5e0cdaf9cc79 <unknown>\n#19 0x7e2ef16bab7b <unknown>\n"
+}
+
+# --- New Code Block --- 
+
+FROM python:3.13-slim AS builder
+
+WORKDIR /usr/src/context-service
+COPY pyproject.toml .
+COPY ./app ./app
+RUN pip install --no-cache-dir .
+
+FROM python:3.13-slim
+
+# Create non-root user
+RUN addgroup --system nonroot && adduser --system nonroot --ingroup nonroot
+
+# For this service, the HOME env variable is needed
+ENV HOME=/home/nonroot
+RUN mkdir -p "$HOME" && chown -R nonroot:nonroot "$HOME"
+
+WORKDIR /usr/src/context-service
+
+# Install Chromium + driver
+RUN apt-get update && apt-get install -y ca-certificates chromium chromium-driver curl && rm -rf /var/lib/apt/lists/*
+
+# Copy installed deps and app
+COPY --from=builder /usr/local/lib/python3.13/site-packages /usr/local/lib/python3.13/site-packages
+COPY --from=builder /usr/local/bin /usr/local/bin
+COPY --from=builder /usr/src/context-service/app ./app
+
+# Copy and add permissions to execute the entrypoint (sets the certificates to be trusted)
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+EXPOSE 8000
+
+# Run as root (needed for CA update)
+USER root
+
+# Run the application from the shell script
+ENTRYPOINT ["/entrypoint.sh"]
+
+# --- New Code Block --- 
+
+"selenium>=4.22.0,<5.0",
+"beautifulsoup4>=4.12.3,<5.0",
+"webdriver-manager>=4.0.0,<5.0",

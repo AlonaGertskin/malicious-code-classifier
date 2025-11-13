@@ -1,0 +1,17 @@
+Building wheels for collected packages: pycosat
+  Building wheel for pycosat (pyproject.toml) ... error
+  error: subprocess-exited-with-error
+
+  × Building wheel for pycosat (pyproject.toml) did not run successfully.
+  │ exit code: 1
+  ╰─> [1 lines of output]
+      error: Microsoft Visual C++ 14.0 or greater is required. Get it with "Microsoft C++ Build Tools": https://visualstudio.microsoft.com/visual-cpp-build-tools/
+      [end of output]
+
+  note: This error originates from a subprocess, and is likely not a problem with pip.
+  ERROR: Failed building wheel for pycosat
+Failed to build pycosat
+
+[notice] A new release of pip is available: 24.2 -> 25.3
+[notice] To update, run: python.exe -m pip install --upgrade pip
+ERROR: ERROR: Failed to build installable wheels for some pyproject.toml based projects (pycosat)

@@ -1,0 +1,23 @@
+import praw
+import time
+
+
+reddit = praw.Reddit(
+    client_id=CLIENT_ID,
+    client_secret=SECRET,
+    user_agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:124.0) Gecko/20100101 Firefox/124.0'
+)
+count = 0
+
+submissions = reddit.subreddit('all').search('tariff', sort='new', time_filter='day', limit=100)
+while submissions:
+    submissions_list = list(submissions)
+    count += len(submissions_list)
+    print(f"Current count: {count} mentions")
+    if not submissions_list:
+        break
+    after = submissions_list[-1].fullname
+    submissions = reddit.subreddit('all').search('tariff', sort='new', time_filter='day', limit=100, params={'after': after})
+    time.sleep(1)  
+
+print(f"Total mentions in the last day: {count}")

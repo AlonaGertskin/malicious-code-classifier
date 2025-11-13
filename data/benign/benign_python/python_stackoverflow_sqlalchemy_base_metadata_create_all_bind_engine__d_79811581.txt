@@ -1,0 +1,65 @@
+from sqlalchemy import Column, Integer, String, Text, ForeignKey, DateTime, func
+from sqlalchemy.orm import relationship, declarative_base
+
+Base = declarative_base()
+
+class Session(Base):
+    __tablename__ = "sessions"
+    id = Column( Integer, primary_key=True)
+    title = Column(String())
+    transcript = Column(Text)
+    summary = Column(Text)
+    created_at = Column(DateTime, default=func.now())
+    questions = relationship("Question", back_populates="session")
+
+class Question(Base):
+    __tablename__ = "questions"
+    id = Column( Integer, primary_key=True)
+    session_id = Column( Integer, ForeignKey("sessions.id"))
+    prompt = Column(Text)
+    qtype = Column(String())
+    created_at = Column(DateTime, default=func.now())
+    session = relationship("Session", back_populates="questions")
+
+# --- New Code Block --- 
+
+import os
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker, declarative_base
+from dotenv import load_dotenv
+
+load_dotenv()
+
+MYSQL_HOST = os.getenv("MYSQL_HOST", "localhost")
+MYSQL_PORT = int(os.getenv("MYSQL_PORT", 3306))
+MYSQL_USER = os.getenv("MYSQL_USER", "root")
+MYSQL_PASSWORD = os.getenv("MYSQL_PASSWORD", "1111")
+MYSQL_DB = os.getenv("MYSQL_DB", "chatbot_db")
+
+DB_URL = f"mysql+pymysql://{MYSQL_USER}:{MYSQL_PASSWORD}@{MYSQL_HOST}:{MYSQL_PORT}/{MYSQL_DB}"
+
+engine = create_engine(DB_URL, echo=True)
+SessionLocal = sessionmaker(bind=engine)
+Base = declarative_base()
+
+# --- New Code Block --- 
+
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from .routes import generate
+
+app = FastAPI(title="Short Question Backend")
+
+origins = ["http://localhost:3000"]
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+from .database import Base, engine
+from .models import Session, Question
+Base.metadata.create_all(bind=engine)
+
+app.include_router(generate.router, prefix="/api", tags=["AI"])

@@ -1,0 +1,17 @@
+Error Message:
+
+
+Traceback (most recent call last):
+  File "awsauth.py", line 826, in <module>
+  File "awsauth.py", line 795, in main
+  File "awsauth.py", line 301, in generateAndShowQRCode
+  File "qrcode\main.py", line 297, in print_ascii
+OSError: Not a tty
+[PYI-25936:ERROR] Failed to execute script 'awsauth' due to unhandled exception!
+
+
+QR Code section, fails on print_ascii:
+
+    qr.add_data(someUrl)
+    qr.make(fit=True)
+    qr.print_ascii(tty=True)

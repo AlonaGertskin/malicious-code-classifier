@@ -1,0 +1,25 @@
+import pandas as pd
+df = pd.DataFrame({
+    "id": [1, 2, 3, 4, 5, 6],
+    "email": [
+        "a@example.com",
+        "b@example.com",
+        "a@example.com",
+        "c@example.com",
+        "b@example.com",
+        "d@example.com"
+    ]
+})
+print(df)
+
+# --- New Code Block --- 
+
+id          email
+0   1   a@example.com
+1   2   b@example.com
+3   4   c@example.com
+5   6   d@example.com
+
+# --- New Code Block --- 
+
+df.drop_duplicates(subset="email")

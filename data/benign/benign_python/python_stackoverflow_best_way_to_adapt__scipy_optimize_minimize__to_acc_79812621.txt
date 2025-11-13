@@ -1,0 +1,19 @@
+import numpy as np
+from scipy.optimize import minimize 
+
+x = np.linspace(-5, 5, 100) 
+
+def function_to_minimize(*args):
+    function = 0 
+    for j in range(0, 4):
+        a_j = args[j][0]
+        b_j = args[j][1]
+        c_j = args[j][2] 
+        function += a_j * x**2 - b_j * x + c_j 
+    return function 
+
+guess = [] 
+for j in range(0, 4):
+    guess.append([1,1,1]) 
+    
+res = minimize(function_to_minimize, guess)

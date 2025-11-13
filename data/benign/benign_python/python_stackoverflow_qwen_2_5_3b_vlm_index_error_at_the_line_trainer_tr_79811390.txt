@@ -1,0 +1,38 @@
+IndexError                                Traceback (most recent call last)
+/tmp/ipython-input-773422404.py in <cell line: 0>()
+----> 1 trainer_stats = trainer.train()
+
+8 frames
+/usr/local/lib/python3.12/dist-packages/transformers/models/qwen2_5_vl/processing_qwen2_5_vl.py in __call__(self, images, text, videos, **kwargs)
+    175             for i in range(len(text)):
+    176                 while self.image_token in text[i]:
+--> 177                     num_image_tokens = image_grid_thw[index].prod() // merge_length
+    178                     text[i] = text[i].replace(self.image_token, "<|placeholder|>" * num_image_tokens, 1)
+    179                     index += 1
+
+IndexError: index 2 is out of bounds for dimension 0 with size 2
+
+# --- New Code Block --- 
+
+def collate_fn(samples):
+    texts = []
+    images = []
+
+    for sample in samples:
+        prompt_text = processor.apply_chat_template(sample['text'], tokenize=False)
+        texts.append(prompt_text)
+        images.append(sample['image'])
+
+
+    inputs = processor(
+        text=texts,
+        images=images,
+        return_tensors='pt',
+        padding=True
+    )
+
+    labels=inputs['input_ids'].clone()
+    labels[labels == processor.tokenizer.pad_token_id] = -100
+    inputs['labels'] = labels
+
+    return inputs

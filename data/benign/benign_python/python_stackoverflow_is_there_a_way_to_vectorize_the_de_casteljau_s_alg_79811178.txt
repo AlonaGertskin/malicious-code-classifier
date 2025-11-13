@@ -1,0 +1,18 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
+def de_casteljau(cp, t):
+    interpolated = cp.copy()
+    for i in range(len(cp)-1):
+        p_from = interpolated[:-1]
+        p_to = interpolated[1:]
+        interpolated = t * p_from + (1-t) * p_to
+    return interpolated[0,:]
+
+cp = np.array([[268, 113], [293, 226], [284, 277], [206, 146]])
+t = np.linspace(0, 1, num=50, endpoint=True)
+curve = np.array([de_casteljau(cp, u) for u in t])
+
+plt.plot(curve[:,0], curve[:,1])
+plt.plot(cp[:,0], cp[:,1])
+plt.show()

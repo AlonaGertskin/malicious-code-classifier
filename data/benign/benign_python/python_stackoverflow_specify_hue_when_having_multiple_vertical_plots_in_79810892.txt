@@ -1,0 +1,16 @@
+df = polars.read_csv("...")
+ax = seaborn.swarmplot(data=[df["ColA"], df["ColB"], df["ColC"]])
+ax.set_xticklabels(["A", "B", "C"])
+
+# --- New Code Block --- 
+
+ValueError: The following variable cannot be assigned with wide-form data: `hue`
+
+# --- New Code Block --- 
+
+df = polars.read_csv("...")
+df_long = df.melt(id_vars='ColD', var_name='Measures', value_name='Score', value_vars=["ColA", "ColB", "ColC"])
+ax = seaborn.swarmplot(data=df_long, hue='ColD', x='Measures', y='Score')
+ax.set(xlabel='', ylabel='')
+ax.set_xticks([i for i in range(3)]) # To suppress the warning
+ax.set_xticklabels(["A", "B", "C"])

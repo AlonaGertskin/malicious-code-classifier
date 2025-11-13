@@ -1,0 +1,46 @@
+#Python code for solving nonlinear equations numerically 
+from scipy.optimize import fsolve
+from scipy.optimize import root
+import numpy as np
+import numpy.lib.scimath as math
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+import pandas as pd
+#from scipy.io import loadmat
+#from mat4py import loadmat
+from pymatreader import read_mat
+
+# Define constants (symbols or assign numeric values later)
+chi_= 20
+beta_= 4
+chi0= 1
+chi1= 10
+alpha_chi= 1
+D0= 0.25
+D1= 2.5
+alpha_D= 0.1
+mu_c= 1.2
+lam= 0.5
+den = 10
+
+#--------------------------------------------
+# Define the system of nonlinear equations
+#--------------------------------------------
+def F(X):
+    Q, Gam, g1, g2, g3 = X
+    # Load .mat file correctly
+    data = read_mat(r'E:\Rahul\Data_tokamak\data&plot\data3-field_ITB\data_3f_itb\Fisher_ITB_data\set5\data1_x0_03.mat')
+    print("Type of data:", type(data))
+    print("Data content preview:")
+    # Remove MATLAB meta keys
+    data_keys = [k for k in data.keys() if not k.startswith('__')]
+    print("Keys found in file:", data_keys)
+
+    if len(data_keys) == 0:
+        raise KeyError("No user-defined variables found in MAT file.")
+
+    # Get the first variable automatically
+    var_name = data_keys[0]
+    data_1 = np.array(data[var_name])
+    print(f"Loaded variable '{var_name}' with shape {data_1.shape}")
+#Define Q Gam g1 g2 g3

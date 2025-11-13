@@ -1,0 +1,31 @@
+# FFT
+
+N = 2793  # Number of samples
+fs = 25.0  # frequency of signal
+T = 1 / fs
+Ny = fs / 2.0  # Nyquist freq
+
+# create an array that corresponds to the values in the signal
+
+yf = fft(y)  # perform the fft on the signal
+xf = np.linspace(0.0, Ny, N // 2)  # create new x-axis: frequency
+
+# plot results
+
+plt.plot(xf, 2.0 / N * np.abs(yf[:N // 2]))
+plt.grid(True)
+plt.show()
+
+# --- New Code Block --- 
+
+0   0.00    -190.919    0.0698  0   0   1   NaN 0
+    1   0.04    -190.814    0.1397  40  0   1   NaN 0
+    2   0.08    -190.769    0.2094  80  0   1   NaN 0
+    3   0.12    -190.705    0.2792  120 0   1   NaN 0
+    4   0.16    -190.650    0.3491  160 0   1   NaN 0
+    ... ... ... ... ... ... ... ... ...
+    2789    111.56  -184.678    0.6283  111560  0   1   NaN 0
+    2790    111.60  -184.682    0.6912  111600  0   1   NaN 0
+    2791    111.64  -184.716    0.7540  111640  0   1   NaN 0
+    2792    111.68  -184.750    0.8168  111680  0   1   NaN 0
+    2793    111.72  -184.862    0.8796  111720  0   1   NaN 0

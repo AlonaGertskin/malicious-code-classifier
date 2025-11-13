@@ -1,0 +1,10 @@
+git clone --recurse-submodules https://github.com/tfmoraes/python-gdcm
+
+# --- New Code Block --- 
+
+# Note the trailing slash!
+pip install python-gdcm/
+
+# --- New Code Block --- 
+
+Directory 'python-gdcm/' is not installable. File 'setup.py' not found.

@@ -1,0 +1,6 @@
+pre_timechange = datetime.datetime(2025, 11, 2, 1, 59, 9, tzinfo=zoneinfo.ZoneInfo(key='America/Toronto'))
+pre_timechange_epoch = pre_timechange.timestamp() # Equal to 1762063149.0
+
+post_timechange = pre_timechange + timedelta(minutes=15)
+# post_timechange is now datetime.datetime(2025, 11, 2, 2, 14, 9, tzinfo=zoneinfo.ZoneInfo(key='America/Toronto'))
+post_timechange_epoch = post_timechange.timestamp() # Equal to 1762067649.0
