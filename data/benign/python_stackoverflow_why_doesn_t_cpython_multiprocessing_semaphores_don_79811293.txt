@@ -1,0 +1,11 @@
+>>> import multiprocessing as mp
+>>> a= mp.Semaphore()
+>>> a.acquire()
+True
+>>> a._semlock.name
+>>>
+
+# --- New Code Block --- 
+
+/ # ls -l /dev/shm
+total 0

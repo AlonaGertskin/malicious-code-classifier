@@ -1,0 +1,31 @@
+from pyflink.datastream.connectors.kafka import KafkaSink, KafkaRecordSerializationSchema
+from pyflink.common.serialization import SimpleStringSchema
+from pyflink.common import Types
+
+records = aggregated.map(
+    ToKeyValueStrings(),  # returns (key:str, payload:str)
+    output_type=Types.TUPLE([Types.STRING(), Types.STRING()])
+)
+
+sink = (
+    KafkaSink.builder()
+    .set_bootstrap_servers(bootstrap)
+    .set_record_serializer(
+        KafkaRecordSerializationSchema.builder()
+        .set_topic(topic)
+        .set_key_serialization_schema(SimpleStringSchema())
+        .set_value_serialization_schema(SimpleStringSchema())
+        .build()
+    )
+    .set_delivery_guarantee(DeliveryGuarantee.AT_LEAST_ONCE)
+    .set_transactional_id_prefix(f"{topic}-{os.getpid()}")
+    .build()
+)
+
+records.sink_to(sink)
+
+# --- New Code Block --- 
+
+Caused by: java.lang.ClassCastException: class org.apache.flink.types.Row cannot be cast to class java.lang.String
+    at org.apache.flink.api.common.serialization.SimpleStringSchema.serialize(SimpleStringSchema.java:36)
+    ...

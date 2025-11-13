@@ -1,0 +1,12 @@
+ffmpeg_extract_subclip(inputfile, start, end, targetname=outputfile)
+
+# --- New Code Block --- 
+
+clip = VideoFileClip(inputfile).subclip(start, end)
+
+clip.to_videofile(outputfile, codec="libx264", temp_audiofile='temp-audio.m4a', remove_temp=True, audio_codec='aac')
+
+# --- New Code Block --- 
+
+from moviepy.editor import VideoFileClip
+from moviepy.video.io.ffmpeg_tools import ffmpeg_extract_subclip

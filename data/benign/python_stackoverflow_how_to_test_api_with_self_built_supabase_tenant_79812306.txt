@@ -1,0 +1,64 @@
+🚀 Connecting to ws://10.249.***.**/realtime/v1/websocket?apikey=<omitted>&project_ref=cv-br-epic-mink-*******-realtime&log_level=info&vsn=1.0.0
+Traceback (most recent call last):
+  File "/Users/bytedance/Documents/code/realtime_ws_test.py", line 30, in <module>
+    asyncio.run(main())
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/asyncio/runners.py", line 44, in run
+    return loop.run_until_complete(main)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/asyncio/base_events.py", line 642, in run_until_complete
+    return future.result()
+  File "/Users/bytedance/Documents/code/realtime_ws_test.py", line 14, in main
+    async with websockets.connect(uri) as ws:
+  File "/Users/bytedance/Library/Python/3.9/lib/python/site-packages/websockets/asyncio/client.py", line 587, in __aenter__
+    return await self
+  File "/Users/bytedance/Library/Python/3.9/lib/python/site-packages/websockets/asyncio/client.py", line 543, in __await_impl__
+    await self.connection.handshake(
+  File "/Users/bytedance/Library/Python/3.9/lib/python/site-packages/websockets/asyncio/client.py", line 114, in handshake
+    raise self.protocol.handshake_exc
+  File "/Users/bytedance/Library/Python/3.9/lib/python/site-packages/websockets/client.py", line 325, in parse
+    self.process_response(response)
+  File "/Users/bytedance/Library/Python/3.9/lib/python/site-packages/websockets/client.py", line 142, in process_response
+    raise InvalidStatus(response)
+websockets.exceptions.InvalidStatus: server rejected WebSocket connection: HTTP 403
+
+# --- New Code Block --- 
+
+import asyncio
+import websockets
+import json
+
+# === configuration ===
+realtime_host = "10.249.***.**"
+project_ref = "cv-br-epic-mink-*******-realtime"
+anon_token = "<omitted>"
+
+uri = f"ws://{realtime_host}/realtime/v1/websocket?apikey={anon_token}&project_ref={project_ref}&log_level=info&vsn=1.0.0"
+
+async def main():
+    print(f"🚀 Connecting to {uri}")
+    async with websockets.connect(uri) as ws:
+        print("✅ Connected! Sending join request...")
+
+        payload = {
+            "topic": "realtime:public:messages",
+            "event": "phx_join",
+            "payload": {},
+            "ref": "1"
+        }
+        await ws.send(json.dumps(payload))
+        print("📤 Sent join request.")
+
+        while True:
+            msg = await ws.recv()
+            print(f"📥 {msg}")
+
+asyncio.run(main())
+
+# --- New Code Block --- 
+
+11:55:29.063 project=127 external_id=127 error_code=TenantNotFound [error] TenantNotFound: Tenant not found: 127
+11:55:29.063 project=127 external_id=127 [info] REFUSED CONNECTION TO RealtimeWeb.UserSocket in 4ms
+  Transport: :websocket
+  Serializer: Phoenix.Socket.V1.JSONSerializer
+  Parameters: %{"apikey" => "[FILTERED]", "log_level" => "[FILTERED]", "project_ref" => "[FILTERED]", "vsn" => "[FILTERED]"}
+11:55:29.980 request_id=GHW3ciBDu3XBj0YAEnoB [info] HEAD /healthcheck
+11:55:29.981 request_id=GHW3ciBDu3XBj0YAEnoB [info] Sent 200 in 183µs

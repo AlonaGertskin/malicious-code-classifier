@@ -1,0 +1,72 @@
+C:\Users\USERNAME\FolderName - With Spaces\_MyHome\Documents\Dev\Python\my_script.py
+
+# --- New Code Block --- 
+
+"C:\Users\USERNAME\FolderName - With Spaces\_MyHome\Documents\Dev\temp\test.txt"
+
+# --- New Code Block --- 
+
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python Debugger: Current File with Arguments",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "args": "${command:pickArgs}"
+        }
+    ]
+}
+
+# --- New Code Block --- 
+
+PS C:\Users\USERNAME\FolderName - With Spaces\_MyHome\Documents\Dev\Python>  c:; cd 'c:\Users\USERNAME\FolderName - With Spaces\_MyHome\Documents\Dev\Python'; c:\Users\USERNAME\AppData\Local\Programs\Python\Python312\python.exe c:\Users\USERNAME\.vscode\extensions\ms-python.debugpy-2025.14.1-win32-x64\bundled\libs\debugpy\launcher 50410 -- C:\Users\USERNAME\FolderName - With Spaces\_MyHome\Documents\Dev\Python\my_script.py "C:\Users\USERNAME\FolderName - With Spaces\_MyHome\Documents\Dev\temp\test.txt" 
+Traceback (most recent call last):
+  File "c:\Users\USERNAME\AppData\Local\Programs\Python\Python312\Lib\runpy.py", line 198, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\USERNAME\AppData\Local\Programs\Python\Python312\Lib\runpy.py", line 88, in _run_code
+    exec(code, run_globals)
+  File "c:\Users\USERNAME\.vscode\extensions\ms-python.debugpy-2025.14.1-win32-x64\bundled\libs\debugpy\launcher/../..\debugpy\__main__.py", line 71, in <module>
+    cli.main()
+  File "c:\Users\USERNAME\.vscode\extensions\ms-python.debugpy-2025.14.1-win32-x64\bundled\libs\debugpy\launcher/../..\debugpy/..\debugpy\server\cli.py", line 508, in main
+    run()
+  File "c:\Users\USERNAME\.vscode\extensions\ms-python.debugpy-2025.14.1-win32-x64\bundled\libs\debugpy\launcher/../..\debugpy/..\debugpy\server\cli.py", line 358, in run_file
+    runpy.run_path(target, run_name="__main__")
+  File "c:\Users\USERNAME\.vscode\extensions\ms-python.debugpy-2025.14.1-win32-x64\bundled\libs\debugpy\_vendored\pydevd\_pydevd_bundle\pydevd_runpy.py", line 309, in run_path
+    code, fname = _get_code_from_file(run_name, path_name)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\USERNAME\.vscode\extensions\ms-python.debugpy-2025.14.1-win32-x64\bundled\libs\debugpy\_vendored\pydevd\_pydevd_bundle\pydevd_runpy.py", line 278, in _get_code_from_file        
+    with io_open_code(decoded_path) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\USERNAME\\FolderName'
+PS C:\Users\USERNAME\FolderName - With Spaces\_MyHome\Documents\Dev\Python>
+
+# --- New Code Block --- 
+
+PS C:\Users\USERNAME\FolderName - With Spaces\_MyHome\Documents\Dev\Python>  c:; cd 'c:\Users\USERNAME\FolderName - With Spaces\_MyHome\Documents\Dev\Python'; c:\Users\USERNAME\AppData\Local\Programs\Python\Python312\python.exe c:\Users\USERNAME\.vscode\extensions\ms-python.debugpy-2025.14.1-win32-x64\bundled\libs\debugpy\launcher 53983 -- C:\Users\USERNAME\FolderName - With Spaces\_MyHome\Documents\Dev\Python\my_script.py "C:\Users\USERNAME\Downloads\test.txt"
+Traceback (most recent call last):
+  File "c:\Users\USERNAME\AppData\Local\Programs\Python\Python312\Lib\runpy.py", line 198, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\USERNAME\AppData\Local\Programs\Python\Python312\Lib\runpy.py", line 88, in _run_code
+    exec(code, run_globals)
+  File "c:\Users\USERNAME\.vscode\extensions\ms-python.debugpy-2025.14.1-win32-x64\bundled\libs\debugpy\launcher/../..\debugpy\__main__.py", line 71, in <module>
+    cli.main()
+  File "c:\Users\USERNAME\.vscode\extensions\ms-python.debugpy-2025.14.1-win32-x64\bundled\libs\debugpy\launcher/../..\debugpy/..\debugpy\server\cli.py", line 508, in main
+    run()
+  File "c:\Users\USERNAME\.vscode\extensions\ms-python.debugpy-2025.14.1-win32-x64\bundled\libs\debugpy\launcher/../..\debugpy/..\debugpy\server\cli.py", line 358, in run_file
+    runpy.run_path(target, run_name="__main__")
+  File "c:\Users\USERNAME\.vscode\extensions\ms-python.debugpy-2025.14.1-win32-x64\bundled\libs\debugpy\_vendored\pydevd\_pydevd_bundle\pydevd_runpy.py", line 309, in run_path
+    code, fname = _get_code_from_file(run_name, path_name)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\USERNAME\.vscode\extensions\ms-python.debugpy-2025.14.1-win32-x64\bundled\libs\debugpy\_vendored\pydevd\_pydevd_bundle\pydevd_runpy.py", line 278, in _get_code_from_file        
+    with io_open_code(decoded_path) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\USERNAME\\FolderName'
+PS C:\Users\USERNAME\FolderName - With Spaces\_MyHome\Documents\Dev\Python>

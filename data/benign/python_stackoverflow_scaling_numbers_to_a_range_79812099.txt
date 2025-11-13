@@ -1,0 +1,3 @@
+N = range(0,2,50)
+x = np.random.random(N)
+y = np.random.random(N)

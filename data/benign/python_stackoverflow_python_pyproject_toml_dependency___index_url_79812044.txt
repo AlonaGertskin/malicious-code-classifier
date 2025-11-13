@@ -1,0 +1,28 @@
+pip3 install torch torchaudio --index-url https://download.pytorch.org/whl/cu118
+
+# --- New Code Block --- 
+
+dependencies = [
+    "numpy>=1.26.4",
+    "torch @ https://download.pytorch.org/whl/cu118",
+    "torchaudio @ https://download.pytorch.org/whl/cu118",
+    ...
+]
+
+# --- New Code Block --- 
+
+dependencies = [
+    "numpy>=1.26.4",
+    "torch",
+    "torchaudio",
+    ...
+]
+
+[[tool.uv.index]]
+name = "pytorch-cu118"
+url = "https://download.pytorch.org/whl/cu118"
+explicit = true
+
+# --- New Code Block --- 
+
+ERROR: Cannot unpack file E:\TMP\pip-unpack-d0ik4x9f\cu118.html (downloaded from E:\TMP\pip-install-rcxbtrj9\torch_47f33372416f496ba653abdf6d44028c, content-type: text/html); cannot detect archive format

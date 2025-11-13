@@ -1,0 +1,23 @@
+class Solution:
+    def __init__(self):
+        self.value = { 'a': 1, 'b': 2, 'c': 3, 'd': 4, 'e': 5, 'f': 6, 'g': 7, 'h': 8, 'i': 9, 'j': 10, 'k': 11, 'l': 12, 'm': 13, 'n': 14, 'o': 15, 'p': 16, 'q': 17, 'r': 18, 's': 19, 't': 20, 'u': 21, 'v': 22, 'w': 23, 'x': 24, 'y': 25, 'z': 26 }
+
+        self.first = { 0 : 'zero', 1 : 'one', 2 : 'two', 3 : 'three', 4 : 'four', 5 : 'five',
+          6 : 'six', 7 : 'seven', 8 : 'eight', 9 : 'nine', 10 : 'ten',
+          11 : 'eleven', 12 : 'twelve', 13 : 'thirteen', 14 : 'fourteen',
+          15 : 'fifteen', 16 : 'sixteen', 17 : 'seventeen', 18 : 'eighteen',
+          19 : 'nineteen', 20 : 'twenty'}
+
+    def helper(self, n):
+        f_char = 'a'
+        if n in self.first:
+            f_char = self.first[n][0]
+        else:
+            f_char = self.first[int(str(n)[0])][0]
+        return self.value[f_char]
+        
+
+    def findKthNumber(self, n: int, k: int) -> int:
+        inter = [x for x in range(n+1)]
+        inter.sort(key=lambda x: self.helper(x))
+        return inter[k-1]

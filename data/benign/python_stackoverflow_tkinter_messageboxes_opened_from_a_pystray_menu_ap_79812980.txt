@@ -1,0 +1,29 @@
+import threading
+import tkinter as tk
+from tkinter import messagebox
+import pystray
+from PIL import Image, ImageDraw
+
+def create_icon_image():
+    img = Image.new('RGB', (64, 64), (30, 144, 255))
+    d = ImageDraw.Draw(img)
+    d.rectangle([16, 16, 48, 48], fill=(255, 255, 255))
+    return img
+
+def show_messagebox():
+    root = tk.Tk()
+    root.withdraw()
+    messagebox.showinfo("Test", "Window opened from tray menu", parent=root)
+    root.destroy()
+
+def on_click(icon, item):
+    threading.Thread(target=show_messagebox, daemon=True).start()
+
+icon = pystray.Icon(
+    "test_icon",
+    create_icon_image(),
+    "Test Tray",
+    menu=pystray.Menu(pystray.MenuItem("Show message", on_click))
+)
+
+icon.run()
