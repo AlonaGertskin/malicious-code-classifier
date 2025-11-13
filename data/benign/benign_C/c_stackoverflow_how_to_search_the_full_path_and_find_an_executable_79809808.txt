@@ -1,0 +1,16 @@
+// Find path
+ char path[3000];
+ strncpy(path, getenv("PATH"), sizeof(path));
+ char* pathToTry = strtok(path, ":");
+ char absPath[1024];
+ while (pathToTry != NULL)
+ {
+    
+     snprintf(absPath, sizeof(absPath), "%s/%s", pathToTry, userInput);
+     if (access(absPath, F_OK) == 0)
+     {
+         printf("Found");
+         system(absPath);
+     }
+     pathToTry = strtok(NULL, ":");
+ }

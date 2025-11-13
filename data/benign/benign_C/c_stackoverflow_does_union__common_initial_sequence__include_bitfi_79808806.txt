@@ -1,0 +1,52 @@
+enum command_type {
+    command_type_foo,
+    command_type_bar,
+};
+
+struct foo_command {
+    enum command_type type;
+    int x;
+};
+
+struct bar_command {
+    enum_command_type type;
+    const char* s;
+};
+
+union command {
+    struct foo_command foo;
+    struct bar_command bar;
+};
+
+// second case means `cmd.foo` was not active, but fine due to CIS
+switch (cmd.foo.type) {
+    case command_type_foo:
+        return do_foo(&cmd.foo);
+    case command_type_bar:
+        return do_bar(&cmd.bar);
+}
+
+# --- New Code Block --- 
+
+struct i2c_address {
+    uint32_t is_aux : 1;
+    uint32_t _reserved : 7;
+    uint32_t address : 8;
+    uint32_t offset : 8;
+    uint32_t length : 8;
+};
+
+struct aux_address {
+    uint32_t is_aux : 1;
+    uint32_t _reserved : 3;
+    uint32_t address : 20;
+    uint32_t length : 8;
+};
+
+union address {
+    struct i2c_address i2c;
+    struct aux_addredd aux;
+};
+
+// is accessing the `is_aux` bit from inactive member UB?
+return addr.i2c.is_aux ? do_aux(&addr.aux, buffer) : do_i2c(&addr.i2c, buffer);

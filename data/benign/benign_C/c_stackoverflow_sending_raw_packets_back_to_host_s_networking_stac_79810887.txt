@@ -1,0 +1,39 @@
+// devname is "eth0"
+
+    fd = socket( PF_PACKET, SOCK_RAW, htons(ETH_P_ALL) ); // or AF_PACKET/IPPROTO_RAW / PF_PACKET/htons(ETH_P_ALL)
+    struct ifreq if_idx;
+    memset(&if_idx, 0, sizeof(struct ifreq));
+    strncpy(if_idx.ifr_name, devname, IFNAMSIZ-1);
+    if (ioctl(fd, SIOCGIFINDEX, &if_idx) < 0)
+        Error
+
+    struct sockaddr_ll socket_address = {
+        .sll_ifindex = if_idx.ifr_ifindex,
+        .sll_halen = 0,
+        .sll_family = AF_PACKET,
+        .sll_protocol = htons(ETH_P_ALL),
+        .sll_hatype = 0,
+        .sll_pkttype = PACKET_BROADCAST,
+    };
+
+    if ( bind( fd, (const struct sockaddr*)&socket_address, sizeof( socket_address ) ) < 0 )
+        Error
+
+# --- New Code Block --- 
+
+// https://stackoverflow.com/questions/10070008/reading-from-pf-packet-sock-raw-with-read-misses-packets MAYBE?
+    struct packet_mreq mr = {
+        .mr_ifindex = socket_address.sll_ifindex,
+        .mr_type = PACKET_MR_PROMISC,
+    };
+    if (setsockopt(fd, SOL_PACKET, PACKET_ADD_MEMBERSHIP, &mr, sizeof(mr)) < 0) {
+        FAIL( "Error setting packet membership\n" );
+    }
+
+    struct ifreq ifr = { 0 };
+    strncpy(ifr.ifr_name, devname, IFNAMSIZ-1);
+    if( ioctl( fd, SIOCGIFHWADDR, &ifr ) < 0 )
+        Error
+
+    memcpy( mymac, (char*)ifr.ifr_hwaddr.sa_data, 6 );
+    int rv = setsockopt( fd, SOL_SOCKET, SO_BINDTODEVICE, devname, strlen(devname) );

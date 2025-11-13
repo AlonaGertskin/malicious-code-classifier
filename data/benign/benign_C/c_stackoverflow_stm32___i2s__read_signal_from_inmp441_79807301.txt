@@ -1,0 +1,210 @@
+#include "stm32f10x.h"
+#include "stm32f10x_gpio.h"
+#include "stdio.h"
+
+#define BUF_SIZE 1024
+volatile uint16_t i2s_data_buf[BUF_SIZE];
+volatile uint16_t i2s_rx_index = 0;
+struct __FILE {
+    int dummy;
+};
+FILE __stdout;
+
+int fputc(int ch, FILE *f){
+    /* Send your custom byte */
+    USART_SendData(USART1, ch);
+    while (USART_GetFlagStatus(USART1, USART_FLAG_TXE) == RESET){};
+    /* If everything is OK, you have to return character written */
+    return ch;
+}
+
+void GPIO_Configure()
+{
+  RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART1 | RCC_APB2Periph_GPIOA | RCC_APB2Periph_AFIO, ENABLE);
+    GPIO_InitTypeDef GPIO_InitStructure;
+    //A9: TX
+    GPIO_InitStructure.GPIO_Mode   = GPIO_Mode_AF_PP;
+    GPIO_InitStructure.GPIO_Pin    = GPIO_Pin_9;
+    GPIO_InitStructure.GPIO_Speed  = GPIO_Speed_50MHz;
+    GPIO_Init(GPIOA, &GPIO_InitStructure);
+    //A10 : RX INPUTFLOASTING
+    GPIO_InitStructure.GPIO_Mode   = GPIO_Mode_IN_FLOATING;
+    GPIO_InitStructure.GPIO_Pin    = GPIO_Pin_10;
+    GPIO_InitStructure.GPIO_Speed  = GPIO_Speed_50MHz;
+    GPIO_Init(GPIOA, &GPIO_InitStructure);
+}
+void USART_Configure()
+{
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART1, ENABLE);
+    USART_InitTypeDef  USART_InitStructure;
+    USART_InitStructure.USART_BaudRate           = 9600;
+    USART_InitStructure.USART_Mode               = USART_Mode_Rx | USART_Mode_Tx;
+    USART_InitStructure.USART_HardwareFlowControl= USART_HardwareFlowControl_None;
+    USART_InitStructure.USART_Parity             = USART_Parity_No;
+    USART_InitStructure.USART_StopBits           = USART_StopBits_1;
+    USART_InitStructure.USART_WordLength         = USART_WordLength_8b;
+    USART_Init(USART1, &USART_InitStructure);
+    USART_Cmd(USART1, ENABLE);
+}
+void USART_SendChar(USART_TypeDef *USARTx, char data)
+{
+
+    USART_SendData(USART1, data);
+    //TxE = 1: Data is transferred to the shift register)
+  //TxE = 0; Data is not transferred to the shift register
+    while(USART_GetFlagStatus(USARTx, USART_FLAG_TXE) == RESET);
+}
+void USART_SendString(USART_TypeDef *USARTx, char *s)
+{
+    while(*s)
+    {
+        USART_SendChar(USARTx, *s);
+        s++;
+    }
+}
+
+void I2S2_Master_Init(void)
+{
+    GPIO_InitTypeDef GPIO_InitStructure;
+    I2S_InitTypeDef I2S_InitStructure;
+
+    /* Enable clocks */
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB | RCC_APB2Periph_AFIO, ENABLE);
+    RCC_APB1PeriphClockCmd(RCC_APB1Periph_SPI2, ENABLE);
+
+    /* Configure pins: WS (PB12), CK (PB13), SD (PB15) */
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_12 | GPIO_Pin_13 | GPIO_Pin_15;
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+    GPIO_Init(GPIOB, &GPIO_InitStructure);
+
+    /* I2S configuration */
+    SPI_I2S_DeInit(SPI2);
+    I2S_InitStructure.I2S_AudioFreq = I2S_AudioFreq_44k;
+    I2S_InitStructure.I2S_Standard = I2S_Standard_Phillips;
+    I2S_InitStructure.I2S_DataFormat = I2S_DataFormat_16b;
+    I2S_InitStructure.I2S_CPOL = I2S_CPOL_Low;
+    I2S_InitStructure.I2S_Mode = I2S_Mode_MasterTx;
+    I2S_InitStructure.I2S_MCLKOutput = I2S_MCLKOutput_Disable;
+    I2S_Init(SPI2, &I2S_InitStructure);
+
+    /* Enable I2S */
+    I2S_Cmd(SPI2, ENABLE);
+}
+
+
+void USART_SendNumber(USART_TypeDef *USARTx,int n)
+{
+    int chuc = 0, dvi = 0, tram = 0, nghin = 0;
+    nghin = n / 1000; //1234 '1'
+    tram  = (n % 1000) / 100;
+    chuc  = ((n % 1000) %100)/10;
+    dvi   = ((n % 1000) %100) %10;
+    USART_SendChar(USART1, nghin + 48);
+    USART_SendChar(USART1, tram  + 48);
+    USART_SendChar(USART1, chuc  + 48);
+    USART_SendChar(USART1, dvi   + 48);
+}
+void delay(int time)
+{
+    while(time)
+    {
+        SysTick -> LOAD  = 72000 - 1;
+        SysTick -> VAL   = 0;
+        SysTick -> CTRL  = 5;
+        while(!(SysTick -> CTRL & ( 1 << 16))){}
+        --time;
+    }
+}
+
+
+
+void I2S2_GPIO_Config(void)
+{
+    GPIO_InitTypeDef GPIO_InitStructure;
+
+    /* Enable GPIOB clock */
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);
+
+    /* PB12 -> WS, PB13 -> CK, PB15 -> SD (data out), PB14 -> SD_in (MISO) */
+    /* For reception we need the SD_in pin (PB14) as input floating or AF */
+    /* Use AF_PP for SD output pins and AF_INPUT / Floating for SD_in depending on package */
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_12 | GPIO_Pin_13 | GPIO_Pin_15;
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
+    GPIO_Init(GPIOB, &GPIO_InitStructure);
+
+    /* PB14 as input floating (SD_IN) */
+        GPIO_InitStructure.GPIO_Pin = GPIO_Pin_15;
+        GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
+        GPIO_Init(GPIOB, &GPIO_InitStructure);
+}
+
+void I2S2_Config_IRQ(void)
+{
+    I2S_InitTypeDef I2S_InitStructure;
+
+    /* Enable SPI2 clock (APB1) and AFIO if needed */
+    RCC_APB1PeriphClockCmd(RCC_APB1Periph_SPI2, ENABLE);
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
+
+    SPI_I2S_DeInit(SPI2);
+
+    I2S_InitStructure.I2S_Mode = I2S_Mode_MasterRx; // ? Master + Receive
+    I2S_InitStructure.I2S_Standard = I2S_Standard_Phillips;
+    I2S_InitStructure.I2S_DataFormat = I2S_DataFormat_24b;
+    I2S_InitStructure.I2S_MCLKOutput = I2S_MCLKOutput_Disable;
+    I2S_InitStructure.I2S_AudioFreq = I2S_AudioFreq_16k; // ho?c 8k, 32k, tu? b?n
+    I2S_InitStructure.I2S_CPOL = I2S_CPOL_Low;
+
+    I2S_Init(SPI2, &I2S_InitStructure);
+    I2S_Cmd(SPI2, ENABLE);
+
+    /* Configure NVIC for SPI2 IRQ (RXNE) */
+    NVIC_InitTypeDef NVIC_InitStructure;
+    NVIC_InitStructure.NVIC_IRQChannel = SPI2_IRQn; 
+    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;
+    NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
+    NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+    NVIC_Init(&NVIC_InitStructure);
+
+    /* Enable RXNE interrupt */
+    SPI_I2S_ITConfig(SPI2, SPI_I2S_IT_RXNE, ENABLE);
+}
+
+
+void SPI2_IRQHandler(void)
+{
+    if (SPI_I2S_GetITStatus(SPI2, SPI_I2S_IT_RXNE) == SET)
+    {
+        uint16_t data = SPI_I2S_ReceiveData(SPI2);
+        i2s_data_buf[i2s_rx_index++] = data;
+        if (i2s_rx_index >= BUF_SIZE) i2s_rx_index = 0;
+    }
+}
+
+
+
+/*int gio = x, int minute = x, int second = 0*/
+int main(){
+    GPIO_Configure();
+    USART_Configure();
+    I2S2_Master_Init();
+//  I2S2_GPIO_Config();
+//  I2S2_Config_IRQ();
+    while(1)
+    {
+        //fprintf(stdout, "Gio Phu giay: %d %d %d\n", hour, minute, second);
+        USART_SendString(USART1, "Vuong Viet Thao\n");
+        
+        USART_SendString(USART1,"12344");
+        delay(1000);
+        
+        if (SPI2->SR & SPI_SR_RXNE) {
+            uint16_t data = SPI2->DR;
+            char buf[32];
+            sprintf(buf, "%u\r\n", data);
+            USART_SendString(USART1, buf);
+        }
+    }
+}

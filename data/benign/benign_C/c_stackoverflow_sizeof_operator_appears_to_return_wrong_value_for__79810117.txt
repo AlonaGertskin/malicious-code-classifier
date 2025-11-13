@@ -1,0 +1,20 @@
+struct __attribute__((__packed__)) XIRControl
+{
+    uint8_t command;
+    char code[19];
+    uint16_t error;
+    union codeData
+    {
+        struct rcvCommands
+        {
+            char ptxCommand[30];
+            char matchpat[40];
+        } rcvdata;
+        struct IRPanaData
+        {
+            uint16_t address;
+            uint32_t hexCode;
+        } pandata;
+        uint16_t samdata[67];
+    } cd;
+} pta;

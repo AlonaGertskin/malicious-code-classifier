@@ -1,0 +1,27 @@
+type containing an unknown-size array is not allowed
+
+# --- New Code Block --- 
+
+typedef struct {
+    /** Command ID. One of CMD_* in fpc_cmds.h. */
+    uint16_t cmd_id;
+    /** Type of frame. One of FPC_BP_FRAME_TYPE_*. */
+    uint16_t type;
+    /** Placeholder for payload, if any. See fpc_cmds_*.h for command payloads. */
+    uint8_t payload[];
+} fpc_cmd_hdr_t;
+
+typedef struct {
+    /** Command header. */
+    fpc_cmd_hdr_t cmd;
+    /** 96 bits of unique ID. */
+    uint32_t mcu_unique_id[3];
+    /** FW ID. */
+    uint8_t fw_id;
+    /** Fuse Level. */
+    uint8_t fw_fuse_level;
+    /** Version String Length */
+    uint16_t version_str_len;
+    /** Version String (incl termination '\0') */
+    char version_str[];
+} fpc_cmd_version_response_t;

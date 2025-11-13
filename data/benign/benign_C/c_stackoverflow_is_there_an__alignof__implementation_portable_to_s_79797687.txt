@@ -1,0 +1,5 @@
+#define alignof(T) offsetof(struct{char _; T x;}, x)
+
+# --- New Code Block --- 
+
+#define alignof(T) (__extension__ offsetof(struct{char _; T x;}, x))

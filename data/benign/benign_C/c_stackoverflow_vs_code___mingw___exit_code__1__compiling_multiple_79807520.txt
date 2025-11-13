@@ -1,0 +1,88 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "type": "cppbuild",
+            "label": "C/C++: gcc.exe build all C files in folder",
+            "command": "C:\\MinGW\\bin\\gcc.exe",
+            "args": [
+                "-fdiagnostics-color=always",
+                "-g",
+                "*.c", // This doesn't seem to work
+                "-o",
+                "${fileDirname}\\${fileBasenameNoExtension}.exe"
+            ],
+            "options": {
+                "cwd": "${fileDirname}"
+            },
+            "problemMatcher": ["$gcc"],
+            "group": { "kind": "build", "isDefault": true }
+        }
+    ]
+}
+
+# --- New Code Block --- 
+
+{
+    "version": "0.2.0",
+    "configurations": []
+}
+
+# --- New Code Block --- 
+
+#include <stdio.h>
+#include "funciones.h"
+
+void Ej1();
+
+int main() {
+
+    Ej1();
+    //Ej2();
+    //Ej3();
+
+
+    return 0;
+}
+
+/* Armar un código en C para mostrar por pantalla los diferentes tamaños de los tipos: char, short,
+ int, long, float y double (utilizar la función sizeof). */
+void Ej1() {
+    
+    printf("Tamaño de los tipos de datos en bytes:\n");
+    printf("char: %zu bytes\n", sizeof(char));
+    printf("short: %zu bytes\n", sizeof(short));
+    printf("int: %zu bytes\n", sizeof(int));
+    printf("long: %zu bytes\n", sizeof(long));
+    printf("float: %zu bytes\n", sizeof(float));
+    printf("double: %zu bytes\n", sizeof(double));
+
+    return;
+}
+
+/* Crear un vector de enteros de 10 posiciones, recorrerlo e imprimir por pantalla cada uno de sus
+ valores. ¿Qué tamaño ocupa en memoria? */
+
+void Ej2() {
+
+    int vector[10];
+
+    for (int i; i < 10; i++) {
+
+        vector[i]=i;
+        printf("vector[%d] = %d\n", i, vector[i]);
+
+    }
+    printf("Tamaño total del vector en memoria: %zu bytes\n\n", sizeof(vector));
+
+    return;
+}
+
+void Ej3(){
+
+    int x = 5, y = 4;
+
+    printf("Cuenta: %d + %d = %d\n\n", x, y, sumar(x ,y));
+
+    return;
+}

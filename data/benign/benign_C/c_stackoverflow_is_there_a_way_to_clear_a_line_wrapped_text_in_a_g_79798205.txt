@@ -1,0 +1,62 @@
+void redisplay(void) {
+ fputs("\033[2K\r", stdout);
+
+  char *hl = highlight_line(rl_line_buffer);
+  const char *line = hl ? hl : rl_line_buffer;
+
+  fputs(rl_display_prompt, stdout);
+  fputs(line, stdout);
+
+  fflush(stdout);
+  if (hl) free(hl);
+}
+
+# --- New Code Block --- 
+
+void redisplay(void) {
+    int rows, cols;
+    rl_get_screen_size(&rows, &cols);
+    
+    // Calculate how many lines the current display uses
+    int prompt_len = strlen(rl_display_prompt);
+    int total_len = prompt_len + rl_end;
+    int lines_used = (total_len / cols) + 1;
+    
+    // Move to the start of the first line and clear everything
+    for (int i = 1; i < lines_used; i++) {
+        printf("\033[A");  // Move up
+    }
+    printf("\r\033[J");  // Move to start and clear down
+    
+    // Draw prompt and highlighted content
+    char *hl = highlight_line(rl_line_buffer);
+    const char *line = hl ? hl : rl_line_buffer;
+    
+    fputs(rl_display_prompt, stdout);
+    fputs(line, stdout);
+    
+    // Calculate where cursor should be
+    int cursor_pos = prompt_len + rl_point;
+    int cursor_row = cursor_pos / cols;
+    int cursor_col = cursor_pos % cols;
+    
+    // Calculate where we are now (end of everything we just printed)
+    int current_pos = prompt_len + rl_end);
+    int current_row = current_pos / cols;
+    int current_col = current_pos % cols;
+    
+    // Move cursor to correct position
+    int row_diff = current_row - cursor_row;
+    if (row_diff > 0) {
+        printf("\033[%dA", row_diff);  // Move up
+    }
+    
+    // Move to correct column
+    printf("\r");  // Start of line
+    if (cursor_col > 0) {
+        printf("\033[%dC", cursor_col);  // Move right
+    }
+    
+    fflush(stdout);
+    if (hl) free(hl);
+}

@@ -1,0 +1,80 @@
+#file debug.h
+#ifndef PDEBUG
+#define PDEBUG(msg ...)\
+logger_write(logger_stdout, (struct log) {\
+    .level_target = LOGLEV_DEBUG,\
+    .message = msg,\
+    .properties = strdict_make_from_va(__VA_ARGS__, 0)\
+})
+#endif
+#include "err_multi.h"
+
+# --- New Code Block --- 
+
+#file err_multi.h
+#ifdef PDEBUG
+#define TRY(expr, ...) {\
+maybe _err = (expr);\
+switch(_err.code) {\
+    case ERR_OK: break;\
+        __VA_ARGS__ \
+    case ERR_UNKNOWN:\
+    default:\
+        PDEBUG(\
+            "Unhandled err, code {_err.code}: {_err.detail}",\
+            "_err.code", _err.code,\
+            "_err.detail", _err.detail\
+        );\
+        return _err;\
+}\
+}
+#endif
+
+# --- New Code Block --- 
+
+#file debug.c
+#include "debug.h"
+
+void do_something(void) {
+    TRY(get_log_message( &fmsg, msg, properties ));
+}
+
+# --- New Code Block --- 
+
+{
+  maybe _err = (get_log_message(&fmsg, msg, properties));
+  switch (_err.code) {
+  case ERR_OK:
+    break;
+  case ERR_UNKNOWN:
+  default:
+    (logger_write(
+        logger_stdout,
+        (struct log){.level_target = LOGLEV_DEBUG,
+                     .message = "Unhandled err, code {_err.code}: {_err.detail}",
+                     "_err.code", _err.code,
+                     "_err.detail", _err.detail,
+                     .properties = strdict_make_from_va(__VA_ARGS__, 0)}));
+    return _err;
+  }
+}
+
+# --- New Code Block --- 
+
+#file debug.h
+struct log {
+    uint64_t level_target;
+    char* message;
+    struct strdict properties;
+};
+
+# --- New Code Block --- 
+
+#file dict1.h
+struct strdict {
+    ptrdiff_t n;
+    char **keys;
+    char **vals;
+};
+
+struct strdict strdict_make_from_va(...);

@@ -1,0 +1,72 @@
+#include "framework.h"
+#include "WindowsProject1.h"
+#include <windows.h>
+
+// +----------------------------------------------------------------------------
+// | -DialogProc()-
+// | This is the callback function that processes the messages sent to our
+// | dialog box. Most everything of consequence in such a program is either
+// | done here or called from here.
+// +----------------------------------------------------------------------------
+BOOL CALLBACK DialogProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+    // check message type
+    switch (uMsg)
+    {
+    case WM_COMMAND:
+        // here's where you would process commands sent to the dialog box
+        switch (LOWORD(wParam))
+        {
+        case IDOK:
+            // OK button clicked - perform data validation and such here
+            EndDialog(hWnd, TRUE);
+            break;
+
+        case IDCANCEL:
+            // Cancel button clicked
+            EndDialog(hWnd, FALSE);
+            break;
+
+            // process messages from additional controls here
+        }
+        break;
+
+    case WM_INITDIALOG:
+        // perform any necessary initialization here - return FALSE if you
+        // set the focus to a control yourself, otherwise just break and
+        // allow the function to return TRUE to indicate that the keyboard
+        // focus should be set automatically
+        break;
+
+    default:
+        // return zero if we do not process this message
+        return FALSE;
+    }
+
+    // return nonzero if we did process the message
+    return TRUE;
+}
+
+// +----------------------------------------------------------------------------
+// | -WinMain()-
+// | Program entry point. Normally you'd find a message loop in WinMain(), but
+// | for a dialog-based application, all we have to do is create the dialog and
+// | then quit. You should probably add some kind of error-checking facility in
+// | case the call to DialogBox() fails. You might also wish to do something
+// | with the return value of DialogBox() if it's important. Finally, you could 
+// | use DialogBoxParam() instead of DialogBox() if you wanted to pass a 
+// | parameter to the dialog box.
+// +----------------------------------------------------------------------------
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
+{
+    HWND hDlg =(HWND) DialogBox(hInstance,MAKEINTRESOURCE(IDD_FORMVIEW), NULL, (DLGPROC)DialogProc);
+    ShowWindow(hDlg, SW_SHOW);
+
+    MSG msg;
+    while (GetMessage(&msg, NULL, 0, 0) == TRUE)
+    {
+        TranslateMessage(&msg);
+        DispatchMessage(&msg);
+    }
+    return 0;
+}
