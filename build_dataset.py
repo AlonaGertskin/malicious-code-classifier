@@ -7,11 +7,13 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parent
 DATA_DIR = PROJECT_ROOT / "data"
 
-# Benign path is the same
-BENIGN_DIR = DATA_DIR / "benign"
+# --- UPDATED Benign Paths ---
+BENIGN_PARENT_DIR = DATA_DIR / "benign"
+BENIGN_C_DIR = BENIGN_PARENT_DIR / "benign_C"
+BENIGN_PYTHON_DIR = BENIGN_PARENT_DIR / "benign_python"
+# -------------------------
 
-# --- NEW Malicious Paths ---
-# Point to the new subfolders
+# --- Malicious Paths (these are correct) ---
 MALWARE_DATASET_DIR = DATA_DIR / "malware_dataset"
 MALICIOUS_C_DIR = MALWARE_DATASET_DIR / "malicious_C"
 MALICIOUS_PYTHON_DIR = MALWARE_DATASET_DIR / "malicious_python"
@@ -42,12 +44,13 @@ def main():
     print("--- Starting Dataset Builder ---")
     
     # 1. Check if data directories exist
-    if not BENIGN_DIR.exists():
-        print(f"!!! ERROR: Benign directory not found at: {BENIGN_DIR}")
-        print("Please make sure you have collected benign data.")
+    if not BENIGN_C_DIR.exists() or not BENIGN_PYTHON_DIR.exists():
+        print(f"!!! ERROR: Benign directories not found.")
+        print(f"Please check that these folders exist:")
+        print(f" - {BENIGN_C_DIR}")
+        print(f" - {BENIGN_PYTHON_DIR}")
         return
 
-    # Check the new malicious paths
     if not MALICIOUS_C_DIR.exists() or not MALICIOUS_PYTHON_DIR.exists():
         print(f"!!! ERROR: Malicious directories not found.")
         print(f"Please check that these folders exist:")
@@ -56,9 +59,16 @@ def main():
         return
 
     # 2. Load Benign (Label 0)
-    print(f"Loading benign code (Label 0) from: {BENIGN_DIR}...")
-    benign_samples = load_code_from_directory(BENIGN_DIR, 0)
-    print(f"Found {len(benign_samples)} benign samples.")
+    print(f"Loading benign C code (Label 0) from: {BENIGN_C_DIR}...")
+    benign_c_samples = load_code_from_directory(BENIGN_C_DIR, 0)
+    print(f"Found {len(benign_c_samples)} benign C samples.")
+
+    print(f"Loading benign Python code (Label 0) from: {BENIGN_PYTHON_DIR}...")
+    benign_python_samples = load_code_from_directory(BENIGN_PYTHON_DIR, 0)
+    print(f"Found {len(benign_python_samples)} benign Python samples.")
+
+    total_benign = len(benign_c_samples) + len(benign_python_samples)
+    print(f"--- Total benign samples found: {total_benign} ---")
 
     # 3. Load Malicious (Label 1)
     print(f"Loading malicious C code (Label 1) from: {MALICIOUS_C_DIR}...")
@@ -73,13 +83,18 @@ def main():
     print(f"--- Total malicious samples found: {total_malicious} ---")
 
     # 4. Check if we have data to work with
-    if len(benign_samples) == 0 or total_malicious == 0:
-        print("!!! ERROR: Not enough data. Both benign and malicious folders must contain .txt files.")
+    if total_benign == 0 or total_malicious == 0:
+        print("!!! ERROR: Not enough data. All data folders must contain .txt files.")
         return
 
     # 5. Combine and Shuffle
     print("Combining and shuffling all samples...")
-    all_samples = benign_samples + malicious_c_samples + malicious_python_samples
+    all_samples = (
+        benign_c_samples + 
+        benign_python_samples + 
+        malicious_c_samples + 
+        malicious_python_samples
+    )
     random.shuffle(all_samples) # This is critical for training
     
     # 6. Create DataFrame
@@ -94,7 +109,7 @@ def main():
         print("\n--- SUCCESS! ---")
         print(f"Dataset saved to: {OUTPUT_CSV_PATH}")
         print(f"Total samples: {len(df)}")
-        print(f" - Benign: {len(benign_samples)}")
+        print(f" - Benign: {total_benign}")
         print(f" - Malicious: {total_malicious}")
         print("\nYou are now ready to run 'classifier/train.py'")
     except Exception as e:
