@@ -1,0 +1,75 @@
+No dependencies
+Building in debug mode
+Compiling .pio\build\nucleo_f401re\FrameworkHALDriver\Src\stm32f4xx_hal.o
+Compiling .pio\build\nucleo_f401re\FrameworkHALDriver\Src\stm32f4xx_hal_adc.o
+Compiling .pio\build\nucleo_f401re\FrameworkHALDriver\Src\stm32f4xx_hal_adc_ex.o
+arm-none-eabi-gcc: fatal error: no input files
+compilation terminated.
+arm-none-eabi-gcc: fatal error: no input files
+Compiling .pio\build\nucleo_f401re\FrameworkHALDriver\Src\stm32f4xx_hal_can.o
+compilation terminated.
+*** [.pio\build\nucleo_f401re\FrameworkHALDriver\Src\stm32f4xx_hal.o] Error 1
+*** [.pio\build\nucleo_f401re\FrameworkHALDriver\Src\stm32f4xx_hal_adc.o] Error 1
+arm-none-eabi-gcc: fatal error: no input files
+compilation terminated.
+*** [.pio\build\nucleo_f401re\FrameworkHALDriver\Src\stm32f4xx_hal_adc_ex.o] Error 1
+arm-none-eabi-gcc: fatal error: no input files
+compilation terminated.
+*** [.pio\build\nucleo_f401re\FrameworkHALDriver\Src\stm32f4xx_hal_can.o] Error 1
+
+# --- New Code Block --- 
+
+[env:nucleo_f401re]
+platform = ststm32
+board = nucleo_f401re
+framework = stm32cube
+
+; Options de téléversement
+upload_protocol = stlink
+debug_tool = stlink
+debug_init_break = tbreak main
+build_type = debug
+
+; Configuration du moniteur série
+monitor_speed = 115200
+
+; Options de compilation
+build_flags = 
+    ; -O0  ; Optimisation désactivée pour le debug
+    -I Core/Inc
+    -I Core/Src
+    -I Drivers/STM32F4xx_HAL_Driver/Inc
+    -I Drivers/STM32F4xx_HAL_Driver/Src
+    -I Drivers/STM32F4xx_HAL_Driver/Inc/Legacy
+    -I Drivers/CMSIS/Device/ST/STM32F4xx/Include
+    -I Drivers/CMSIS/Device/ST/STM32F4xx/Source
+    -I Drivers/CMSIS/Include
+    -I Middlewares/ST/STM32_USB_Device_Library/Core/Inc
+    -I Middlewares/ST/STM32_USB_Device_Library/Core/Src
+    -I Middlewares/ST/STM32_USB_Device_Library/Class/HID/Inc
+    -I Middlewares/ST/STM32_USB_Device_Library/Class/HID/Src
+    -I USB_Device/App
+    -I USB_Device/Target
+    -D USE_HAL_DRIVER
+    -D STM32F401xE
+    ; -Wall  ; Active tous les avertissements
+    ; -Wextra  ; Active des avertissements supplémentaires
+
+
+
+[platformio]
+include_dir = Core/Inc,
+    Drivers/STM32F4xx_HAL_Driver/Inc,
+    Drivers/CMSIS/Device/ST/STM32F4xx/Include,
+    Middlewares/ST/STM32_USB_Device_Library/Core/Inc,
+    Middlewares/ST/STM32_USB_Device_Library/Class/HID/Inc,
+    USB_Device/App,
+    USB_Device/Target
+
+src_dir = Core/Src,
+    Drivers/STM32F4xx_HAL_Driver/Src,
+    Drivers/CMSIS/Device/ST/STM32F4xx/Source,
+    Middlewares/ST/STM32_USB_Device_Library/Core/Src,
+    Middlewares/ST/STM32_USB_Device_Library/Class/HID/Src,
+    USB_Device/App,
+    USB_Device/Target
