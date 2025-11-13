@@ -1,0 +1,36 @@
+#include <stdio.h>  
+#include <stdlib.h>  
+#include <string.h>  
+  
+int diziyi_yazdır(int dizi[],int dizi_uzunluğu)  
+{  
+  for(int i=0;i<dizi_uzunluğu;i++)  
+  {  
+    printf("%d",dizi[i]);  
+  }  
+   printf("\n");  
+}  
+  
+int kombnsyon_yazdır(int dizi[],int dizi_uzunluğu,int index)  
+{  
+   if(index==4)  
+    {  
+      return 0;  
+    }  
+    for(int i=0;i<dizi_uzunluğu;i++)  
+    {  
+        int geçici=dizi[index];  
+        dizi[index]=dizi[i];  
+        dizi[i]=geçici;  
+        diziyi_yazdır(dizi,dizi_uzunluğu);  
+       kombnsyon_yazdır(dizi,dizi_uzunluğu,index+1);  
+       dizi[i]=dizi[index];  
+       dizi[i]=geçici;  
+    }  
+}  
+  
+int main()  
+{       
+  int dizi[4]={1,2,3,4};  
+  kombnsyon_yazdır(dizi,4,0);  
+}

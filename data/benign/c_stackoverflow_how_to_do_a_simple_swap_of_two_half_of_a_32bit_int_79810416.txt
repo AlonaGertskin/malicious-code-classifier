@@ -1,0 +1,7 @@
+int inverse_half(unsigned int x){
+    int high;
+    int low;
+    
+    high = x >> 16;
+    low = x & 0xFFFF;
+}

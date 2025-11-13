@@ -1,0 +1,114 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdint.h>
+
+
+int function1(void)
+{
+   return 1;
+}
+
+int function2(void)
+{
+   return 2;
+}
+
+int function3(void)
+{
+   return 3;
+}
+
+int function4(void)
+{
+   return 4;
+}
+
+int function5(void)
+{
+   return 5;
+}
+
+int main(void)
+{
+   int ret = 0;
+
+   ret = function1();
+   printf("1. ret = %d\n", ret);
+
+   ret = function2();
+   printf("2. ret = %d\n", ret);
+
+   ret = function3();
+   printf("3. ret = %d\n", ret);
+
+   ret = function4();
+   printf("4. ret = %d\n", ret);
+
+   ret = function5();
+   printf("5. ret = %d\n", ret);
+
+   return 0;
+}
+
+# --- New Code Block --- 
+
+$ gcc -g program.c -o program
+
+# --- New Code Block --- 
+
+(gdb) file program
+Reading symbols from program...
+(gdb) break main
+Breakpoint 1 at 0x11a0: file program.c, line 34.
+(gdb) run
+Starting program: /home/user/gdb_test/gdb_debugging/program
+
+This GDB supports auto-downloading debuginfo from the following URLs:
+  <https://debuginfod.ubuntu.com>
+Enable debuginfod for this session? (y or [n]) n
+Debuginfod has been disabled.
+To make this setting permanent, add 'set debuginfod enabled off' to .gdbinit.
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib/x86_64-linux-gnu/libthread_db.so.1".
+
+Breakpoint 1, main () at program.c:34
+34              int ret = 0;
+(gdb)
+
+# --- New Code Block --- 
+
+$ objcopy --only-keep-debug program program.debug
+
+# --- New Code Block --- 
+
+$ strip --strip-debug --strip-unneeded program
+
+# --- New Code Block --- 
+
+(gdb) file program
+Reading symbols from program...
+
+This GDB supports auto-downloading debuginfo from the following URLs:
+  <https://debuginfod.ubuntu.com>
+Enable debuginfod for this session? (y or [n]) n
+Debuginfod has been disabled.
+To make this setting permanent, add 'set debuginfod enabled off' to .gdbinit.
+(No debugging symbols found in program)
+(gdb) add-symbol-file program.debug
+add symbol table from file "program.debug"
+(y or n) y
+Reading symbols from program.debug...
+(gdb) break main
+Breakpoint 1 at 0x11a0: file program.c, line 34.
+(gdb) run
+Starting program: /home/user/gdb_test/gdb_debugging/program
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib/x86_64-linux-gnu/libthread_db.so.1".
+1. ret = 1
+2. ret = 2
+3. ret = 3
+4. ret = 4
+5. ret = 5
+[Inferior 1 (process 8838) exited normally]
+(gdb)

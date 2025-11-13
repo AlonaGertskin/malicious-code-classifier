@@ -1,0 +1,38 @@
+MIDDLEWARE = [
+    "django.middleware.security.SecurityMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
+]
+
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10,
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+}
+
+# --- New Code Block --- 
+
+from django.contrib import admin
+from django.urls import path,include
+from rest_framework.authtoken import views
+from django.views.decorators.csrf import csrf_exempt
+
+from api import views as api_views
+
+urlpatterns = [
+    path("home/",include("expenses.urls")),
+    path("admin/", admin.site.urls),
+    path("api/",include("api.urls")),
+    path('api-auth/', include('rest_framework.urls')),
+    path('api-token-auth/', csrf_exempt(views.obtain_auth_token)),
+]

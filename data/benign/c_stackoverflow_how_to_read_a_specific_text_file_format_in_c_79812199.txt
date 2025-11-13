@@ -1,0 +1,15 @@
+#include "include/load_uc_file.h"
+
+bool find_file_format()
+{
+    FILE* fileptr;
+
+    fileptr = fopen("", "r");
+
+    if (fileptr == NULL)
+    {
+        printf("The file was not found");
+    }
+
+    return false;
+}

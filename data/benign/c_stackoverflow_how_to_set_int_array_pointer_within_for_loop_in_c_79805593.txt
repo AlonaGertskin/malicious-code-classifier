@@ -1,0 +1,27 @@
+int main()
+{
+    int *test[3];
+        
+    /** Try to set the array value one by one */
+        
+    for (int i = 0; i < 3; i++)
+    {
+        test[i] = &i;
+    }
+        
+    /** Try to print the array value one by one */
+    
+    for (int i = 0; i < 3; i++)
+    {
+        int value = *test[i];
+        printf("%d = %d\n", i, value);
+    }
+        
+    return 0;
+}
+
+# --- New Code Block --- 
+
+0 = 3
+1 = 3
+2 = 3

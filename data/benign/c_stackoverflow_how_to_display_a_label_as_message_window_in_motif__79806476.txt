@@ -1,0 +1,165 @@
+/* demo_mainwindow_container.c — minimal Motif 2.0 MainWindow + Container + message label
+ *
+ * Build:
+ *   cc demo_mainwindow_container.c -o demo_mainwindow_container -lXm -lXt -lX11
+ */
+
+#include <Xm/Xm.h>
+#include <Xm/MainW.h>
+#include <Xm/Container.h>
+#include <Xm/IconG.h>
+#include <Xm/Label.h>
+#include <stdio.h>
+
+int
+main(int argc, char **argv)
+{
+    XtAppContext app;
+    Widget toplevel, main_w, container, status;
+    Widget node1, node2, item;
+    Arg args[20];
+    int n, i;
+    XmString s;
+    char name[32];
+    char label[32];
+
+    XtSetLanguageProc(NULL, NULL, NULL);
+    toplevel = XtVaAppInitialize(&app, "XmlviewDemo", NULL, 0, &argc, argv, NULL, NULL);
+
+    /* MAIN WINDOW */
+    n = 0;
+    XtSetArg(args[n], XmNwidth, 800);                             n++;
+    XtSetArg(args[n], XmNheight, 600);                            n++;
+    XtSetArg(args[n], XmNscrollBarDisplayPolicy, XmAS_NEEDED);    n++;
+    XtSetArg(args[n], XmNscrollingPolicy, XmAUTOMATIC);           n++;
+    XtSetArg(args[n], XmNshowSeparator, True);                    n++;
+    main_w = XmCreateMainWindow(toplevel, "main_w", args, n);
+    XtManageChild(main_w);
+
+    /* WORK AREA: CONTAINER */
+    n = 0;
+    XtSetArg(args[n], XmNlayoutType, XmOUTLINE);        n++;
+    XtSetArg(args[n], XmNentryViewType, XmSMALL_ICON);  n++;
+    container = XmCreateContainer(main_w, "container", args, n);
+    XtManageChild(container);
+
+    /* MESSAGE AREA: LABEL */
+    s = XmStringCreateLocalized("Status: ready (message window label)");
+    n = 0;
+    XtSetArg(args[n], XmNlabelString, s);        n++;
+    status = XmCreateLabel(main_w, "status", args, n);
+    XmStringFree(s);
+    XtManageChild(status);
+
+    /* NODE 1 */
+    n = 0;
+    s = XmStringCreateLocalized("Node 1");
+    XtSetArg(args[n], XmNlabelString, s); n++;
+    node1 = XmCreateIconGadget(container, "node1", args, n);
+    XmStringFree(s);
+    XtManageChild(node1);
+
+    /* NODE 2 */
+    n = 0;
+    s = XmStringCreateLocalized("Node 2");
+    XtSetArg(args[n], XmNlabelString, s); n++;
+    node2 = XmCreateIconGadget(container, "node2", args, n);
+    XmStringFree(s);
+    XtManageChild(node2);
+
+    /* CHILDREN FOR NODE 1 */
+    for (i = 1; i <= 3; ++i) {
+        sprintf(name, "n1_item%d", i);
+        sprintf(label, "Item %d", i);
+
+        n = 0;
+        s = XmStringCreateLocalized(label);
+        XtSetArg(args[n], XmNlabelString, s);     n++;
+        XtSetArg(args[n], XmNentryParent, node1); n++;
+        item = XmCreateIconGadget(container, name, args, n);
+        XmStringFree(s);
+        XtManageChild(item);
+    }
+
+    /* CHILDREN FOR NODE 2 */
+    for (i = 1; i <= 3; ++i) {
+        sprintf(name, "n2_item%d", i);
+        sprintf(label, "Item %d", i);
+
+        n = 0;
+        s = XmStringCreateLocalized(label);
+        XtSetArg(args[n], XmNlabelString, s);     n++;
+        XtSetArg(args[n], XmNentryParent, node2); n++;
+        item = XmCreateIconGadget(container, name, args, n);
+        XmStringFree(s);
+        XtManageChild(item);
+    }
+
+    /* CONNECT WIDGETS INTO MAINWINDOW */
+    XtVaSetValues(main_w,
+                  XmNworkWindow, container,
+                  XmNmessageWindow, status,
+                  NULL);
+
+    XtRealizeWidget(toplevel);
+    XtAppMainLoop(app);
+    return 0;
+}
+
+# --- New Code Block --- 
+
+cc -o test_mainwindow test_mainwindow.c -I/usr/local/include -L/usr/local/lib -lXm -lX11 -lXt
+
+# --- New Code Block --- 
+
+#include <Xm/Xm.h>
+#include <Xm/MainW.h>
+#include <Xm/Label.h>
+#include <Xm/Text.h>
+
+int main(int argc, char *argv[])
+{
+    XtAppContext app;
+    Widget toplevel, main_w, label, text;
+    XmString label_str;
+
+    /* Initialize top-level shell */
+    toplevel = XtVaAppInitialize(&app, "MainWindowExample", NULL, 0,
+                                 &argc, argv, NULL, NULL);
+
+    /* Create a MainWindow */
+    main_w = XtVaCreateManagedWidget("main_w",
+                                     xmMainWindowWidgetClass, toplevel,
+                                     NULL);
+
+    /* Create a Text widget for the work area */
+    text = XtVaCreateManagedWidget("text",
+                                   xmTextWidgetClass, main_w,
+                                   XmNrows, 5,
+                                   XmNcolumns, 40,
+                                   XmNeditMode, XmMULTI_LINE_EDIT,
+                                   NULL);
+
+    /* Create a Label for the message area */
+    label_str = XmStringCreateLocalized("Ready.");
+    label = XtVaCreateManagedWidget("label",
+                                    xmLabelWidgetClass, main_w,
+                                    XmNlabelString, label_str,
+                                    NULL);
+    XmStringFree(label_str);
+
+    /* Assign text as work area and label as message area */
+    XmMainWindowSetAreas(main_w,
+                         NULL,     /* menu bar */
+                         NULL,     /* command window */
+                         NULL,     /* horizontal scrollbar */
+                         NULL,     /* vertical scrollbar */
+                         text);    /* work area */
+    XtVaSetValues(main_w, XmNmessageWindow, label, NULL);
+
+    /* Realize and enter event loop */
+    XtRealizeWidget(toplevel);
+    XtAppMainLoop(app);
+
+    return 0;
+}

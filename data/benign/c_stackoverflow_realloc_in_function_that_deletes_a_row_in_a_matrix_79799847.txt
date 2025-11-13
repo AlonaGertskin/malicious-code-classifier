@@ -1,0 +1,9 @@
+void row_del(int**& a, int& row, int col, int k) {
+    for (int j = 0; j < col; j++) {
+        for (int i = k; i < row - 1; i++) {
+            a[i][j] = a[i + 1][j];
+        }
+    }
+    row--;
+    a = (int**)realloc(a, row * sizeof(int*));
+}

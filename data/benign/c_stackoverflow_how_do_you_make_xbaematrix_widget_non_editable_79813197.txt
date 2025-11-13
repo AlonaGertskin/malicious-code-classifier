@@ -1,0 +1,58 @@
+/*
+ * xbae_example.c
+ * Minimal XbaeMatrix demo (C89-compatible)
+ */
+
+#include <Xm/Xm.h>
+#include <Xm/Form.h>
+#include <Xbae/Matrix.h>
+
+int main(int argc, char *argv[])
+{
+    XtAppContext app;
+    Widget toplevel, form, matrix;
+
+    static String column_labels[] = { "A", "B", "C" };
+
+    static String row0[] = { "1", "2", "3" };
+    static String row1[] = { "4", "5", "6" };
+    static String row2[] = { "7", "8", "9" };
+    static String *rows[] = { row0, row1, row2 };
+
+    toplevel = XtVaAppInitialize(&app, "XbaeDemo", NULL, 0,
+                                 &argc, argv, NULL, NULL);
+
+    form = XtVaCreateManagedWidget("form",
+                                   xmFormWidgetClass, toplevel,
+                                   NULL);
+
+    matrix = XtVaCreateManagedWidget("matrix",
+                                     xbaeMatrixWidgetClass, form,
+                                     XmNrows, 3,
+                                     XmNcolumns, 3,
+                                     XmNrowLabels, NULL,
+                                     XmNcolumnLabels, column_labels,
+                                     XmNcells, rows,
+                                     XmNeditable, False,
+                                     XmNcellHighlightThickness, 0,
+                                     XmNtraversalOn, False,
+                                     NULL);
+
+    XtRealizeWidget(toplevel);
+    XtAppMainLoop(app);
+    return 0;
+}
+
+# --- New Code Block --- 
+
+# Simple Makefile for xbae_example
+CC = cc
+CFLAGS = -I/usr/local/include -Wall
+LDFLAGS = -L/usr/local/lib -lXbae -lXm -lXt -lX11
+
+xbae_example: xbae_example.c
+        $(CC) $(CFLAGS) -o $@ $< $(LDFLAGS)
+
+# --- New Code Block --- 
+
+XmNeditable, False,

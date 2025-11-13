@@ -1,0 +1,7 @@
+// file1.c
+#include "includefile1.h"
+
+# --- New Code Block --- 
+
+// includefile1.h
+#include <atomic>

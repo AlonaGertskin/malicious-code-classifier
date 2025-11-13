@@ -1,0 +1,163 @@
+#include <stdio.h>
+#include <string.h>
+#include <openssl/evp.h>
+#include <openssl/core_names.h>
+#include <openssl/err.h>
+#include <openssl/dh.h>
+
+int main(void) {
+    EVP_PKEY_CTX *paramgen_ctx = NULL, *keygen_ctx = NULL;
+    EVP_PKEY *params = NULL, *pkey_alice = NULL, *pkey_bob = NULL;
+    EVP_PKEY *pubkey_bob = NULL;
+    EVP_PKEY_CTX *derive_ctx_alice = NULL;
+    unsigned char *secret_alice = NULL;
+    size_t secret_len_alice;
+
+    // Initialize OpenSSL
+    ERR_load_crypto_strings();
+    OpenSSL_add_all_algorithms();
+
+    /* === Step 1: Generate DH parameters (p, g) === */
+    paramgen_ctx = EVP_PKEY_CTX_new_from_name(NULL, "DH", NULL);
+    if (!paramgen_ctx) {
+        ERR_print_errors_fp(stderr);
+        return 1;
+    }
+
+    if (EVP_PKEY_paramgen_init(paramgen_ctx) <= 0) {
+        ERR_print_errors_fp(stderr);
+        return 1;
+    }
+
+    if (EVP_PKEY_CTX_set_dh_paramgen_prime_len(paramgen_ctx, 512) <= 0) {
+        ERR_print_errors_fp(stderr);
+        return 1;
+    }
+
+    if (EVP_PKEY_CTX_set_dh_paramgen_generator(paramgen_ctx, 2) <= 0) {
+        ERR_print_errors_fp(stderr);
+        return 1;
+    }
+
+    if (EVP_PKEY_paramgen(paramgen_ctx, &params) <= 0) {
+        ERR_print_errors_fp(stderr);
+        return 1;
+    }
+
+    EVP_PKEY_CTX_free(paramgen_ctx);
+
+    /* === Step 2: Generate Alice’s key pair === */
+    keygen_ctx = EVP_PKEY_CTX_new_from_pkey(NULL, params, NULL);
+    if (!keygen_ctx) {
+        ERR_print_errors_fp(stderr);
+        return 1;
+    }
+
+    if (EVP_PKEY_keygen_init(keygen_ctx) <= 0) {
+        ERR_print_errors_fp(stderr);
+        return 1;
+    }
+
+    if (EVP_PKEY_keygen(keygen_ctx, &pkey_alice) <= 0) {
+        ERR_print_errors_fp(stderr);
+        return 1;
+    }
+
+    EVP_PKEY_CTX_free(keygen_ctx);
+
+    /* === Step 3: Generate Bob’s key pair === */
+    keygen_ctx = EVP_PKEY_CTX_new_from_pkey(NULL, params, NULL);
+    if (!keygen_ctx) {
+        ERR_print_errors_fp(stderr);
+        return 1;
+    }
+
+    if (EVP_PKEY_keygen_init(keygen_ctx) <= 0) {
+        ERR_print_errors_fp(stderr);
+        return 1;
+    }
+
+    if (EVP_PKEY_keygen(keygen_ctx, &pkey_bob) <= 0) {
+        ERR_print_errors_fp(stderr);
+        return 1;
+    }
+
+    EVP_PKEY_CTX_free(keygen_ctx);
+
+    /* === Extract Bob's public key as BIGNUM === */
+    BIGNUM *bob_pub_bn = NULL;
+    if (EVP_PKEY_get_bn_param(pkey_bob, OSSL_PKEY_PARAM_PUB_KEY, &bob_pub_bn) <= 0) {
+        ERR_print_errors_fp(stderr);
+        return 1;
+    }
+
+    // Prepare OSSL_PARAM for Bob's public key (only pubkey, not p/g)
+    int pub_len = BN_num_bytes(bob_pub_bn);
+    unsigned char *pub_buf = OPENSSL_malloc(pub_len);
+    BN_bn2bin(bob_pub_bn, pub_buf);
+
+    OSSL_PARAM bob_pub_params[2];
+    bob_pub_params[0] = OSSL_PARAM_construct_BN(OSSL_PKEY_PARAM_PUB_KEY, pub_buf, pub_len);
+    bob_pub_params[1] = OSSL_PARAM_construct_end();
+
+    EVP_PKEY_CTX *bob_pub_ctx = EVP_PKEY_CTX_new_from_name(NULL, "DH", NULL);
+    if (!bob_pub_ctx) {
+        ERR_print_errors_fp(stderr);
+        return 1;
+    }
+    if (EVP_PKEY_fromdata_init(bob_pub_ctx) <= 0) {
+        ERR_print_errors_fp(stderr);
+        return 1;
+    }
+    if (EVP_PKEY_fromdata(bob_pub_ctx, &pubkey_bob, EVP_PKEY_PUBLIC_KEY, bob_pub_params) <= 0) {
+        ERR_print_errors_fp(stderr);
+        return 1;
+    }
+
+    /* === Alice derives shared secret using her private key and Bob's public key === */
+    derive_ctx_alice = EVP_PKEY_CTX_new(pkey_alice, NULL);
+    if (!derive_ctx_alice) {
+        ERR_print_errors_fp(stderr);
+        return 1;
+    }
+    if (EVP_PKEY_derive_init(derive_ctx_alice) <= 0) {
+        ERR_print_errors_fp(stderr);
+        return 1;
+    }
+    // This call fails with segmentation!
+    if (EVP_PKEY_derive_set_peer(derive_ctx_alice, pubkey_bob) <= 0) {
+        ERR_print_errors_fp(stderr);
+        return 1;
+    }
+    if (EVP_PKEY_derive(derive_ctx_alice, NULL, &secret_len_alice) <= 0) {
+        ERR_print_errors_fp(stderr);
+        return 1;
+    }
+    secret_alice = OPENSSL_malloc(secret_len_alice);
+    if (!secret_alice) {
+        ERR_print_errors_fp(stderr);
+        return 1;
+    }
+    if (EVP_PKEY_derive(derive_ctx_alice, secret_alice, &secret_len_alice) <= 0) {
+        ERR_print_errors_fp(stderr);
+        return 1;
+    }
+
+    printf("Alice derived shared secret (%zu bytes).\n", secret_len_alice);
+
+    /* === Cleanup === */
+    EVP_PKEY_free(params);
+    EVP_PKEY_free(pkey_alice);
+    EVP_PKEY_free(pkey_bob);
+    EVP_PKEY_free(pubkey_bob);
+    EVP_PKEY_CTX_free(derive_ctx_alice);
+    EVP_PKEY_CTX_free(bob_pub_ctx);
+    OPENSSL_free(secret_alice);
+    OPENSSL_free(pub_buf);
+    if (bob_pub_bn) BN_free(bob_pub_bn);
+
+    EVP_cleanup();
+    ERR_free_strings();
+
+    return 0;
+}

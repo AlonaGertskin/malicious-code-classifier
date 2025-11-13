@@ -1,0 +1,12 @@
+api_gateway = _api_gw.LambdaRestApi(self, f'{construct_id}-gw-api',
+                                            handler=lambda_hello,
+                                            rest_api_name=f'gw-api{env_ext}',
+                                            default_cors_preflight_options=_api_gw.CorsOptions(
+                                                allow_headers=['Content-Type', 'X-Amz-Date', 'Authorization',
+                                                               'X-Api-Key', 'X-Amz-Security-Token'],
+                                                allow_origins=_api_gw.Cors.ALL_ORIGINS,
+                                                allow_methods=_api_gw.Cors.ALL_METHODS
+                                            ),
+                                            proxy=False,
+                                            deploy_options=None)
+                                            )

@@ -1,0 +1,8 @@
+return condition ? a : b;
+
+# --- New Code Block --- 
+
+if (condition)
+   return a;
+else 
+   return b;

@@ -1,0 +1,22 @@
+int main()
+{
+    const char *hello = "Hello World";
+
+    char *world = malloc(strlen(hello) + 1);
+    strcpy(world, hello);
+
+    free(hello);
+    free(world);
+    
+    return 0;
+}
+
+# --- New Code Block --- 
+
+try{
+    free(hello);
+}catch(Throwable ex) {
+}finally{
+}
+
+free(world);

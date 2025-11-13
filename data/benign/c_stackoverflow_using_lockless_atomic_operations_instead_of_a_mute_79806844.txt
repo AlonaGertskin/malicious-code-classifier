@@ -1,0 +1,20 @@
+pthread_mutex_t mutex;
+int shared_var = 0;
+
+void thread1()
+{
+    pthread_mutex_lock(&mutex); // Lock the mutex
+    if (shared_var == 3)
+    {
+        // do something, then decrement shared_var 
+        shared_var--;
+    }
+    pthread_mutex_unlock(&mutex); // Unlock the mutex
+}
+
+void thread2()
+{
+    pthread_mutex_lock(&mutex); // Lock the mutex
+    shared_var++;
+    pthread_mutex_unlock(&mutex); // Unlock the mutex
+}
