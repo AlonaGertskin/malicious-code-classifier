@@ -1,6 +1,0 @@
-double amountAdd = 0;
-
-        while (amountAdd <= 0) {
-            printf("\nEnter Amount to deposit: ");
-            scanf("%lf", &amountAdd);
-        }

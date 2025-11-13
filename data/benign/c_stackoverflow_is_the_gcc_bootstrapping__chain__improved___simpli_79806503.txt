@@ -1,1 +1,0 @@
-hex0 -> hex1 -> hex2 -> M0 -> M2-Planet -> Mes -> Mescc -> TCC -> GCC 4 -> GCC

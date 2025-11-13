@@ -1,6 +1,0 @@
-PermissionError: [Errno 13] Permission denied: 'output.txt'
-
-# --- New Code Block --- 
-
-with open("output.txt", "w") as f:
-    f.write("test data")

@@ -1,3 +1,0 @@
-unsigned int n = 1;
-char* s = "X" + 1;
-s[-n];

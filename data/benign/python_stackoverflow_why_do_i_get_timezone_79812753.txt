@@ -1,5 +1,0 @@
-import datetime as dt
-import pytz
-zone = pytz.timezone("America/New_York")
-pre_timechange = dt.datetime(2025, 11, 2, 1, 59, 9, tzinfo=zone)
-print(pre_timechange) # 2025-11-02 01:59:09-04:56

@@ -1,9 +1,0 @@
-#include <stdio.h>
-
-int main(void)
-{
-    printf("output test");
-    int y = 8;
-    printf("this is a test %d", y);
-    return 0;
-}
