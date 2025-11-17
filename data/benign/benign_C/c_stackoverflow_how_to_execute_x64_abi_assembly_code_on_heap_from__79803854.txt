@@ -1,0 +1,39 @@
+void* write_into_executable(uint8_t code[]) {
+    SYSTEM_INFO info;
+    GetSystemInfo(&info);
+    
+    void *buf = VirtualAlloc(NULL, info.dwPageSize, MEM_COMMIT, PAGE_READWRITE);
+    memcpy(buf, code, info.dwPageSize);
+    
+    DWORD dummy;
+    VirtualProtect(buf, info.dwPageSize, PAGE_EXECUTE_READ, &dummy);
+    
+    return buf;
+}
+
+# --- New Code Block --- 
+
+int test(int v) {
+    return v;
+}
+
+void heap_exec() {
+    uintptr_t fnPt = (uintptr_t)test;
+    
+    uint8_t code[] = {
+        0x55,                                               // push rbp
+        0x48, 0x89, 0xE5,                                   // mov rbp, rsp
+        0x48, 0xC7, 0xC1, 0x05, 0x00, 0x00, 0x00,           // mov rcx, 0x5 
+        0x48, 0xBB, fnPt>>0 , fnPt>>8 , fnPt>>16, fnPt>>24, // mov rbx, fnPt
+                    fnPt>>32, fnPt>>40, fnPt>>48, fnPt>>56,
+        0xFF, 0xD3,                                         // call rbx
+        0x5D,                                               // pop rbp
+        0xC3,                                               // ret
+    };
+
+    void *buf = write_into_executable(code);
+
+    typedef int (*callable) ();
+    printf("%d\n", ((callable)buf)());
+    VirtualFree(buf, 0, MEM_RELEASE);
+}

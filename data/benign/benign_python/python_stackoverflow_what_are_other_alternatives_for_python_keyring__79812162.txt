@@ -1,0 +1,1 @@
+Keyring save failed: (1783, 'CredWrite', 'The stub received bad data')

@@ -1,0 +1,29 @@
+import asyncio
+from pyrogram import Client
+
+async def main():
+  worker = Client()
+
+  await worker.start()
+  chat = await worker.create_channel("New chanel")
+  link = await worker.export_chat_invite_link(chat.id)
+  print(link)
+  print(chat.id)
+
+if __name__=='__main__':
+  asyncio.run(main())
+
+# --- New Code Block --- 
+
+import asyncio
+from pyrogram import Client
+
+async def main():
+  worker = Client()
+
+  await worker.start()
+  await worker.send_message("chanel_id", "Message")
+  await print("Done")
+
+if __name__=='__main__':
+  asyncio.run(main())

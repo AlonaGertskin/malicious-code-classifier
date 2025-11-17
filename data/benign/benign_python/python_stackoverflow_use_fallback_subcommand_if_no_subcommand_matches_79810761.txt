@@ -1,0 +1,12 @@
+@click.group()
+@click.option('--config-file', type=click.STRING, help='Config file to use')
+def mytool(count, name):
+    """Simple program that does things."""
+    ....
+
+@mytool.command()
+@click.argument("script_name")
+@click.pass_context
+def execute(ctx, script_name):
+    """Execute custom script"""
+    ....

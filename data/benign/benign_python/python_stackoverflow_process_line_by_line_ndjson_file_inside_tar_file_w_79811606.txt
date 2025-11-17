@@ -1,0 +1,14 @@
+import json
+
+inputFileDir = ""
+outputFileDir = ""
+
+def processHtml(html):
+    return(1)
+
+with open(inputFileDir, "r", encoding = "utf-8") as f, open(outputFileDir, "w", encoding='utf-8') as g:
+    for jsonLine in f:
+        html = json.loads(jsonLine)
+        html = processHtml(html)
+        json.dump(html, g)
+        g.write('\n')

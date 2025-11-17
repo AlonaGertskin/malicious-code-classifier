@@ -1,0 +1,215 @@
+#include <math.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/time.h>
+
+// Mersenne-like RNG
+
+void RNG_Free(uint32_t **seed) {
+    *seed = realloc(*seed, 0);
+    *seed = 0;
+}
+
+uint32_t *RNG_Make(uint32_t init) {
+    const uint32_t size = 624;
+    uint32_t *seed;
+
+    (seed = realloc(NULL, sizeof(*seed) * (size + 1)))[1] = init;
+    for (seed[0] = 0, init = 1; init < size; init++)
+        seed[init + 1] = init + (seed[init] ^ (seed[init] >> 30)) * 1812433253;
+    return seed;
+}
+
+uint32_t RNG_Load(uint32_t *seed) {
+    const uint32_t size = 624;
+    uint32_t retn, iter;
+
+    if (!seed)
+        return 0;
+
+    seed[0] = (iter = seed[0] + 1) % size;
+    retn = (seed[iter] & 0x80000000) | (seed[seed[0] + 1] & 0x7FFFFFFF);
+    retn = seed[iter] = seed[(iter + 396) % size + 1]
+                      ^ (retn >> 1) ^ ((retn & 1)? 0x9908B0DF : 0);
+    retn ^= (retn >> 11);
+    retn ^= (retn <<  7) & 0x9D2C5680;
+    retn ^= (retn << 15) & 0xEFC60000;
+    return retn ^ (retn >> 18);
+}
+
+
+
+#define TESTLEN 1000
+//#define RNDSEED 0x6901CE9B
+#define RADIUS 300
+#define NPOINTS 10000
+#define MINDEPTH 1
+#define MAXDEPTH 12
+
+typedef struct { uint32_t _[4]; } QUAD;
+typedef struct { uint32_t slow, fast, dist; } PERF;
+
+static inline int aabb_dist2(int x, int y, int inc) {
+    x = (x + inc - 1 > 0) ? (x - inc < 0) ? 0 : (x - inc) : (x + inc - 1);
+    y = (y + inc - 1 > 0) ? (y - inc < 0) ? 0 : (y - inc) : (y + inc - 1);
+    return x * x + y * y;
+}
+
+int walk_tree_fast(QUAD *tree, int lvl, int here, PERF *p) {
+    p->fast++;
+    if (lvl == 0) return tree[here]._[0];
+    int retn = 0;
+    #define RECURSION(off) \
+    if (!retn && tree[here]._[off]) \
+        retn = walk_tree_fast(tree, lvl - 1, tree[here]._[off], p);
+    RECURSION(0 | (0 << 1))
+    RECURSION(1 | (0 << 1))
+    RECURSION(0 | (1 << 1))
+    RECURSION(1 | (1 << 1))
+    #undef RECURSION
+    return retn;
+}
+
+int walk_tree(QUAD *tree, int lvl, int here, int x, int y, int r, PERF *p) {
+    p->slow++;
+    if (lvl == 0) return tree[here]._[0];
+    int retn = 0;
+    int inc = (1 << (lvl-- + MINDEPTH)) >> 2;
+    int full_r = r - inc * 3; // 2 * sqrt(2) ~ 3; the quad is fully within
+    #define RECURSION(x, y, off) \
+    if (!retn && tree[here]._[off]) { p->dist++; \
+        int dist2 = aabb_dist2(x, y, inc); \
+        if ((full_r >= 0) && (dist2 <= full_r * full_r)) \
+            retn = walk_tree_fast(tree, lvl, tree[here]._[off], p); \
+        else if (dist2 <= r * r) \
+            retn = walk_tree(tree, lvl, tree[here]._[off], x, y, r, p); \
+    }
+    RECURSION(x - inc    , y - inc    , 0 | (0 << 1))
+    RECURSION(x + inc - 1, y - inc    , 1 | (0 << 1))
+    RECURSION(x - inc    , y + inc - 1, 0 | (1 << 1))
+    RECURSION(x + inc - 1, y + inc - 1, 1 | (1 << 1))
+    #undef RECURSION
+    return retn;
+}
+
+void print_elapsed(const struct timeval *old) {
+    struct timeval new, ret;
+    gettimeofday(&new, NULL);
+    timersub(&new, old, &ret);
+    printf("Time elapsed: %ld.%06ld\n",
+            (long int)ret.tv_sec, (long int)ret.tv_usec);
+}
+
+int main() {
+    struct timeval start = {};
+
+    gettimeofday(&start, NULL);
+    uint32_t init = start.tv_sec * start.tv_usec;
+    #ifdef RNDSEED
+    init = RNDSEED;
+    #endif
+    uint32_t *seed = RNG_Make(init);
+    printf("--- init = 0x%08X ---\n\n", init);
+
+    struct { int16_t x, y; } *points = realloc(NULL, sizeof(*points) * NPOINTS);
+    struct { uint32_t idx, next; } *list
+            = realloc(NULL, sizeof(*list) * NPOINTS);
+    for (int i = 0; i < NPOINTS; i++) {
+        points[i].x = RNG_Load(seed) & ((1 << MAXDEPTH) - 1);
+        points[i].y = RNG_Load(seed) & ((1 << MAXDEPTH) - 1);
+        //printf("#%d %d %d [INIT]\n", i, points[i].x, points[i].y);
+    }
+    init = (MAXDEPTH - MINDEPTH - 1) * NPOINTS + 1; // same root quad for all
+    QUAD *tree = realloc(NULL, sizeof(*tree) * init);
+    tree[0] = (QUAD){};
+
+    for (int i = 0, next = 0, head = 0; i < NPOINTS; i++) { // fill the tree
+        int here = 0;
+        for (uint32_t cur = (1 << MAXDEPTH) >> 1, end = (1 << MINDEPTH) >> 1;
+             cur != end; cur >>= 1) {
+            int off = !!(points[i].x & cur) | (!!(points[i].y & cur) << 1);
+            if (!tree[here]._[off]) {
+                tree[++next] = (QUAD){};
+                tree[here]._[off] = next;
+            }
+            here = tree[here]._[off];
+        }
+        list[head].idx = i;
+        list[head].next = tree[here]._[0];
+        tree[here]._[0] = ++head;
+    }
+    printf("\n--- max_size = %d ---\n\n", init);
+
+    int16_t find_r = RADIUS;
+    PERF p = {};
+
+    if (TESTLEN == 1) { // accuracy test
+        int16_t find_x = RNG_Load(seed) & ((1 << MAXDEPTH) - 1);
+        int16_t find_y = RNG_Load(seed) & ((1 << MAXDEPTH) - 1);
+        printf("\n--- find_x = %d, find_y = %d, find_r = %d ---\n\n",
+                find_x, find_y, find_r);
+
+        for (int i = 0; i < NPOINTS; i++) {
+            int dist2 = (points[i].x - find_x) * (points[i].x - find_x)
+                      + (points[i].y - find_y) * (points[i].y - find_y);
+            if (dist2 <= find_r * find_r)
+                printf("#%d %d %d [%f]\n",
+                        i, points[i].x, points[i].y, sqrt(dist2));
+        }
+        printf("\n--- NOW SEARCHING IN THE TREE ---\n\n");
+
+        int idx = walk_tree(tree, MAXDEPTH - MINDEPTH, 0,
+                ((1 << MAXDEPTH) >> 1) - find_x,
+                ((1 << MAXDEPTH) >> 1) - find_y, find_r, &p);
+        if (idx) {
+            idx = list[idx - 1].idx;
+            int dist2 = (points[idx].x - find_x) * (points[idx].x - find_x)
+                      + (points[idx].y - find_y) * (points[idx].y - find_y);
+            printf("#%d %d %d [%f | slow: %u, fast: %u, dist: %u]\n",
+                    idx, points[idx].x, points[idx].y, sqrt(dist2),
+                    p.slow, p.fast, p.dist);
+        } else {
+            printf("NOTHING FOUND! [slow: %u, fast: %u, dist: %u]\n",
+                    p.slow, p.fast, p.dist);
+        }
+    } else { // performance test
+        struct { int16_t x, y; } *tst = realloc(NULL, sizeof(*tst) * TESTLEN);
+        for (int _ = 0; _ < TESTLEN; _++) {
+            tst[_].x = RNG_Load(seed) & ((1 << MAXDEPTH) - 1);
+            tst[_].y = RNG_Load(seed) & ((1 << MAXDEPTH) - 1);
+        }
+        start = (struct timeval){};
+        gettimeofday(&start, NULL);
+        int iter = 0;
+        for (int _ = 0; _ < TESTLEN; _++) {
+            int i = 0;
+            for (; i < NPOINTS; i++) {
+                int dist2 = (points[i].x - tst[_].x) * (points[i].x - tst[_].x)
+                          + (points[i].y - tst[_].y) * (points[i].y - tst[_].y);
+                if (dist2 <= find_r * find_r) break;
+            }
+            iter += i;
+        }
+        printf("[iter: %d]\n", iter);
+        print_elapsed(&start);
+
+        printf("\n--- NOW SEARCHING IN THE TREE ---\n\n");
+
+        start = (struct timeval){};
+        gettimeofday(&start, NULL);
+        for (int _ = 0; _ < TESTLEN; _++) {
+            walk_tree(tree, MAXDEPTH - MINDEPTH, 0,
+                    ((1 << MAXDEPTH) >> 1) - tst[_].x,
+                    ((1 << MAXDEPTH) >> 1) - tst[_].y, find_r, &p);
+        }
+        printf("[slow: %u, fast: %u, dist: %u]\n", p.slow, p.fast, p.dist);
+        print_elapsed(&start);
+        tst = realloc(tst, 0);
+    }
+    tree = realloc(tree, 0);
+    list = realloc(list, 0);
+    points = realloc(points, 0);
+    RNG_Free(&seed);
+    return 0;
+}

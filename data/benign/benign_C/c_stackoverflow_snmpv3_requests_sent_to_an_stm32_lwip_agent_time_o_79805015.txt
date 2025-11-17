@@ -1,0 +1,190 @@
+--> get-request
+<-- report 1.3.6.1.6.3.15.1.1.4.0
+--> encryptedPDU: privKey Unknown
+--> encryptedPDU: privKey Unknown
+--> encryptedPDU: privKey Unknown
+--> encryptedPDU: privKey Unknown
+--> encryptedPDU: privKey Unknown
+--> encryptedPDU: privKey Unknown
+
+# --- New Code Block --- 
+
+registered debug token usm, 1
+usm: potentially bootstrapping the USM table from session data
+usm: getting user
+usm: USM processing has begun (offset 22)
+usm: getting user
+usm: Failed to find engine data.
+usm: USM processing completed.
+usm: USM processing begun...
+usm: USM processing completed.
+usm: potentially bootstrapping the USM table from session data
+usm: no flag defined...  continuing
+usm: Building user admin...
+usm: copying privKey
+usm: extending key
+usm:extend_kul:  key already big enough
+
+<The following part repeats for every "encryptedPDU" packet>
+usm: USM processing has begun (offset 53)
+usm: getting user admin
+usm: match on user admin
+usm: Encryption successful.
+usm: USM processing completed.
+<Repetition end>
+
+Timeout: No Response from 192.168.13.190.
+
+# --- New Code Block --- 
+
+struct API_SnmpUser
+{
+    const char *Username;
+    uint8_t AuthKey[20];
+    uint8_t PrivKey[16];
+};
+
+// snmpv3_get_user port method
+err_t snmpv3_get_user(
+    const char *Username,
+    snmpv3_auth_algo_t *AuthAlgo,
+    uint8_t *AuthKey,
+    snmpv3_priv_algo_t *PrivAlgo,
+    uint8_t *PrivKey
+    )
+{
+    struct API_SnmpUser *User;
+
+    if(strlen(Username) == 0)
+    {
+        return ERR_VAL;
+    }
+    
+    // _FindUserByName correctly returns user information
+    User = _FindUserByName(_DefaultController, Username);
+    if(User == NULL)
+    {
+        return ERR_VAL;
+    }
+    
+    if(AuthAlgo != NULL)
+    {
+        *AuthAlgo = SNMP_V3_AUTH_ALGO_SHA;
+    }
+    
+    if(PrivAlgo != NULL)
+    {
+        *PrivAlgo = SNMP_V3_PRIV_ALGO_AES;
+    }
+    
+    if(AuthKey != NULL)
+    {
+        memcpy(AuthKey, User->AuthKey, 20);
+    }
+    
+    if(PrivKey != NULL)
+    {
+        memcpy(PrivKey, User->PrivKey, 16);
+    }
+    
+    return ERR_OK;
+}
+
+// My coworker suggested this method for deriving the privKey from localized authKey,
+// please see the comment at this method's potential call site below.
+static void _LocalizedToPrivateKey(const uint8_t *LocalizedKey, uint8_t *PrivKey)
+{
+    uint8_t Buffer[32];
+    uint8_t ShaOut[20];
+    mbedtls_sha1_context Ctx;
+
+    // Concatenate LocalizedKey + first 12 bytes of LocalizedKey
+    memcpy(Buffer, LocalizedKey, 20);
+    memcpy(Buffer + 20, LocalizedKey, 12);
+
+    // SHA1 of that 32-byte buffer
+    mbedtls_sha1_init(&Ctx);
+    mbedtls_sha1_starts_ret(&Ctx);
+    mbedtls_sha1_update_ret(&Ctx, Buffer, sizeof(Buffer));
+    mbedtls_sha1_finish_ret(&Ctx, ShaOut);
+    mbedtls_sha1_free(&Ctx);
+
+    // Use first 16 bytes of the digest as the AES-128 key
+    memcpy(PrivKey, ShaOut, 16);
+}
+
+// API method used to register a user. This method is only ever called before snmp_init.
+e_ErrorTypeDef API_SnmpRegisterUser(
+    struct API_SnmpController *Controller,
+    const char *Username,
+    const char *Password
+    )
+{
+    struct API_SnmpUser *ThisUser;
+    
+    const char *EngineId;
+    uint8_t EngineIdLen;
+    uint32_t UsernameLen;
+    uint32_t PasswordLen;
+    
+    UsernameLen = strlen(Username);
+    PasswordLen = strlen(Password);
+    
+    if(UsernameLen == 0 || PasswordLen < 8)
+    {
+        return ErrorTypeDef_InvalidArgs;
+    }
+    
+    snmpv3_get_engine_id(&EngineId, &EngineIdLen);
+    
+    // ...
+    // User allocation and registration here, ThisUser gets initialized
+    // ...
+    
+    ThisUser->Username = Username;
+    
+    snmpv3_password_to_key_sha(
+        (const uint8_t *)Password,
+        PasswordLen,
+        (const uint8_t *)EngineId,
+        EngineIdLen,
+        ThisUser->AuthKey
+        );
+    
+    // This approach was suggested by a coworker, I've used to localize
+    // the PrivKey using the same method as the one used for the AuthKey above,
+    // but the observed behavior is the same.
+    // _LocalizedToPrivateKey(ThisUser->AuthKey, ThisUser->PrivKey);
+    //
+    // Another source claims that the AES privKey is simply the authKey truncated
+    // to 16 bytes.
+    memcpy(ThisUser->PrivKey, ThisUser->AuthKey, 16);
+    
+    return ErrorTypeDef_NoError;
+}
+
+# --- New Code Block --- 
+
+// Excerpt from lwipopts.h
+#define LWIP_SNMP                               1
+#define LWIP_SNMP_V3                            1
+#define SNMP_USE_RAW                            1
+#define SNMP_USE_NETCONN                        0
+
+#define SNMP_COMMUNITY                   "public"
+#define SNMP_COMMUNITY_WRITE       SNMP_COMMUNITY
+#define SNMP_COMMUNITY_TRAP        SNMP_COMMUNITY
+
+// Excerpt from mbedtls_config.h
+#define MBEDTLS_AES_C
+#define MBEDTLS_CIPHER_C
+#define MBEDTLS_CIPHER_MODE_CBC
+
+#define MBEDTLS_SHA1_C
+
+#define MBEDTLS_MD_C
+#define MBEDTLS_MD5_C
+
+#define MBEDTLS_PLATFORM_NO_STD_FUNCTIONS
+#define MBEDTLS_PLATFORM_C
+#define MBEDTLS_PLATFORM_MEMORY

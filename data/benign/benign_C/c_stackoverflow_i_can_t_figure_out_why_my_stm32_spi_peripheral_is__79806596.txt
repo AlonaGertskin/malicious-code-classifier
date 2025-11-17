@@ -1,0 +1,117 @@
+#include "spi.h"
+#include <stdint.h>
+#include "gpio.h"
+#include "stm32f10x.h"
+
+void SPI_Init(SPI_TypeDef* SPIx, uint32_t BaudRatePrescaler) {
+    // Enable clock for the SPI peripheral
+    if (SPIx == SPI1) {
+        RCC->APB2ENR |= RCC_APB2ENR_SPI1EN;
+    } else if (SPIx == SPI2) {
+        RCC->APB1ENR |= RCC_APB1ENR_SPI2EN;
+    } else {
+        // Unsupported SPI peripheral
+        return;
+    }
+
+    GPIO_Init(GPIOA, 5, AF_OUTPUT_PUSH_PULL); // SCK
+    GPIO_Init(GPIOA, 7, AF_OUTPUT_PUSH_PULL); // MOSI (data line in 1-line mode)
+    GPIO_Init(GPIOA, 6, INPUT_PULL_UP);       // MISO (keep pulled to defined state)
+    GPIO_Init(GPIOA, 4, OUTPUT_PUSH_PULL);    // NSS as GPIO (software CS)
+
+    // Configure SPI control registers for master, 8-bit, software NSS
+    SPIx->CR1 = 0;                 // Clear all bits first
+    SPIx->CR1 |= BaudRatePrescaler;// Set baud rate prescaler
+
+    SPIx->CR1 |= SPI_CR1_BIDIMODE; /* 1-line (bidirectional) */
+    SPIx->CR1 |= SPI_CR1_BIDIOE;   /* drive output (TX) */
+    SPIx->CR1 |= SPI_CR1_MSTR;     /* Master mode */
+    SPIx->CR1 |= SPI_CR1_SSM;      /* Software slave management */
+    SPIx->CR1 |= SPI_CR1_SSI;      /* Internal NSS = 1 */
+    // Keep defaults: CPOL=0, CPHA=0 (SPI mode 0), MSB first, 8-bit data
+
+    // Enable the SPI peripheral
+    SPIx->CR1 |= SPI_CR1_SPE;
+}
+
+void SPI_Transmit(SPI_TypeDef* SPIx, uint8_t data) {
+    // Ensure peripheral is in transmit direction for 1-line mode
+    SPIx->CR1 |= SPI_CR1_BIDIOE;
+
+    // Wait until TXE (Transmit buffer empty) flag is set
+    while (!(SPIx->SR & SPI_SR_TXE));
+
+    // Send data
+    SPIx->DR = data;
+
+    // Wait until the data has been transferred (TXE then BSY cleared)
+    while (!(SPIx->SR & SPI_SR_TXE));
+    while (SPIx->SR & SPI_SR_BSY);
+}
+
+# --- New Code Block --- 
+
+#include "gpio.h"
+
+void GPIO_Init(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin, GPIOMode_TypeDef GPIO_Mode) {
+    // Enable clock for the GPIO port
+    if (GPIOx == GPIOA) {
+        RCC->APB2ENR |= RCC_APB2ENR_IOPAEN;
+    } else if (GPIOx == GPIOB) {
+        RCC->APB2ENR |= RCC_APB2ENR_IOPBEN;
+    } else if (GPIOx == GPIOC) {
+        RCC->APB2ENR |= RCC_APB2ENR_IOPCEN;
+    } else {
+        // "Unsupported GPIO port"
+    }
+
+
+    if (GPIO_Pin > 15) {
+        return; // invalid pin
+    }
+
+    uint32_t pin_index = (uint32_t)GPIO_Pin;
+    uint32_t shift = (pin_index % 8) * 4;
+    volatile uint32_t *cfg_reg = (pin_index < 8) ? &GPIOx->CRL : &GPIOx->CRH;
+
+    /* clear the 4 configuration bits for this pin */
+    *cfg_reg &= ~(0xFu << shift);
+
+    switch (GPIO_Mode) {
+        case INPUT_ANALOG:
+            /* Input Analog: CNF=00, MODE=00 */
+            *cfg_reg |= (0x0u << shift);
+            break;
+        case INPUT_FLOATING:
+            /* Input Floating: CNF=01, MODE=00,  */
+            *cfg_reg |= (0x4u << shift);
+            break;
+        case INPUT_PULL_DOWN:
+        /* Input Pull-down: CNF=10, MODE=00 */
+        *cfg_reg |= (0x8u << shift);
+            break;
+        case INPUT_PULL_UP:
+            /* Input Pull-up: CNF=10, MODE=00 PxODR=1 */
+            *cfg_reg |= (0x8u << shift);
+            GPIOx->ODR |= (0x1u << pin_index);
+            break;
+        case OUTPUT_PUSH_PULL:
+            /* Output Push-Pull: CNF=00, MODE=11 */
+            *cfg_reg |= (0x3u << shift);
+            break;
+        case OUTPUT_OPEN_DRAIN:
+            /* Output Open-Drain: CNF=01, MODE=11 */
+            *cfg_reg |= (0x7u << shift); 
+            break;
+        case AF_OUTPUT_PUSH_PULL:
+            /* Alternate function output push-pull: CNF=10, MODE=11 */
+            *cfg_reg |= (0xBu << shift);
+            break;
+        case AF_OUTPUT_OPEN_DRAIN:
+            /* Alternate function output open-drain: CNF=11, MODE=11 */
+            *cfg_reg |= (0xFu << shift);
+        default:
+            /* Invalid mode - do nothing */
+            break;
+    }
+}

@@ -1,0 +1,24 @@
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+#include <stdbool.h>
+
+char* lrf_path = "The path to the file I want to read";
+
+FILE* lrf_file = fopen(lrf_path,"r");
+
+int line_len = 1000; //up to 1000 characters long
+char* line = malloc(line_len*sizeof(char));
+while (fgets(line, line_len, lrf_file)) {
+    printf("Line is %i characters long.\n",strlen(line)/sizeof(char));
+
+    lrf_file = NULL;
+    free(line);
+    line=NULL;
+    line_len=NULL;
+}
+fclose(lrf_file);
+
+# --- New Code Block --- 
+
+("key_test" . "value.")

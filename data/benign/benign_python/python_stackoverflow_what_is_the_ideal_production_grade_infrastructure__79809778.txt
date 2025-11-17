@@ -1,0 +1,17 @@
+### 700k Rows
+
+| Configuration        | Read File | Calculate | Build Results | JSON | Total  |
+|---------------------|-----------|-----------|---------------|------|--------|
+| **Single Process**  | 1-2s      | 5-6s      | 8-10s        | 3-4s | 17-22s |
+| **4 Workers**       | 1-2s      | 3-4s*     | 3-4s*        | 3-4s | 10-14s |
+| **8 Workers**       | 1-2s      | 2-3s*     | 2-3s*        | 3-4s | 8-12s  |
+
+*Parallel processing time (multiple chunks at once)
+
+### 60k Rows
+
+| Configuration        | Total Time | Notes                              |
+|---------------------|------------|------------------------------------|
+| **Single Process**  | 2-3s       | No overhead, pure speed            |
+| **4 Workers**       | 3-4s       | ⚠️ Overhead > benefit             |
+| **8 Workers**       | 4-5s       | ⚠️ Too much overhead

@@ -1,0 +1,26 @@
+./Makefile
+
+./src/lib/hello.h
+./src/lib/hello.c
+./src/lib/world.h
+./src/lib/world.c
+./src/lib/foo.h
+./src/lib/foo.c
+./src/lib/bar.h
+./src/lib/bar.c
+
+# --- New Code Block --- 
+
+CC = gcc
+CFLAGS = -Wall -g
+# How to include only "hello.h"?
+INCLUDES = -Isrc/lilb
+# How to write the rest for debugging only "hello.c"?
+
+# --- New Code Block --- 
+
+CC = gcc
+CFLAGS = -Wall -g
+# How to include only "world.h"?
+INCLUDES = -Isrc/lilb
+# How to write the rest for debugging only "world.c"?

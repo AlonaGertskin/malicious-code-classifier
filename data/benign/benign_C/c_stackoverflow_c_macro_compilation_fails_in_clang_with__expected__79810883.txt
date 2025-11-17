@@ -1,0 +1,551 @@
+#pragma once
+
+#include <stdio.h>
+#include <stdlib.h>
+
+#define __RESULT_EAT_PARENS(...) __VA_ARGS__
+
+typedef enum ResultKind
+{
+    OK,
+    ERR
+} ResultKind;
+
+#define DEFINE_RESULT(ok_type, err_type)         \
+    typedef struct Result_##ok_type##_##err_type \
+    {                                            \
+        ResultKind kind;                         \
+        union                                    \
+        {                                        \
+            ok_type ok;                          \
+            err_type err;                        \
+        } value;                                 \
+    } Result_##ok_type##_##err_type;
+
+#define __RESULT_OK_PASTE(ok_type, err_type, ...) \
+    (Result_##ok_type##_##err_type)               \
+    {                                             \
+        .kind = OK, .value = {.ok = __VA_ARGS__ } \
+    }
+
+#define __RESULT_OK_IMPL(ok_type, err_type, ...) \
+    __RESULT_OK_PASTE(ok_type, err_type, __VA_ARGS__)
+
+#define __RESULT_ERR_PASTE(ok_type, err_type, ...)  \
+    (Result_##ok_type##_##err_type)                 \
+    {                                               \
+        .kind = ERR, .value = {.err = __VA_ARGS__ } \
+    }
+
+#define __RESULT_ERR_IMPL(ok_type, err_type, ...) \
+    __RESULT_ERR_PASTE(ok_type, err_type, __VA_ARGS__)
+
+#define Ok(types, ...) \
+    __RESULT_OK_IMPL(__RESULT_EAT_PARENS types, (__VA_ARGS__))
+
+#define Err(types, ...) \
+    __RESULT_ERR_IMPL(__RESULT_EAT_PARENS types, (__VA_ARGS__))
+
+#define is_ok(res) \
+    ((res).kind == OK)
+
+#define is_err(res) \
+    ((res).kind == ERR)
+
+#define expect(res, msg)                                                                                        \
+    ({                                                                                                          \
+        __auto_type __res_tmp = (res);                                                                          \
+        (is_err(__res_tmp))                                                                                     \
+            ? (fprintf(stderr, "Panic at %s:%d: %s\n", __FILE__, __LINE__, (msg)), exit(1), __res_tmp.value.ok) \
+            : __res_tmp.value.ok;                                                                               \
+    })
+
+#define expect_err(res, msg)                                                                                     \
+    ({                                                                                                           \
+        __auto_type __res_tmp = (res);                                                                           \
+        (is_ok(__res_tmp))                                                                                       \
+            ? (fprintf(stderr, "Panic at %s:%d: %s\n", __FILE__, __LINE__, (msg)), exit(1), __res_tmp.value.err) \
+            : __res_tmp.value.err;                                                                               \
+    })
+
+#define unwrap_or(res, default_val)                            \
+    ({                                                         \
+        __auto_type __res_tmp = (res);                         \
+        is_ok(__res_tmp) ? __res_tmp.value.ok : (default_val); \
+    })
+
+#define unwrap_or_else(res, func)                         \
+    ({                                                    \
+        __auto_type __res_tmp = (res);                    \
+        is_ok(__res_tmp) ? __res_tmp.value.ok : (func)(); \
+    })
+
+#define __RESULT_MAP_PASTE(out_ok_type, err_type, res_in, var, ...)         \
+    ({                                                                      \
+        __auto_type __res_tmp = (res_in);                                   \
+        (is_err(__res_tmp))                                                 \
+            ? __RESULT_ERR_IMPL(out_ok_type, err_type, __res_tmp.value.err) \
+            : ({                                                            \
+                  typeof(__res_tmp.value.ok) var = __res_tmp.value.ok;      \
+                  __RESULT_OK_IMPL(out_ok_type, err_type, __VA_ARGS__);     \
+              });                                                           \
+    })
+
+#define __RESULT_MAP_IMPL(out_ok_type, err_type, res_in, var, ...) \
+    __RESULT_MAP_PASTE(out_ok_type, err_type, res_in, var, __VA_ARGS__)
+
+#define map(types, res_in, var, ...) \
+    __RESULT_MAP_IMPL(__RESULT_EAT_PARENS types, res_in, var, (__VA_ARGS__))
+
+#define __RESULT_MAP_ERR_PASTE(ok_type, out_err_type, res_in, var, ...)   \
+    ({                                                                    \
+        __auto_type __res_tmp = (res_in);                                 \
+        (is_ok(__res_tmp))                                                \
+            ? __RESULT_OK_IMPL(ok_type, out_err_type, __res_tmp.value.ok) \
+            : ({                                                          \
+                  typeof(__res_tmp.value.err) var = __res_tmp.value.err;  \
+                  __RESULT_ERR_IMPL(ok_type, out_err_type, __VA_ARGS__);  \
+              });                                                         \
+    })
+
+#define __RESULT_MAP_ERR_IMPL(ok_type, out_err_type, res_in, var, ...) \
+    __RESULT_MAP_ERR_PASTE(ok_type, out_err_type, res_in, var, __VA_ARGS__)
+
+#define map_err(types, res_in, var, ...) \
+    __RESULT_MAP_ERR_IMPL(__RESULT_EAT_PARENS types, res_in, var, (__VA_ARGS__))
+
+#define __RESULT_AND_THEN_PASTE(out_ok_type, err_type, res_in, var, ...)    \
+    ({                                                                      \
+        __auto_type __res_tmp = (res_in);                                   \
+        (is_err(__res_tmp))                                                 \
+            ? __RESULT_ERR_IMPL(out_ok_type, err_type, __res_tmp.value.err) \
+            : ({                                                            \
+                  typeof(__res_tmp.value.ok) var = __res_tmp.value.ok;      \
+                  __VA_ARGS__                                               \
+              });                                                           \
+    })
+
+#define __RESULT_AND_THEN_IMPL(out_ok_type, err_type, res_in, var, ...) \
+    __RESULT_AND_THEN_PASTE(out_ok_type, err_type, res_in, var, __VA_ARGS__)
+
+#define and_then(types, res_in, var, ...) \
+    __RESULT_AND_THEN_IMPL(__RESULT_EAT_PARENS types, res_in, var, (__VA_ARGS__))
+
+# --- New Code Block --- 
+
+#define __RESULT_AND_THEN_PASTE(out_ok_type, err_type, res_in, var, ...)    \
+    ({                                                                      \
+        __auto_type __res_tmp = (res_in);                                   \
+        (is_err(__res_tmp))                                                 \
+            ? __RESULT_ERR_IMPL(out_ok_type, err_type, __res_tmp.value.err) \
+            : ({                                                            \
+                  typeof(__res_tmp.value.ok) var = __res_tmp.value.ok;      \
+                  __VA_ARGS__                                               \
+              });                                                           \
+    })
+
+#define __RESULT_AND_THEN_IMPL(out_ok_type, err_type, res_in, var, ...) \
+    __RESULT_AND_THEN_PASTE(out_ok_type, err_type, res_in, var, __VA_ARGS__)
+
+#define and_then(types, res_in, var, ...) \
+    __RESULT_AND_THEN_IMPL(__RESULT_EAT_PARENS types, res_in, var, (__VA_ARGS__))
+
+# --- New Code Block --- 
+
+#include "result.h" // The header file with the macro definitions
+#include <stdio.h>
+
+// --- Type Definitions ---
+typedef const char *CString;
+
+// --- 1. Define the required Result type ---
+// Result<int, CString>
+DEFINE_RESULT(int, CString);
+
+// --- Helper Functions for and_then ---
+
+/**
+ * @brief A function for the and_then test (Ok -> Ok or Ok -> Err)
+ * Simulates an operation that might fail.
+ */
+Result_int_CString sophisticated_op(int i)
+{
+  printf("    -> (Called sophisticated_op(%d))\n", i);
+  if (i > 10)
+  {
+    // Return a new Ok
+    return Ok((int, CString), i * 2);
+  }
+  else
+  {
+    // Return an Err
+    return Err((int, CString), "value too small");
+  }
+}
+
+/**
+ * @brief A function for the and_then test (Ok -> Err)
+ */
+Result_int_CString sophisticated_err_op(int i)
+{
+  printf("    -> (Called sophisticated_err_op(%d))\n", i);
+  // Always returns Err
+  return Err((int, CString), "sophisticated op failed");
+}
+
+// --- Main Test Function ---
+int main()
+{
+  // --- Setup: Basic values ---
+  // These macros (Ok, Err) work correctly.
+  Result_int_CString res_ok = Ok((int, CString), 42);
+  Result_int_CString res_err = Err((int, CString), "file not found");
+
+  printf("\n--- 4. Chaining (and_then) ---\n");
+  printf("Compilation is expected to fail on the following 3 lines:\n");
+
+  // 4a. Ok(42) |> and_then(sophisticated_op) -> Ok(84)
+  // COMPILATION FAILS HERE
+  Result_int_CString chain1 = and_then(
+      (int, CString),       // Target type (U, E)
+      res_ok,               // Input Ok(42)
+      val,                  // Bind variable
+      sophisticated_op(val) // Expression -> Ok(84)
+  );
+
+  // 4b. Ok(42) |> and_then(sophisticated_err_op) -> Err("...")
+  // COMPILATION FAILS HERE
+  Result_int_CString chain2 = and_then(
+      (int, CString), // Target type (U, E)
+      res_ok,         // Input Ok(42)
+      val,
+      sophisticated_err_op(val) // Expression -> Err(...)
+  );
+
+  // 4c. Err(...) |> and_then(sophisticated_op) -> Err(...) (short-circuit)
+  // COMPILATION FAILS HERE
+  Result_int_CString chain3 = and_then(
+      (int, CString),       // Target type (U, E)
+      res_err,              // Input Err("file not found")
+      val,                  // Bind variable
+      sophisticated_op(val) // Expression - should not execute
+  );
+
+  printf("...If compilation somehow succeeded, printing results:\n");
+
+  // These lines just print the results.
+  // They require is_ok, unwrap_or, and expect_err from result.h.
+  if (is_ok(chain1))
+  {
+    printf("and_then(Ok(42), op_ok): value = %d\n", unwrap_or(chain1, -1));
+  }
+  if (is_err(chain2))
+  {
+    printf("and_then(Ok(42), op_err): error = \"%s\"\n", expect_err(chain2, "should be err"));
+  }
+  if (is_err(chain3))
+  {
+    printf("and_then(Err, op_ok): error = \"%s\"\n", expect_err(chain3, "should be err"));
+  }
+
+  printf("All tests finished.\n");
+
+  return 0;
+}
+
+# --- New Code Block --- 
+
+karesis@Celestina:~/Projects/cprint$ clang -Wall -Wextra -std=c23 src/test_result.c -o test
+src/test_result.c:141:31: error: expected ';' after expression
+  141 |   Result_int_CString chain1 = and_then(
+      |                               ^
+src/result.h:134:5: note: expanded from macro 'and_then'
+  134 |     __RESULT_AND_THEN_IMPL(__RESULT_EAT_PARENS types, res_in, var, (__VA_ARGS__))
+      |     ^
+src/result.h:131:63: note: expanded from macro '__RESULT_AND_THEN_IMPL'
+  131 |     __RESULT_AND_THEN_PASTE(out_ok_type, err_type, res_in, var, __VA_ARGS__)
+      |                                                               ^
+src/test_result.c:150:31: error: expected ';' after expression
+  150 |   Result_int_CString chain2 = and_then(
+      |                               ^
+src/result.h:134:5: note: expanded from macro 'and_then'
+  134 |     __RESULT_AND_THEN_IMPL(__RESULT_EAT_PARENS types, res_in, var, (__VA_ARGS__))
+      |     ^
+src/result.h:131:63: note: expanded from macro '__RESULT_AND_THEN_IMPL'
+  131 |     __RESULT_AND_THEN_PASTE(out_ok_type, err_type, res_in, var, __VA_ARGS__)
+      |                                                               ^
+src/test_result.c:159:31: error: expected ';' after expression
+  159 |   Result_int_CString chain3 = and_then(
+      |                               ^
+src/result.h:134:5: note: expanded from macro 'and_then'
+  134 |     __RESULT_AND_THEN_IMPL(__RESULT_EAT_PARENS types, res_in, var, (__VA_ARGS__))
+      |     ^
+src/result.h:131:63: note: expanded from macro '__RESULT_AND_THEN_IMPL'
+  131 |     __RESULT_AND_THEN_PASTE(out_ok_type, err_type, res_in, var, __VA_ARGS__)
+      |                                                               ^
+3 errors generated.
+karesis@Celestina:~/Projects/cprint$
+
+# --- New Code Block --- 
+
+...
+  Result_int_CString chain1 = ({ __auto_type __res_tmp = (res_ok); (((__res_tmp).kind == ERR)) ? (Result_int_CString) { .kind = ERR, .value = {.err = __res_tmp.value.err } } : ({ typeof(__res_tmp.value.ok) val = __res_tmp.value.ok; (sophisticated_op(val)), }); });
+# 64 "test_mre.c"
+  Result_int_CString chain2 = ({ __auto_type __res_tmp = (res_ok); (((__res_tmp).kind == ERR)) ? (Result_int_CString) { .kind = ERR, .value = {.err = __res_tmp.value.err } } : ({ typeof(__res_tmp.value.ok) val = __res_tmp.value.ok; (sophisticated_err_op(val)), }); });
+# 73 "test_mre.c"
+  Result_int_CString chain3 = ({ __auto_type __res_tmp = (res_err); (((__res_tmp).kind == ERR)) ? (Result_int_CString) { .kind = ERR, .value = {.err = __res_tmp.value.err } } : ({ typeof(__res_tmp.value.ok) val = __res_tmp.value.ok; (sophisticated_op(val)), }); });
+...
+
+# --- New Code Block --- 
+
+Result_int_CString chain1 =
+    ({
+        __auto_type __res_tmp = (res_ok);
+        (
+            ((__res_tmp).kind == ERR)
+        )
+        ? (Result_int_CString){
+            .kind = ERR,
+            .value = {.err = __res_tmp.value.err}
+          }
+        : ({
+            typeof(__res_tmp.value.ok) val = __res_tmp.value.ok;
+            (sophisticated_op(val)), /* <--- Problematic Comma Here */
+          });
+    });
+
+# --- New Code Block --- 
+
+#define __RESULT_AND_THEN_PASTE(out_ok_type, err_type, res_in, var, ...)    \
+    ({                                                                      \
+        __auto_type __res_tmp = (res_in);                                   \
+        (is_err(__res_tmp))                                                 \
+            ? __RESULT_ERR_IMPL(out_ok_type, err_type, __res_tmp.value.err) \
+            : ({                                                            \
+                  typeof(__res_tmp.value.ok) var = __res_tmp.value.ok;      \
+                  __VA_ARGS__; /* <--- I add a `;` */                       \
+              });                                                           \
+    })
+
+# --- New Code Block --- 
+
+karesis@Celestina:~/Projects/cprint$ clang -Wall -Wextra -std=c23 test_mre.c -o test
+test_mre.c:55:31: error: expected expression
+   55 |   Result_int_CString chain1 = and_then(
+      |                               ^
+./result.h:132:5: note: expanded from macro 'and_then'
+  132 |     __RESULT_AND_THEN_IMPL(__RESULT_EAT_PARENS types, res_in, var, (__VA_ARGS__))
+      |     ^
+./result.h:129:5: note: expanded from macro '__RESULT_AND_THEN_IMPL'
+  129 |     __RESULT_AND_THEN_PASTE(out_ok_type, err_type, res_in, var, __VA_ARGS__)
+      |     ^
+./result.h:124:30: note: expanded from macro '__RESULT_AND_THEN_PASTE'
+  124 |                   __VA_ARGS__; /* <--- I add a `;` */                       \
+      |                              ^
+test_mre.c:64:31: error: expected expression
+   64 |   Result_int_CString chain2 = and_then(
+      |                               ^
+./result.h:132:5: note: expanded from macro 'and_then'
+  132 |     __RESULT_AND_THEN_IMPL(__RESULT_EAT_PARENS types, res_in, var, (__VA_ARGS__))
+      |     ^
+./result.h:129:5: note: expanded from macro '__RESULT_AND_THEN_IMPL'
+  129 |     __RESULT_AND_THEN_PASTE(out_ok_type, err_type, res_in, var, __VA_ARGS__)
+      |     ^
+./result.h:124:30: note: expanded from macro '__RESULT_AND_THEN_PASTE'
+  124 |                   __VA_ARGS__; /* <--- I add a `;` */                       \
+      |                              ^
+test_mre.c:73:31: error: expected expression
+   73 |   Result_int_CString chain3 = and_then(
+      |                               ^
+./result.h:132:5: note: expanded from macro 'and_then'
+  132 |     __RESULT_AND_THEN_IMPL(__RESULT_EAT_PARENS types, res_in, var, (__VA_ARGS__))
+      |     ^
+./result.h:129:5: note: expanded from macro '__RESULT_AND_THEN_IMPL'
+  129 |     __RESULT_AND_THEN_PASTE(out_ok_type, err_type, res_in, var, __VA_ARGS__)
+      |     ^
+./result.h:124:30: note: expanded from macro '__RESULT_AND_THEN_PASTE'
+  124 |                   __VA_ARGS__; /* <--- I add a `;` */                       \
+      |                              ^
+3 errors generated.
+karesis@Celestina:~/Projects/cprint$
+
+# --- New Code Block --- 
+
+...
+  Result_int_CString chain1 = ({ __auto_type __res_tmp = (res_ok); (((__res_tmp).kind == ERR)) ? (Result_int_CString) { .kind = ERR, .value = {.err = __res_tmp.value.err } } : ({ typeof(__res_tmp.value.ok) val = __res_tmp.value.ok; (sophisticated_op(val)),; }); });
+# 64 "test_mre.c"
+  Result_int_CString chain2 = ({ __auto_type __res_tmp = (res_ok); (((__res_tmp).kind == ERR)) ? (Result_int_CString) { .kind = ERR, .value = {.err = __res_tmp.value.err } } : ({ typeof(__res_tmp.value.ok) val = __res_tmp.value.ok; (sophisticated_err_op(val)),; }); });
+# 73 "test_mre.c"
+  Result_int_CString chain3 = ({ __auto_type __res_tmp = (res_err); (((__res_tmp).kind == ERR)) ? (Result_int_CString) { .kind = ERR, .value = {.err = __res_tmp.value.err } } : ({ typeof(__res_tmp.value.ok) val = __res_tmp.value.ok; (sophisticated_op(val)),; }); });
+...
+
+# --- New Code Block --- 
+
+#pragma once
+
+#include <stdio.h>
+#include <stdlib.h>
+
+#define __RESULT_EAT_PARENS(...) __VA_ARGS__
+
+typedef enum ResultKind
+{
+    OK,
+    ERR
+} ResultKind;
+
+#define DEFINE_RESULT(ok_type, err_type)         \
+    typedef struct Result_##ok_type##_##err_type \
+    {                                            \
+        ResultKind kind;                         \
+        union                                    \
+        {                                        \
+            ok_type ok;                          \
+            err_type err;                        \
+        } value;                                 \
+    } Result_##ok_type##_##err_type;
+
+#define __RESULT_OK_PASTE(ok_type, err_type, ...) \
+    (Result_##ok_type##_##err_type)               \
+    {                                             \
+        .kind = OK, .value = {.ok = __VA_ARGS__ } \
+    }
+
+#define __RESULT_OK_IMPL(ok_type, err_type, ...) \
+    __RESULT_OK_PASTE(ok_type, err_type, __VA_ARGS__)
+
+#define __RESULT_ERR_PASTE(ok_type, err_type, ...)  \
+    (Result_##ok_type##_##err_type)                 \
+    {                                               \
+        .kind = ERR, .value = {.err = __VA_ARGS__ } \
+    }
+
+#define __RESULT_ERR_IMPL(ok_type, err_type, ...) \
+    __RESULT_ERR_PASTE(ok_type, err_type, __VA_ARGS__)
+
+#define Ok(types, ...) \
+    __RESULT_OK_IMPL(__RESULT_EAT_PARENS types, (__VA_ARGS__))
+
+#define Err(types, ...) \
+    __RESULT_ERR_IMPL(__RESULT_EAT_PARENS types, (__VA_ARGS__))
+
+#define is_ok(res) \
+    ((res).kind == OK)
+
+#define is_err(res) \
+    ((res).kind == ERR)
+
+#define expect(res, msg)                                                                                        \
+    ({                                                                                                          \
+        __auto_type __res_tmp = (res);                                                                          \
+        (is_err(__res_tmp))                                                                                     \
+            ? (fprintf(stderr, "Panic at %s:%d: %s\n", __FILE__, __LINE__, (msg)), exit(1), __res_tmp.value.ok) \
+            : __res_tmp.value.ok;                                                                               \
+    })
+
+#define expect_err(res, msg)                                                                                     \
+    ({                                                                                                           \
+        __auto_type __res_tmp = (res);                                                                           \
+        (is_ok(__res_tmp))                                                                                       \
+            ? (fprintf(stderr, "Panic at %s:%d: %s\n", __FILE__, __LINE__, (msg)), exit(1), __res_tmp.value.err) \
+            : __res_tmp.value.err;                                                                               \
+    })
+
+#define unwrap_or(res, default_val)                            \
+    ({                                                         \
+        __auto_type __res_tmp = (res);                         \
+        is_ok(__res_tmp) ? __res_tmp.value.ok : (default_val); \
+    })
+
+#define unwrap_or_else(res, func)                         \
+    ({                                                    \
+        __auto_type __res_tmp = (res);                    \
+        is_ok(__res_tmp) ? __res_tmp.value.ok : (func)(); \
+    })
+
+#define __RESULT_MAP_PASTE(out_ok_type, err_type, res_in, var, ...)         \
+    ({                                                                      \
+        __auto_type __res_tmp = (res_in);                                   \
+        (is_err(__res_tmp))                                                 \
+            ? __RESULT_ERR_IMPL(out_ok_type, err_type, __res_tmp.value.err) \
+            : ({                                                            \
+                  typeof(__res_tmp.value.ok) var = __res_tmp.value.ok;      \
+                  __RESULT_OK_IMPL(out_ok_type, err_type, __VA_ARGS__);     \
+              });                                                           \
+    })
+
+#define __RESULT_MAP_IMPL(out_ok_type, err_type, res_in, var, ...) \
+    __RESULT_MAP_PASTE(out_ok_type, err_type, res_in, var, __VA_ARGS__)
+
+#define map(types, res_in, var, ...) \
+    __RESULT_MAP_IMPL(__RESULT_EAT_PARENS types, res_in, var, (__VA_ARGS__))
+
+#define __RESULT_MAP_ERR_PASTE(ok_type, out_err_type, res_in, var, ...)   \
+    ({                                                                    \
+        __auto_type __res_tmp = (res_in);                                 \
+        (is_ok(__res_tmp))                                                \
+            ? __RESULT_OK_IMPL(ok_type, out_err_type, __res_tmp.value.ok) \
+            : ({                                                          \
+                  typeof(__res_tmp.value.err) var = __res_tmp.value.err;  \
+                  __RESULT_ERR_IMPL(ok_type, out_err_type, __VA_ARGS__);  \
+              });                                                         \
+    })
+
+#define __RESULT_MAP_ERR_IMPL(ok_type, out_err_type, res_in, var, ...) \
+    __RESULT_MAP_ERR_PASTE(ok_type, out_err_type, res_in, var, __VA_ARGS__)
+
+#define map_err(types, res_in, var, ...) \
+    __RESULT_MAP_ERR_IMPL(__RESULT_EAT_PARENS types, res_in, var, (__VA_ARGS__))
+
+#define __RESULT_AND_THEN_PASTE(out_ok_type, err_type, res_in, var, ...)    \
+    ({                                                                      \
+        __auto_type __res_tmp = (res_in);                                   \
+        (is_err(__res_tmp))                                                 \
+            ? __RESULT_ERR_IMPL(out_ok_type, err_type, __res_tmp.value.err) \
+            : ({                                                            \
+                  typeof(__res_tmp.value.ok) var = __res_tmp.value.ok;      \
+                  __VA_ARGS__; /* <--- I add a `;` */                       \
+              });                                                           \
+    })
+
+#define __RESULT_AND_THEN_IMPL(out_ok_type, err_type, res_in, var, ...) \
+    __RESULT_AND_THEN_PASTE(out_ok_type, err_type, res_in, var, __VA_ARGS__)
+
+#define and_then(types, res_in, var, ...) \
+    __RESULT_AND_THEN_IMPL(__RESULT_EAT_PARENS types, res_in, var, (__VA_ARGS__))karesis@Celestina:~/Projects/cprint$
+
+# --- New Code Block --- 
+
+#include <stdio.h>
+
+#define __RESULT_EAT_PARENS(...) __VA_ARGS__
+
+#define PRINT_ARGS_MACRO(out_ok_type, err_type, res_in, var, ...) \
+  printf("  arg 1 (out_ok_type): %s\n", #out_ok_type);            \
+  printf("  arg 2 (err_type):    %s\n", #err_type);               \
+  printf("  arg 3 (res_in):      %s\n", #res_in);                 \
+  printf("  arg 4 (var):         %s\n", #var);                    \
+  printf("  arg 5 (VA_ARGS):     %s\n", #__VA_ARGS__)
+
+#define and_then_buggy(types, res_in, var, ...) \
+  PRINT_ARGS_MACRO(__RESULT_EAT_PARENS types, res_in, var, (__VA_ARGS__))
+
+int main()
+{
+  printf("--- use macro ---\n");
+  and_then_buggy(
+      (int, CString), // types
+      "res_ok",       // res_in
+      "val",          // var
+      "my_func(val)"  // ...
+  );
+
+  printf("\n--- expected ---\n");
+  printf("  arg 1 (out_ok_type): int\n");
+  printf("  arg 2 (err_type):    CString\n");
+  printf("  arg 3 (res_in):      \"res_ok\"\n");
+  printf("  arg 4 (var):         \"val\"\n");
+  printf("  arg 5 (VA_ARGS):     (\"my_func(val)\")\n");
+
+  return 0;
+}

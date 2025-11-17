@@ -1,0 +1,211 @@
+import os
+import time
+import requests
+from requests_oauthlib import OAuth1
+
+
+class XApi:
+    MEDIA_UPLOAD_URL = "https://upload.twitter.com/1.1/media/upload.json"
+    POST_TWEET_URL = "https://api.twitter.com/2/tweets"
+
+    def __init__(self):
+        self.api_key = os.getenv("X_API_KEY")  
+        self.api_key_secret = os.getenv("X_API_KEY_SECRET")  
+        self.access_token = os.getenv("X_ACCESS_TOKEN")  
+        self.access_token_secret = os.getenv("X_ACCESS_TOKEN_SECRET") 
+        
+        # Validate credentials
+        missing = [
+            name for name, val in [
+                ("X_API_KEY", self.api_key),
+                ("X_API_KEY_SECRET", self.api_key_secret),
+                ("X_ACCESS_TOKEN", self.access_token),
+                ("X_ACCESS_TOKEN_SECRET", self.access_token_secret),
+            ] if not val
+        ]
+        if missing:
+            raise ValueError(f"Missing environment variables: {', '.join(missing)}")
+        
+        # OAuth 1.0a setup
+        self.oauth = OAuth1(
+            self.api_key,
+            client_secret=self.api_key_secret,
+            resource_owner_key=self.access_token,
+            resource_owner_secret=self.access_token_secret,
+            signature_method="HMAC-SHA1",
+            signature_type="AUTH_HEADER"
+        )
+
+    def test_credentials(self):
+        """Verify credentials by hitting the v1.1 verify_credentials endpoint."""
+        print("🔍 Testing credentials...")
+        verify_url = "https://api.twitter.com/1.1/account/verify_credentials.json"
+        resp = requests.get(verify_url, auth=self.oauth)
+        if resp.status_code == 200:
+            user_data = resp.json()
+            user_id = user_data.get('id_str')
+            screen_name = user_data.get('screen_name')
+            print(f"✅ Credentials valid! Authenticated as: @{screen_name} (ID: {user_id})")
+            return user_id
+        print(f"❌ Credential test failed: {resp.status_code} - {resp.text}")
+        return None
+
+    def upload_video(self, video_bytes: bytes, title: str, description: str) -> dict:
+        """Upload video and post tweet with attached media."""
+        user_id = self.test_credentials()
+        if not user_id:
+            raise Exception("Credential verification failed. Check your API keys and permissions.")
+        
+        media_type = "video/mp4"
+        total_bytes = len(video_bytes)
+
+        # Step 1 — INIT
+        init_data = {
+            "command": "INIT",
+            "media_type": media_type,
+            "total_bytes": total_bytes,
+            "media_category": "tweet_video",
+        }
+        init_resp = requests.post(self.MEDIA_UPLOAD_URL, auth=self.oauth, data=init_data)
+        print(f"   Response status: {init_resp.status_code}")
+        if not init_resp.ok:
+            raise Exception(f"INIT failed: {init_resp.status_code} - {init_resp.text}")
+
+        init_json = init_resp.json()
+        media_id = init_json.get("media_id_string")
+        if not media_id:
+            raise Exception(f"No media_id returned: {init_resp.text}")
+        print(f"✅ INIT complete - Media ID: {media_id}")
+
+        # Step 2 — APPEND
+        chunk_size = 5 * 1024 * 1024
+        for i, start in enumerate(range(0, total_bytes, chunk_size)):
+            end = min(start + chunk_size, total_bytes)
+            chunk = video_bytes[start:end]
+            print(f"   📤 Chunk {i+1} ({len(chunk):,} bytes)")
+            append_resp = requests.post(
+                self.MEDIA_UPLOAD_URL,
+                auth=self.oauth,
+                data={"command": "APPEND", "media_id": media_id, "segment_index": i},
+                files={"media": chunk},
+            )
+            if not append_resp.ok:
+                raise Exception(f"APPEND failed: {append_resp.status_code} - {append_resp.text}")
+        print("✅ All chunks uploaded")
+
+        # Step 3 — FINALIZE
+        finalize_resp = requests.post(
+            self.MEDIA_UPLOAD_URL,
+            auth=self.oauth,
+            data={"command": "FINALIZE", "media_id": media_id},
+        )
+        if not finalize_resp.ok:
+            raise Exception(f"FINALIZE failed: {finalize_resp.status_code} - {finalize_resp.text}")
+
+        finalize_data = finalize_resp.json()
+        processing_info = finalize_data.get("processing_info")
+
+        # Step 4 — Poll for processing
+        if processing_info:
+            self._wait_for_processing(media_id, processing_info)
+        
+        # Verify final media status before posting
+        status_resp = requests.get(
+            self.MEDIA_UPLOAD_URL,
+            auth=self.oauth,
+            params={"command": "STATUS", "media_id": media_id},
+        )
+        
+        if status_resp.ok:
+            status_data = status_resp.json()
+            state = status_data.get('processing_info', {}).get('state', 'unknown')
+            expires = status_data.get('expires_after_secs', 0)
+            
+            if state != 'succeeded':
+                raise Exception(f"Media processing did not succeed. State: {state}")
+        else:
+            print(f"   ⚠️  Could not verify status: {status_resp.status_code}")
+        
+        # Extended wait for media to be indexed
+        time.sleep(30)
+
+        # Step 5 — Post tweet with v2 API using SAME OAuth credentials
+        tweet_text = title if title else "Video tweet"
+        
+        # IMPORTANT: Use same OAuth1 instance for both upload and tweet
+        payload = {
+            "text": tweet_text,
+            "media": {"media_ids": [media_id]}
+        }
+        
+        print(f"   📤 Payload: {payload}")
+        
+        # Post with explicit headers
+        headers = {
+            "Content-Type": "application/json",
+            "User-Agent": "XApiPythonBot/1.0"
+        }
+        
+        tweet_resp = requests.post(
+            self.POST_TWEET_URL,
+            auth=self.oauth,  # CRITICAL: Use same OAuth instance
+            headers=headers,
+            json=payload
+        )
+        
+        
+        if tweet_resp.ok:
+            tweet_data = tweet_resp.json()
+            tweet_id = tweet_data.get("data", {}).get("id")
+
+            return tweet_data
+        else:
+            error_detail = tweet_resp.text
+            
+            raise Exception(f"Failed to post tweet with media: {error_detail}")
+
+    def _wait_for_processing(self, media_id, processing_info):
+        """Poll media status until processing completes."""
+        state = processing_info.get("state")
+        attempt = 0
+        max_attempts = 60
+
+        while state in ("pending", "in_progress") and attempt < max_attempts:
+            wait = processing_info.get("check_after_secs", 5)
+            time.sleep(wait)
+
+            status_resp = requests.get(
+                self.MEDIA_UPLOAD_URL,
+                auth=self.oauth,
+                params={"command": "STATUS", "media_id": media_id},
+            )
+            if not status_resp.ok:
+                raise Exception(f"STATUS check failed: {status_resp.status_code} - {status_resp.text}")
+
+            status_data = status_resp.json()
+            processing_info = status_data.get("processing_info", {})
+            state = processing_info.get("state")
+
+            # Check for processing errors
+            if state == "failed":
+                error_info = processing_info.get("error", {})
+                error_msg = error_info.get("message", "Unknown error")
+                raise Exception(f"Media processing failed: {error_msg}")
+            
+            attempt += 1
+
+        if state != "succeeded":
+            raise Exception(f"Media processing timeout or failed: state={state}")
+
+# --- New Code Block --- 
+
+social media upload to X
+🔍 Testing credentials...
+✅ Credentials valid! Authenticated as: @tlsenergysavers (ID: 1800926613963481088)
+   Response status: 202
+✅ INIT complete - Media ID: 1985474750911590400
+   📤 Chunk 1 (5,242,880 bytes)
+   📤 Chunk 2 (2,590,178 bytes)
+✅ All chunks uploaded
+   📤 Payload: {'text': "Transform Your Home's Comfort: Insulation Upgrade to R38!", 'media': {'media_ids': ['1985474750911590400']}}
+   ❌ X upload failed: Failed to post tweet with media: {"errors":[{"parameters":{"media.media_ids":["1985474750911590400"]},"message":"Your media IDs are invalid."}],"title":"Invalid Request","detail":"One or more parameters to your request was invalid.","type":"https://api.twitter.com/2/problems/invalid-request"}

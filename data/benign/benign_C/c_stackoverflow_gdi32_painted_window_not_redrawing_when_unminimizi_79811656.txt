@@ -1,0 +1,206 @@
+#include <windows.h>
+#include <stdbool.h>
+
+LRESULT CALLBACK MainWndProc(HWND, UINT, WPARAM, LPARAM);
+LRESULT CALLBACK DrawShapeWndProc(HWND, UINT, WPARAM, LPARAM);
+HINSTANCE hinst;
+
+#define PIXEL_SIZE 30
+#define PIXEL_PER_ROW 7
+#define PIXEL_PER_COL 9
+bool compared_entries[PIXEL_PER_ROW * PIXEL_PER_COL];
+
+void draw_on_canvas(HWND hwnd, LPARAM lParam, HBRUSH brush)
+{
+    HDC hdc;
+    RECT rcClient;
+    HRGN bgRgn;
+    int new_x, new_y;
+    POINT pt;
+
+    pt.x = (LONG) LOWORD (lParam);
+    pt.y = (LONG) HIWORD (lParam);
+
+    hdc = GetDC(hwnd);
+
+    new_x = (pt.x / PIXEL_SIZE) * PIXEL_SIZE;
+    new_y = (pt.y / PIXEL_SIZE) * PIXEL_SIZE;
+
+    rcClient.left = new_x;
+    rcClient.top = new_y;
+    rcClient.right = new_x + PIXEL_SIZE;
+    rcClient.bottom = new_y + PIXEL_SIZE;
+
+    bgRgn = CreateRectRgnIndirect (&rcClient);
+    FillRgn (hdc, bgRgn, brush);
+
+    ReleaseDC (hwnd, hdc);
+}
+
+int WINAPI WinMain (HINSTANCE hinstance,
+                    HINSTANCE hPrevInstance,
+                    LPSTR     lpCmdLine, 
+                    int       nCmdShow)
+{
+    HWND hwnd,
+         hwnd_draw_shape;
+    MSG msg;
+    WNDCLASS wc,
+             wc2;
+    
+    hinst = hinstance;
+
+    wc.style = 0;
+    wc.lpfnWndProc = MainWndProc;
+    wc.cbClsExtra = 0;
+    wc.cbWndExtra = 0;
+    wc.hInstance = hinstance;
+    wc.hIcon = LoadIcon(NULL, IDI_APPLICATION);
+    wc.hCursor = LoadCursor(NULL, IDC_ARROW);
+    wc.hbrBackground = (HBRUSH)(COLOR_3DFACE + 1);
+    wc.lpszMenuName = NULL;
+    wc.lpszClassName = L"MaWinClass"; // Correction ici
+
+    if (!RegisterClass(&wc))
+        return FALSE;
+   
+    wc2.style = 0;
+    wc2.lpfnWndProc = DrawShapeWndProc;
+    wc2.cbClsExtra = 0;
+    wc2.cbWndExtra = 0;
+    wc2.hInstance = hinstance;
+    wc2.hIcon = LoadIcon(NULL, IDI_APPLICATION);
+    wc2.hCursor = LoadCursor(NULL, IDC_ARROW);
+    wc2.hbrBackground = (HBRUSH)(COLOR_3DFACE + 1);
+    wc2.lpszMenuName = NULL;
+    wc2.lpszClassName = L"DrawShapeClass"; // Correction ici
+
+    if (!RegisterClass(&wc2))
+        return FALSE;
+
+    hwnd = CreateWindow(L"MaWinClass",
+                        L"Titre",
+                        WS_OVERLAPPEDWINDOW, // Correction ici
+                        CW_USEDEFAULT,
+                        CW_USEDEFAULT,
+                        400,
+                        450,
+                        NULL,
+                        NULL,
+                        hinstance,
+                        NULL);
+    if (!hwnd)
+        return FALSE;
+
+    hwnd_draw_shape = CreateWindow(L"DrawShapeClass", 
+                                   NULL, 
+                                   SS_BITMAP | WS_VISIBLE | WS_CHILD | WS_BORDER, // Correction ici
+                                   CW_USEDEFAULT,
+                                   CW_USEDEFAULT,
+                                   PIXEL_PER_ROW * PIXEL_SIZE,
+                                   PIXEL_PER_COL * PIXEL_SIZE,
+                                   hwnd, 
+                                   NULL, 
+                                   NULL, 
+                                   NULL);
+    if (!hwnd_draw_shape)
+        return FALSE;
+
+    ShowWindow(hwnd, nCmdShow);
+    UpdateWindow(hwnd);
+
+    while (GetMessage(&msg, NULL, 0, 0))
+    {
+        TranslateMessage(&msg);
+        DispatchMessage(&msg);
+    }
+    return (int)msg.wParam;
+}
+/******************************************************************************/
+
+LRESULT CALLBACK MainWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+    switch (uMsg)
+    {
+    case WM_CREATE:
+        return 0;
+
+    case WM_DESTROY:
+        PostQuitMessage(0);
+        return 0;
+
+    default:
+        return DefWindowProc(hwnd, uMsg, wParam, lParam);
+    }
+}
+LRESULT CALLBACK DrawShapeWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+    HDC hdc;                 // device context (DC) for window  
+    PAINTSTRUCT ps;          // paint data for BeginPaint and EndPaint  
+    static HDC hdcCompat;    // DC for copying bitmap  
+    static RECT rcClient;    // client-area rectangle  
+    static HBITMAP hbmp;     // handle of bitmap to display  
+    static HBRUSH H_Brush_Red,
+                  H_Brush_White;  // handle of background-color brush
+
+    switch (uMsg)
+    {
+    case WM_CREATE:
+
+        // Load the bitmap resource.  
+
+        hbmp = LoadBitmap(hinst, MAKEINTRESOURCE(1));
+
+        // Create a device context (DC) to hold the bitmap.  
+        // The bitmap is copied from this DC to the window's DC  
+        // whenever it must be drawn.  
+
+        hdc = GetDC(hwnd);
+
+        hdcCompat = CreateCompatibleDC(hdc);
+        SelectObject(hdcCompat, hbmp);
+
+        H_Brush_Red = CreateSolidBrush(RGB(255,0,0));
+        H_Brush_White = CreateSolidBrush(RGB(255, 255, 255));
+
+        ReleaseDC(hwnd, hdc);
+
+        return 0;
+
+    case WM_LBUTTONDOWN:
+        draw_on_canvas(hwnd, lParam, H_Brush_Red);
+        return 0;
+
+    case WM_RBUTTONDOWN:
+        draw_on_canvas(hwnd, lParam, H_Brush_White);
+        return 0;
+
+    case WM_MOUSEMOVE:
+        if ((wParam == MK_LBUTTON))
+        {
+            draw_on_canvas(hwnd, lParam, H_Brush_Red);
+        }
+        if ((wParam == MK_RBUTTON))
+        {
+            draw_on_canvas(hwnd, lParam, H_Brush_White);
+        }
+        return 0;
+
+    case WM_PAINT:
+        BeginPaint(hwnd, &ps);
+        SelectObject(hdcCompat, hbmp);
+        BitBlt(ps.hdc, 0, 0,
+            210,
+            270, hdcCompat,
+            0, 0, SRCCOPY);
+        EndPaint(hwnd, &ps);
+        return 0;
+
+    case WM_DESTROY:
+        PostQuitMessage(0);
+        return 0;
+
+    default:
+        return DefWindowProc(hwnd, uMsg, wParam, lParam);
+    }
+}

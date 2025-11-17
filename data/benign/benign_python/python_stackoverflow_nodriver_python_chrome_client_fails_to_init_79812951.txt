@@ -1,0 +1,27 @@
+from nodriver import *
+
+browser = await start(
+    headless=False,
+    browser_executable_path="/path/to/some/other/browser",
+)
+tab = await browser.get('https://somewebsite.com')
+
+# --- New Code Block --- 
+
+19:14:49 - nodriver_client_4406664880 - INFO - Using browser executable: /Applications/Google Chrome.app/Contents/MacOS/Google Chrome
+19:14:52 - nodriver_client_4406664880 - ERROR - Failed to start browser: 
+                ---------------------
+                Failed to connect to browser
+                ---------------------
+                One of the causes could be when you are running as root.
+                In that case you need to pass no_sandbox=True 
+                
+19:14:52 - nodriver_client_4406664880 - ERROR - Failed to initialize browser client: 
+                ---------------------
+                Failed to connect to browser
+                ---------------------
+                One of the causes could be when you are running as root.
+                In that case you need to pass no_sandbox=True 
+                
+19:14:52 - nodriver_client_4406664880 - ERROR - Failed to initialize browser client
+19:14:52 - nodriver_client_4406664880 - INFO - Browser closed and resources cleaned up

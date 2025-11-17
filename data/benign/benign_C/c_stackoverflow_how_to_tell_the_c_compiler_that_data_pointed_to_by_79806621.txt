@@ -1,0 +1,64 @@
+int create_xxx(int *p_xxx);
+int xxx_do_something(int xxx);
+
+int entry() {
+    int xxx;
+
+    create_xxx(&xxx);
+    
+    xxx_do_something(xxx);
+    xxx_do_something(xxx);
+    xxx_do_something(xxx);
+    
+    return 0;
+
+}
+
+# --- New Code Block --- 
+
+entry:
+    subq    $24, %rsp
+    leaq    12(%rsp), %rdi
+    call    xxx_create
+    movl    12(%rsp), %edi  # reload
+    call    xxx_do_something
+    movl    12(%rsp), %edi  # reload
+    call    xxx_do_something
+    movl    12(%rsp), %edi  # reload
+    call    xxx_do_something
+    xorl    %eax, %eax
+    addq    $24, %rsp
+    ret
+
+# --- New Code Block --- 
+
+entry:
+    push    %rbx           # save a call-preserved register
+    subq    $16, %rsp      # space for xxx while keeping RSP aligned by 16
+    leaq    12(%rsp), %rdi
+    call    xxx_create
+    movl    12(%rsp), %edi  # load into EDI as a function arg
+    movl    %edi, %ebx      # and save a copy in a EBX
+    call    xxx_do_something
+    movl    %ebx, %edi        # copy a register instead of reloading
+    call    xxx_do_something
+    movl    %ebx, %edi        # ditto
+    call    xxx_do_something
+    xorl    %eax, %eax      # return 0
+    addq    $16, %rsp
+    pop     %rbx            # restore our caller's RBX
+    ret
+
+# --- New Code Block --- 
+
+int _xxx;
+
+xxx_create(&_xxx);
+
+int xxx = _xxx;
+
+// do other work
+
+xxx_do_something(xxx);
+xxx_do_something(xxx);
+xxx_do_something(xxx);

@@ -1,0 +1,4 @@
+Time_Unit = "days"
+Time_Increment = 1
+
+Time2 = Time1 + timedelta(Time_Unit=Time_Increment)

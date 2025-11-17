@@ -1,0 +1,5 @@
+recognizer = cv.face.LBPHFaceRecognizer()
+
+# --- New Code Block --- 
+
+recognizer = cv.face.LBPHFaceRecognizer_create()

@@ -1,0 +1,46 @@
+<?php
+header('Content-Type: application/json; charset=utf-8');
+$result = [["a" => 2, "b" => 1], ["a" => 5, "b" => 3], ["a" => 8, "b" => 10], ["a" => 12, "b" => 4]];
+echo json_encode($result, JSON_NUMERIC_CHECK);
+?>
+
+# --- New Code Block --- 
+
+import requests
+
+headers = { 'User-Agent' : 'Homeassistant', 'Content-Type': 'application/json' }
+req = requests.post("https://eldwick.org.uk/immersion/test.php", headers=headers)
+print(req.json())
+
+# --- New Code Block --- 
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    </head>
+    <body>
+        <script>
+            fetch("test.php",
+                {method: 'POST',
+                headers: {Accept: 'application/json', 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'}}
+            )
+            .then((response) => {
+                return(response.json())
+            })
+            .then((responseJson) => {
+                document.getElementById("test").innerHTML = JSON.stringify(responseJson);
+            });
+        </script>
+        <div id="test"></div>
+    </body>
+</html>
+
+# --- New Code Block --- 
+
+$ curl -X POST http://eldwick.org.uk/immersion/test.php
+curl: (52) Empty reply from server
+
+# --- New Code Block --- 
+
+$ curl -d '{"passw":"******", "solar":666, "temp":99}' -H "Content-Type: application/json" http://eldwick.org.uk/immersion/get_schedule.php

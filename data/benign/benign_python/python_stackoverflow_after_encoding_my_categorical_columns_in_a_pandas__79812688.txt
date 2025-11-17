@@ -1,0 +1,31 @@
+tags
+"['Psychological Horror', 'D Vision', 'Emotional', 'Modern', 'Immersive Sim', 'Singleplayer', 'Dungeon Crawler', 'Realistic', 'Exploration', 'Mature', 'Walking Simulator', 'First-Person', 'Mystery', 'VR', 'Indie', 'Hidden Object', 'RPG', 'Puzzle', 'Adventure', 'Multiple Endings']"
+"['Indie', 'Singleplayer', 'Narration', 'Hidden Object', 'Retro', 'D', 'Puzzle', 'Classic', 'Fantasy', 'Adventure', 'Story Rich', 'Family Friendly', 'Point & Click', 'Atmospheric', 'Minigames', 'Mystery']"
+
+# --- New Code Block --- 
+
+genres
+"['Adventure', 'Indie', 'RPG', 'Simulation']"
+"['Adventure', 'Indie']"
+"['Action', 'Adventure']"
+['Adventure']
+"['RPG', 'Simulation', 'Sports', 'Early Access']"
+"['Action', 'Adventure', 'RPG']"
+"['Action', 'Adventure', 'Indie', 'Simulation']"
+"['Adventure', 'Indie']"
+"['Casual', 'Indie']"
+"['Action', 'Adventure', 'Indie']"
+
+# --- New Code Block --- 
+
+categories
+"['Single-player', 'VR Supported', 'Family Sharing']"
+"['Single-player', 'Steam Achievements', 'Steam Cloud', 'Family Sharing']"
+"['Single-player', 'Steam Achievements', 'In-App Purchases', 'Partial Controller Support', 'Family Sharing']"
+"['Single-player', 'Family Sharing']"
+"['Multi-player', 'PvP', 'Online PvP', 'Steam Achievements', 'Full controller support', 'Steam Cloud', 'Family Sharing']"
+"['Single-player', 'Steam Achievements', 'Full controller support', 'Steam Trading Cards', 'Steam Cloud', 'Family Sharing']"
+"['Single-player', 'Steam Achievements', 'Full controller support', 'Steam Trading Cards', 'Steam Cloud', 'Remote Play on Tablet', 'Family Sharing']"
+"['Single-player', 'Steam Achievements', 'Full controller support', 'Steam Trading Cards', 'Steam Cloud', 'Remote Play on Phone', 'Remote Play on Tablet', 'Family Sharing']"
+"['Single-player', 'Steam Achievements', 'Steam Cloud', 'Family Sharing']"
+"['Single-player', 'Steam Achievements', 'Full controller support', 'Steam Cloud', 'Family Sharing']"

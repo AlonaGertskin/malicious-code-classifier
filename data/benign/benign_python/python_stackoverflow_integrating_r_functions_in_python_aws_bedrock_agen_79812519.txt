@@ -1,0 +1,71 @@
+from strands import Agent, tool
+from strands.models.anthropic import AnthropicModel
+from strands_tools import http_request, use_aws
+import os
+os.environ["RPY2_CFFI_MODE"] = "ABI"
+import rpy2.robjects as ro
+
+model = AnthropicModel(
+    client_args = {
+        "api_key": ""
+    },
+    model_id = "claude-3-7-sonnet-20250219",
+    max_tokens = 1000
+)
+
+
+@tool
+def r_sys_time() -> str:
+    """Get the current time from R via Sys.time()."""
+    # Runs R expression and returns the first value
+    t = ro.r("Sys.time()")[0]
+    return str(t)
+
+
+WEATHER_SYSTEM_PROMPT = """You are a weather assistant with HTTP capabilities. You can:
+1. Make HTTP requests to the National Weather Servicee API
+2. Process and display weather forecast data
+3. Provide weather information for locations in the United States
+
+When displaying responses:
+- Format weather data in a human-readable way
+- Highlight important information like temperature, precipitation, and alerts
+- Handle errors appropriately
+- Convert technical terms to user-friendly language
+
+Always explain the weather conditions clearly and provide context for the forecast.
+
+IF YOU GET AN ERROR USING THE R TOOLS PLEASE PROVIDE ME WITH THE ERROR
+"""
+
+
+
+subject_expert = Agent(
+    system_prompt=WEATHER_SYSTEM_PROMPT,
+    tools=[r_sys_time, http_request]
+)
+
+query = """
+Answer the following questions:
+1. What is the current time where I am now?
+"""
+
+response = subject_expert(query)
+print(response)
+
+# --- New Code Block --- 
+
+I'll help you get the current time. Let me check that for you.
+Tool #1: r_sys_time
+I encountered an error when trying to get the current time using the R system time function. The error indicates there's an issue with the R-Python conversion context.
+Unfortunately, I cannot retrieve the current time for you due to this technical error with the R system integration. To get your current time, I'd recommend:
+1. Checking your device's clock/time display
+2. Searching "current time" in your web browser
+3. Using your operating system's built-in time display
+Is there anything else I can help you with, perhaps related to weather information using the HTTP request capabilities I have available?>>> print(response)
+I encountered an error when trying to get the current time using the R system time function. The error indicates there's an issue with the R-Python conversion context.
+Unfortunately, I cannot retrieve the current time for you due to this technical error with the R system integration. To get your current time, I'd recommend:
+1. Checking your device's clock/time display
+2. Searching "current time" in your web browser
+3. Using your operating system's built-in time display
+Is there anything else I can help you with, perhaps related to weather information using the HTTP request capabilities I have available?

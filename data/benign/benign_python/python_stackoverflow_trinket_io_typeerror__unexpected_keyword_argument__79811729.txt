@@ -1,0 +1,29 @@
+TypeError: <native JS>() got an unexpected keyword argument 'shape' on line __ in main.py
+
+# --- New Code Block --- 
+
+TypeError: <native JS>() got an unexpected keyword argument 'shape' on line 98 in main.py
+
+# --- New Code Block --- 
+
+elif rand_index == 2:
+    wn.addshape(turtle_image)
+    print("Your new friend is a turtle!")
+    animal = trtl.Turtle(shape = turtle_image)
+    animal.penup()
+    favorite_food = "fruit.gif"
+    wn.update()  # Show the graphics
+
+# --- New Code Block --- 
+
+#---image initialization---
+axolotl_image = "axolotl2.gif" 
+blobfish_image = "blobfish.gif"
+dolphin_image = "dolphin.gif"
+elephant_image = "elephant.gif"
+ferret_image = "ferret.gif"
+panda_image = "Red_panda.gif"
+tiger_image = "tiger.gif"
+turtle_image = "turtle.gif"
+whale_image = "whale.gif"
+wolf_image = "wolf.gif"
