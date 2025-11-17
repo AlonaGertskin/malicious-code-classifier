@@ -125,3 +125,78 @@ def extract_malicious_features(df: pd.DataFrame) -> pd.DataFrame:
         axis=1
     )
     return df
+
+# In extractor/feature_extractor.py
+
+# ... (existing content: C_SENSITIVE_APIS, PYTHON_SENSITIVE_APIS, calculate_api_risk_score, etc.) ...
+
+def is_comment(line, language):
+    """Check if a line is a comment line based on language rules."""
+    line = line.strip()
+    if not line:
+        return True # Treat empty line as comment/whitespace to be excluded from code count
+        
+    if language == 'python':
+        return line.startswith('#')
+    elif language == 'c':
+        # Simple line comment // or multiline comment /* */ (ignoring complex block start/end tracking for simplicity)
+        return line.startswith('//') or line.startswith('/*') or line.startswith('*') or line.endswith('*/')
+    return False
+
+def extract_structural_features(content, language):
+    """
+    Calculates code length, comment count, and code density features.
+    
+    Returns:
+        dict: Features including total_lines, code_lines, comment_lines, code_density
+    """
+    lines = content.split('\n')
+    total_lines = len(lines)
+    code_lines = 0
+    comment_lines = 0
+    
+    for line in lines:
+        if is_comment(line, language):
+            comment_lines += 1
+        else:
+            code_lines += 1
+
+    # Calculate density relative to lines containing content (code or comment)
+    total_relevant_lines = code_lines + comment_lines
+    
+    if total_relevant_lines == 0:
+        code_density = 0.0
+    else:
+        # Code density: ratio of actual code lines to total relevant lines
+        code_density = code_lines / total_relevant_lines
+
+    return {
+        'total_lines': total_lines,
+        'code_lines': code_lines,
+        'comment_lines': comment_lines,
+        'code_density': round(code_density, 4) # High value (near 1.0) indicates less documentation/padding
+    }
+
+
+def generate_all_features(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Master function to run all feature extraction steps.
+    Adds 'api_risk_score' and structural features.
+    """
+    # Malicious API Risk Score (uses the existing logic)
+    df['api_risk_score'] = df.apply(
+        lambda row: calculate_api_risk_score(row['content'], row['language']),
+        axis=1
+    )
+    
+    # Structural Features
+    # Apply structural feature extraction and expand the returned dictionary into new columns
+    structural_features = df.apply(
+        lambda row: extract_structural_features(row['content'], row['language']),
+        axis=1, result_type='expand'
+    )
+    
+    # Merge structural features into the main DataFrame
+    df = pd.concat([df, structural_features], axis=1)
+    
+    return df

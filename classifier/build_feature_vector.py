@@ -52,8 +52,18 @@ def build_initial_dataset():
     return df
 
 if __name__ == "__main__":
-    # --- This part will be expanded in the next steps ---
-    feature_df = build_initial_dataset()
+    # Build the base dataset (raw content, labels, language)
+    initial_df = build_initial_dataset()
+
+    # Extract features: API Risk Score
+    print("Extracting malicious API risk scores...")
+    feature_df = extract_malicious_features(initial_df) 
     
-    # Save the initial DataFrame for inspection
-    # feature_df.to_csv('initial_dataset.csv', index=False)
+    # Display summary of the new feature
+    print("\nFeature extraction complete. New columns added.")
+    print("Sample Data (with new feature):")
+    # Display the first few rows showing the new score
+    print(feature_df[['language', 'label', 'api_risk_score']].head())
+
+    # Save the feature-extracted DataFrame for next steps
+    # feature_df.to_csv('feature_extracted_dataset.csv', index=False)
