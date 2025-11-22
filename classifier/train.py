@@ -1,131 +1,142 @@
 import pandas as pd
 import re
+import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.metrics import accuracy_score, classification_report
+from sklearn.metrics import accuracy_score, confusion_matrix
 from joblib import dump
 from pathlib import Path
-
-# Import the model function from your other file
 from model import create_model 
 
-# --- File Paths ---
-# This makes the paths work from anywhere
-BASE_DIR = Path(__file__).resolve().parent # The classifier/ folder
-DATASET_PATH = BASE_DIR / "code_dataset.csv" # The file your build_dataset.py will create
+# --- Config ---
+BASE_DIR = Path(__file__).resolve().parent
+DATASET_PATH = BASE_DIR / "code_dataset.csv"
 MODEL_OUTPUT_PATH = BASE_DIR / "malicious_code_classifier.joblib"
 VECTORIZER_OUTPUT_PATH = BASE_DIR / "code_vectorizer.joblib"
+# NEW: Path for the text report
+REPORT_OUTPUT_PATH = BASE_DIR / "training_results.txt"
 
 def normalize_code(code_snippet):
     """
-    A simple function to clean and normalize code before vectorization.
+    Simple cleanup: remove comments and lowercase.
     """
-    if not isinstance(code_snippet, str):
-        return "" # Handle empty or non-string data
-    
-    # Simple normalization: lowercasing and removing comments
-    code = re.sub(r'#.*', '', code_snippet) # Remove python-style comments
-    code = re.sub(r'//.*', '', code) # Remove C-style comments
+    if not isinstance(code_snippet, str): return "" 
+    # Remove Python style comments
+    code = re.sub(r'#.*', '', code_snippet) 
+    # Remove C style comments
+    code = re.sub(r'//.*', '', code) 
     return code.lower()
 
-def load_data(path):
+def generate_report_string(y_true, y_pred, title):
     """
-    Loads the dataset from the specified CSV file.
+    Helper function that RETURNS a string report instead of printing it directly.
     """
-    print(f"Loading dataset from: {path}")
-    if not path.exists():
-        print(f"!!! ERROR: Dataset file not found at {path}")
-        print("Please run the data collection and build_dataset.py scripts first.")
-        return None
+    report_str = f"\n>>> {title} REPORT <<<\n"
     
-    try:
-        df = pd.read_csv(path)
-        if 'code' not in df.columns or 'label' not in df.columns:
-            print("!!! ERROR: Dataset CSV must have 'code' and 'label' columns.")
-            return None
-        
-        # Drop rows where 'code' is missing
-        df = df.dropna(subset=['code'])
-        print(f"Dataset loaded successfully: {len(df)} samples.")
-        return df
-    except Exception as e:
-        print(f"!!! ERROR: Failed to load dataset: {e}")
-        return None
+    if len(y_true) == 0:
+        report_str += "  (No samples in this category)\n"
+        return report_str
+
+    # Calculate Confusion Matrix
+    tn, fp, fn, tp = confusion_matrix(y_true, y_pred, labels=[0, 1]).ravel()
+    acc = accuracy_score(y_true, y_pred)
+    
+    # Calculate percentages (safe division)
+    fp_rate = (fp / (fp + tn)) * 100 if (fp + tn) > 0 else 0
+    fn_rate = (fn / (fn + tp)) * 100 if (fn + tp) > 0 else 0
+    
+    report_str += f"  Total Samples: {len(y_true)}\n"
+    report_str += f"  ACCURACY:      {acc * 100:.2f}%\n"
+    report_str += f"  -----------------------------\n"
+    report_str += f"  False Positives: {fp:<3} (Rate: {fp_rate:.2f}%) -> Benign flagged as Malicious (Bad!)\n"
+    report_str += f"  Miss Detections: {fn:<3} (Rate: {fn_rate:.2f}%) -> Malicious missed (Dangerous!)\n"
+    
+    return report_str
 
 def main():
-    print("--- Starting Model Training Script ---")
+    print("--- Starting Model Training & Evaluation ---")
     
-    # 1. Load Data
-    df = load_data(DATASET_PATH)
-    if df is None:
-        return # Stop if data loading failed
-
-    X_raw = df['code'] # The code text
-    y = df['label']    # The 0 (benign) or 1 (malicious)
-
-    # 2. Preprocess & Feature Extraction (TF-IDF)
-    # We must turn raw code text into numbers (vectors)
-    print("Normalizing code samples...")
-    X_normalized = [normalize_code(code) for code in X_raw]
+    # 1. Loading Data
+    if not DATASET_PATH.exists():
+        print(f"Error: Dataset not found at {DATASET_PATH}")
+        print("Please run 'build_dataset.py' first.")
+        return
     
-    print("Initializing TF-IDF Vectorizer...")
-    # TF-IDF finds the most "important" words in the code
-    # (e.g., "socket" and "os.dup2" might be very important)
-    vectorizer = TfidfVectorizer(
-        analyzer='word',
-        ngram_range=(1, 2), # Looks at single words AND pairs of words
-        max_features=5000,  # Limit to the top 5000 most important words/pairs
-    )
+    df = pd.read_csv(DATASET_PATH).dropna(subset=['code'])
     
-    print("Extracting features (fit_transform)...")
-    X_features = vectorizer.fit_transform(X_normalized)
-    print(f"Feature matrix created with shape: {X_features.shape}")
+    X_raw = df['code']
+    y = df['label']
+    
+    # Check if 'language' column exists
+    if 'language' in df.columns:
+        languages = df['language']
+    else:
+        print("Warning: 'language' column not found. Detailed language reports will be skipped.")
+        languages = None
 
-    # 3. Split Data
-    print("Splitting data into train and test sets (80/20)...")
-    X_train, X_test, y_train, y_test = train_test_split(
-        X_features,
-        y,
-        test_size=0.20, # 20% for testing, 80% for training
-        random_state=42,
-        stratify=y # Ensures both train and test sets have a similar mix of 0s and 1s
-    )
-    print(f"Training samples: {X_train.shape[0]}, Testing samples: {X_test.shape[0]}")
+    # 2. Vectorizing
+    print("Vectorizing code samples (learning keywords)...")
+    vectorizer = TfidfVectorizer(analyzer='word', ngram_range=(1, 2), max_features=5000)
+    X_features = vectorizer.fit_transform([normalize_code(c) for c in X_raw])
 
-    # 4. Create and Train Model
-    print("Creating model (from model.py)...")
+    # 3. Splitting Data (80% Train / 20% Test)
+    print("Splitting data into Train (80%) and Test (20%)...")
+    if languages is not None:
+        X_train, X_test, y_train, y_test, lang_train, lang_test = train_test_split(
+            X_features, y, languages, test_size=0.20, random_state=42, stratify=y
+        )
+    else:
+        X_train, X_test, y_train, y_test = train_test_split(
+            X_features, y, test_size=0.20, random_state=42, stratify=y
+        )
+
+    # 4. Training
+    print(f"Training model on {X_train.shape[0]} samples...")
     model = create_model()
-    
-    print("Training model...")
     model.fit(X_train, y_train)
     print("Training complete.")
-
-    # 5. Evaluate Model
-    print("Evaluating model on test set...")
-    y_pred = model.predict(X_test)
     
-    accuracy = accuracy_score(y_test, y_pred)
-    report = classification_report(
-        y_test, 
-        y_pred, 
-        target_names=['Benign (0)', 'Malicious (1)']
-    )
+    # 5. Evaluation
+    print("Running tests on unseen data...")
+    y_pred = model.predict(X_test)
 
-    print("\n--- MODEL EVALUATION RESULTS ---")
-    print(f"Accuracy: {accuracy * 100:.2f}%")
-    print("\nClassification Report:")
-    print(report)
-    print("--------------------------------")
+    # --- BUILD REPORT STRING ---
+    full_report = ""
+    full_report += "========================================\n"
+    full_report += "   MALICIOUS CODE CLASSIFIER RESULTS    \n"
+    full_report += "========================================\n"
 
-    # 6. Save Model and Vectorizer for later use
-    print("Saving trained model and vectorizer to disk...")
+    # 1. Overall Report
+    full_report += generate_report_string(y_test, y_pred, "OVERALL (ALL LANGUAGES)")
+
+    # 2. Language Specific Reports
+    if languages is not None:
+        # Python Only
+        py_mask = (lang_test == 'python')
+        full_report += generate_report_string(y_test[py_mask], y_pred[py_mask], "PYTHON ONLY")
+
+        # C Only
+        c_mask = (lang_test == 'c')
+        full_report += generate_report_string(y_test[c_mask], y_pred[c_mask], "C LANGUAGE ONLY")
+    
+    # --- PRINT AND SAVE ---
+    
+    # Print to console
+    print(full_report)
+    
+    # Save to file
+    try:
+        with open(REPORT_OUTPUT_PATH, "w", encoding="utf-8") as f:
+            f.write(full_report)
+        print(f"\n[SUCCESS] Detailed report saved to: {REPORT_OUTPUT_PATH}")
+    except Exception as e:
+        print(f"\n[ERROR] Could not save report to file: {e}")
+
+    # 6. Save Model
+    print(f"Saving model to {MODEL_OUTPUT_PATH}...")
     dump(model, MODEL_OUTPUT_PATH)
     dump(vectorizer, VECTORIZER_OUTPUT_PATH)
-    
-    print(f"Model saved to: {MODEL_OUTPUT_PATH}")
-    print(f"Vectorizer saved to: {VECTORIZER_OUTPUT_PATH}")
-    print("--- Training Script Finished ---")
-
+    print("Done.")
 
 if __name__ == "__main__":
     main()
