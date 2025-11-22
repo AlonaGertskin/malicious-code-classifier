@@ -1,0 +1,24 @@
+========================================
+   MALICIOUS CODE CLASSIFIER RESULTS    
+========================================
+
+>>> OVERALL (ALL LANGUAGES) REPORT <<<
+  Total Samples: 1020
+  ACCURACY:      94.61%
+  -----------------------------
+  False Positives: 24  (Rate: 4.69%) -> Benign flagged as Malicious (Bad!)
+  Miss Detections: 31  (Rate: 6.10%) -> Malicious missed (Dangerous!)
+
+>>> PYTHON ONLY REPORT <<<
+  Total Samples: 480
+  ACCURACY:      94.79%
+  -----------------------------
+  False Positives: 6   (Rate: 2.13%) -> Benign flagged as Malicious (Bad!)
+  Miss Detections: 19  (Rate: 9.60%) -> Malicious missed (Dangerous!)
+
+>>> C LANGUAGE ONLY REPORT <<<
+  Total Samples: 540
+  ACCURACY:      94.44%
+  -----------------------------
+  False Positives: 18  (Rate: 7.83%) -> Benign flagged as Malicious (Bad!)
+  Miss Detections: 12  (Rate: 3.87%) -> Malicious missed (Dangerous!)
