@@ -13,7 +13,6 @@ BASE_DIR = Path(__file__).resolve().parent
 DATASET_PATH = BASE_DIR / "code_dataset.csv"
 MODEL_OUTPUT_PATH = BASE_DIR / "malicious_code_classifier.joblib"
 VECTORIZER_OUTPUT_PATH = BASE_DIR / "code_vectorizer.joblib"
-# NEW: Path for the text report
 REPORT_OUTPUT_PATH = BASE_DIR / "training_results.txt"
 
 def normalize_code(code_snippet):
@@ -29,11 +28,13 @@ def normalize_code(code_snippet):
 
 def generate_report_string(y_true, y_pred, title):
     """
-    Helper function that RETURNS a string report instead of printing it directly.
+    Helper function that returns a string report.
+    Updates: Rates are now calculated based on the TOTAL number of samples.
     """
     report_str = f"\n>>> {title} REPORT <<<\n"
     
-    if len(y_true) == 0:
+    total = len(y_true)
+    if total == 0:
         report_str += "  (No samples in this category)\n"
         return report_str
 
@@ -41,15 +42,17 @@ def generate_report_string(y_true, y_pred, title):
     tn, fp, fn, tp = confusion_matrix(y_true, y_pred, labels=[0, 1]).ravel()
     acc = accuracy_score(y_true, y_pred)
     
-    # Calculate percentages (safe division)
-    fp_rate = (fp / (fp + tn)) * 100 if (fp + tn) > 0 else 0
-    fn_rate = (fn / (fn + tp)) * 100 if (fn + tp) > 0 else 0
+    # --- CALCULATION UPDATE ---
+    # Calculating percentages out of the TOTAL count
+    fp_rate_total = (fp / total) * 100 
+    fn_rate_total = (fn / total) * 100 
+    # --------------------------
     
-    report_str += f"  Total Samples: {len(y_true)}\n"
+    report_str += f"  Total Samples: {total}\n"
     report_str += f"  ACCURACY:      {acc * 100:.2f}%\n"
     report_str += f"  -----------------------------\n"
-    report_str += f"  False Positives: {fp:<3} (Rate: {fp_rate:.2f}%) -> Benign flagged as Malicious (Bad!)\n"
-    report_str += f"  Miss Detections: {fn:<3} (Rate: {fn_rate:.2f}%) -> Malicious missed (Dangerous!)\n"
+    report_str += f"  False Positives: {fp:<3} ({fp_rate_total:.2f}% of total) -> Safe code marked as Virus\n"
+    report_str += f"  Miss Detections: {fn:<3} ({fn_rate_total:.2f}% of total) -> Virus marked as Safe\n"
     
     return report_str
 
@@ -105,6 +108,7 @@ def main():
     full_report += "========================================\n"
     full_report += "   MALICIOUS CODE CLASSIFIER RESULTS    \n"
     full_report += "========================================\n"
+    full_report += "Note: Percentages are calculated out of the TOTAL samples in that category.\n"
 
     # 1. Overall Report
     full_report += generate_report_string(y_test, y_pred, "OVERALL (ALL LANGUAGES)")
@@ -120,11 +124,8 @@ def main():
         full_report += generate_report_string(y_test[c_mask], y_pred[c_mask], "C LANGUAGE ONLY")
     
     # --- PRINT AND SAVE ---
-    
-    # Print to console
     print(full_report)
     
-    # Save to file
     try:
         with open(REPORT_OUTPUT_PATH, "w", encoding="utf-8") as f:
             f.write(full_report)
