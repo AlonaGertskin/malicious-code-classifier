@@ -1,0 +1,27 @@
+============================================================
+       MALICIOUS CODE CLASSIFIER - FINAL TEST REPORT
+============================================================
+Date: 2025-12-04 19:44:16
+Total Files: 2079
+Time: 234.75s
+------------------------------------------------------------
+OVERALL ACCURACY:    96.49%  (2006/2079)
+------------------------------------------------------------
+FALSE POSITIVE RATE: 0.19%  (3/1570)
+  - Benign Code FP:  3
+  - Non-Code FP:     0
+
+MISS DETECT RATE:    6.49%  (70/1079)
+  (Includes malicious files missed & benign files filtered)
+  - Malicious Missed by Detector:   1
+  - Malicious Missed by Classifier: 6
+  - Benign Code Filtered (Fail):    63
+------------------------------------------------------------
+NON-CODE HANDLING:
+  - Successfully Filtered (Stage 1): 935 (93.5%)
+  - Leaked to Stage 2:               65
+  - Critical Fail (FP):              0
+
+DETECTOR PERFORMANCE BY LANGUAGE (Stage 1):
+  - C     : 99.82% detected as code (563/564)
+  - Python: 87.77% detected as code (452/515)

@@ -1,0 +1,20 @@
+========================================================
+   MALICIOUS CODE CLASSIFIER - LIVE VALIDATION REPORT
+========================================================
+Date: 2025-12-04 21:04:18
+Total Files Checked: 1524
+Execution Time:      488.04s
+--------------------------------------------------------
+OVERALL ACCURACY:    95.73%
+--------------------------------------------------------
+FALSE POSITIVE RATE: 1.97%  (30/1524)
+MISS DETECT RATE:    2.30%  (35/1524)
+--------------------------------------------------------
+DETAILED BREAKDOWN:
+  * Malicious Caught:          473
+  * Malicious Missed (Det):    1
+  * Malicious Missed (Clf):    34
+  * Benign Code Safe (Model):  426
+  * Benign Code Filtered:      52 (Correct Rejection)
+  * Non-Code Filtered:         475 (Correct Rejection)
+  * Non-Code Leaked but Safe:  33
